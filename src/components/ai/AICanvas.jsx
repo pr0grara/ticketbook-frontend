@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-import { prepareContextForAI } from "../hooks/useStateHelper";
-import useAPI from "../hooks/useAPI.js";
 import { handleAIRequest } from "../hooks/useAI.js";
-import DailyPlan from "./DailyPlan.jsx";
 import { parseAIResponse } from '../hooks/useAI.js';
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
 

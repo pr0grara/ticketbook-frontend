@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchGoals, addGoal, removeGoal } from "../../redux/slices/goalsSlice";
+import { fetchGoals, removeGoal } from "../../redux/slices/goalsSlice";
 import { updateTicketStatus, removeTicket } from "../../redux/slices/ticketsSlice";
 import { API_BASE_URL } from "../../config";
 import axios from "axios";
@@ -11,7 +11,6 @@ const useAPI = (userId, selectedGoal) => {
     const [goals, setGoals] = useState([]);
     const [activeTickets, setActiveTickets] = useState([]);
     const [aiSuggestions, setAiSuggestions] = useState([]);
-    const [aiSuggestionsCache, setAiSuggestionsCache] = useState([]);
     const [aiResponse, setAiResponse] = useState("");
 
     // Fetch goals
@@ -82,25 +81,25 @@ const useAPI = (userId, selectedGoal) => {
         setAiSuggestions(aiSuggestions.filter(s => s.text !== toBeDeleted.text));
     }
 
-    const handleAddNewGoal = async (goal) => {
-        const newGoal = {
-            userId: goal.userId,
-            title: goal.title,
-            priority: selectedGoal._id,
-            description: goal.description,
-            status: "pending",
-            progress: 50,
-            parentGoal: "",
-            subGoals: [],
-            tickets: []
-        };
-        try {
-            const res = await axios.post(`${API_BASE_URL}/goals/new`)
-        } catch (e) {
+    // const handleAddNewGoal = async (goal) => {
+    //     const newGoal = {
+    //         userId: goal.userId,
+    //         title: goal.title,
+    //         priority: selectedGoal._id,
+    //         description: goal.description,
+    //         status: "pending",
+    //         progress: 50,
+    //         parentGoal: "",
+    //         subGoals: [],
+    //         tickets: []
+    //     };
+    //     try {
+    //         const res = await axios.post(`${API_BASE_URL}/goals/new`)
+    //     } catch (e) {
 
-        }
-        setGoals([...goals, newGoal]);
-    }
+    //     }
+    //     setGoals([...goals, newGoal]);
+    // }
 
     // Update ticket status
     const handleTicketDrop = (ticketId, newStatus) => {

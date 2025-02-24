@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "../../redux/store"; // Import Redux store
-import { addTicket, updateTicketStatus, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
+import { addTicket, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
 import { API_BASE_URL } from "../../config";
 
 async function parseAIResponse(res) {
@@ -106,7 +106,7 @@ function refineAIOutput(rawOutput) {
 
 // 🚀 MAIN FUNCTION: Calls AI with Context & Instructions
 async function handleAIRequest(request) {
-    const { requestType, selectedGoal, contextGoals, contextTickets, userInput, conversation, from, aiHistory } = request;
+    const { requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory } = request;
     const context = prepareContext(contextGoals, contextTickets);
     const aiResponse = await callAI({userInput, context, requestType, conversation, from, aiHistory});
     return refineAIOutput(aiResponse);
