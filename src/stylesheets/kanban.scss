@@ -1,0 +1,70 @@
+/* 🗑️ Trash Can */
+.trash-can {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    transition: 0.2s;
+    max-height: 100px;
+    max-width: 125px;
+}
+
+.trash-can.visible {
+    display: flex;
+}
+
+.trash-can p {
+    margin-top: 5px;
+    font-size: 14px;
+    color: gray;
+}
+
+/* Allow Kanban board to scroll when AI canvas is open */
+.kanban-board {
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+    /* Adjust height to fit above AI canvas */
+    padding-bottom: 20px;
+}
+
+/* 🏗️ Kanban Columns */
+.kanban-columns {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.kanban-column {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f4f4f4;
+    min-height: 250px;
+    transition: 0.2s;
+    text-align: center;
+}
+
+/* 🎟️ Ticket Styling */
+.ticket-card {
+    background: white;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    transition: 0.2s;
+}
+
+.ticket-card:hover {
+    background: #f0f0f0;
+}
+
+.ticket-card:active {
+    cursor: grabbing;
+}

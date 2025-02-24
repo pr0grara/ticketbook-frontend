@@ -1,0 +1,34 @@
+#tickets-page {
+    // height: 100vh;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
+}
+
+#tickets-container {
+    // max-width: 70%;
+    // height: 100%;
+    // display: flex;
+    // justify-content: wrap;
+}
+
+.ticket-container {
+    display: flex;
+        /* Enables Flexbox */
+        flex-direction: column;
+        /* Stacks items vertically */
+        gap: 10px;
+        /* Space between items */
+        max-width: 300px;
+        /* Prevents stretching */
+        margin: auto;
+        /* Centers the list */
+}
+
+.ticket-item {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
