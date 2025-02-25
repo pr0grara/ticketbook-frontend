@@ -15,7 +15,7 @@ const useAPI = (userId, selectedGoal) => {
 
     // Fetch goals
     useEffect(() => {
-        axios.post(`http://localhost:5000/api/goals/foruser`, { userId })
+        axios.post(`${API_BASE_URL}/goals/foruser`, { userId })
             .then((res) => setGoals(res.data))
             .catch((err) => console.error(err));
     }, [userId]);
@@ -29,7 +29,7 @@ const useAPI = (userId, selectedGoal) => {
     // Fetch tickets when a goal is selected
     useEffect(() => {
         if (selectedGoal) {
-            axios.get(`http://localhost:5000/api/tickets/byGoal/${selectedGoal._id}`)
+            axios.get(`${API_BASE_URL}/tickets/byGoal/${selectedGoal._id}`)
                 .then((res) => setActiveTickets(res.data))
                 .catch((err) => console.error(err));
         }

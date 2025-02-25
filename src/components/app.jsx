@@ -15,6 +15,7 @@ import { setUser } from "../redux/slices/userSlice.js";
 import axios from "axios";
 import { fetchTickets } from "../redux/slices/ticketsSlice";
 import { fetchGoals } from "../redux/slices/goalsSlice.js";
+import { API_BASE_URL } from "../config.js";
 
 let userId = "6778de261a642d64cc04996a"; // Placeholder User ID
 
@@ -29,7 +30,7 @@ export default function App() {
 
     useEffect(() => {
         if (!user_id && userId) dispatch(setUser(user_id)); // Ensure user is set
-        axios.get("http://localhost:5000")
+        axios.get(API_BASE_URL)
             .then(response => {
                 setData(response.data);
                 setLoading(false);

@@ -8,10 +8,10 @@ export const fetchTickets = createAsyncThunk("tickets/fetchTickets", async (req)
     let url = `${API_BASE_URL}/tickets/`;
     switch (type) {
         case "BY USER":
-            url = `http://localhost:5000/api/tickets/byUser/${id}`
+            url = `${API_BASE_URL}/tickets/byUser/${id}`
             break
         case "BY GOAL":
-            url = `http://localhost:5000/api/tickets/byGoal/${id}`
+            url = `${API_BASE_URL}/tickets/byGoal/${id}`
             break
         default:
             console.log("Unknown ticket fetch type in ticketSlice.js")
@@ -23,7 +23,7 @@ export const fetchTickets = createAsyncThunk("tickets/fetchTickets", async (req)
 export const updateTicketStatus = createAsyncThunk(
     "tickets/updateTicketStatus",
     async ({ ticketId, newStatus }) => {
-        await axios.patch(`http://localhost:5000/api/tickets/${ticketId}/updateStatus`, { status: newStatus });
+        await axios.patch(`${API_BASE_URL}/tickets/${ticketId}/updateStatus`, { status: newStatus });
         return { ticketId, newStatus };  // Return data for Redux update
     }
 );
@@ -31,7 +31,7 @@ export const updateTicketStatus = createAsyncThunk(
 export const updateTicket = createAsyncThunk(
     "tickets/updateTicket",
     async ({ ticketId, ticketToUpdate }) => {
-        const response = await axios.patch(`http://localhost:5000/api/tickets/${ticketId}/update`, { ticket: ticketToUpdate });
+        const response = await axios.patch(`${API_BASE_URL}/tickets/${ticketId}/update`, { ticket: ticketToUpdate });
         return response.data;  // Return data for Redux update
     }
 );
@@ -39,7 +39,7 @@ export const updateTicket = createAsyncThunk(
 export const updateTicketPriority = createAsyncThunk(
     "tickets/updateTicketPriority",
     async ({ ticketId, newPriority }) => {
-        await axios.patch(`http://localhost:5000/api/tickets/${ticketId}/updatePriority`, { priority: newPriority });
+        await axios.patch(`${API_BASE_URL}/tickets/${ticketId}/updatePriority`, { priority: newPriority });
         return { ticketId, newPriority };  // Return data for Redux update
     }
 );

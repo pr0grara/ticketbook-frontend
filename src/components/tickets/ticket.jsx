@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 
 export default function Ticket() {
     const [tickets, setTickets] = useState(null);
@@ -8,7 +9,7 @@ export default function Ticket() {
 
     useEffect(() => {
         if (!loading) return;
-        axios.post(`http://localhost:5000/api/tickets/foruser`, {
+        axios.post(`${API_BASE_URL}/tickets/foruser`, {
             id: 1
         }, {
             headers: {
