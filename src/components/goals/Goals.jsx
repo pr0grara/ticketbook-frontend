@@ -30,6 +30,16 @@ function Goals() {
     const [isDragging, setIsDragging] = useState(false);
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => { dispatch(fetchGoals(user)); }, [dispatch, user]); // Fetch goals for user
 
@@ -76,17 +86,19 @@ function Goals() {
 
     return (
         <div className="goals-container">
-            <div className="goal-tree">
-                <h2>🎯 Goals</h2>
-                <GoalInput onGoalAdded={handleGoalAdded} />
-                <button className="ai-btn" onClick={aiSuggestBreakdown}>🤖 AI Breakdown</button>
-                <button className="ai-btn" onClick={handleAiBreakdownForExistingGoal} disabled={!selectedGoal}>🔄 AI Expand</button>
-                <ul className="goal-list">
-                    {goals.map((goal) => (
-                        <GoalCard key={goal._id} goal={goal} onClick={() => dispatch(setSelectedGoal(goal))} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                    ))}
-                </ul>
-            </div>
+            {!isMobile &&
+                <div className="goal-tree">
+                    <h2>🎯 Goals</h2>
+                    <GoalInput onGoalAdded={handleGoalAdded} />
+                    <button className="ai-btn" onClick={aiSuggestBreakdown}>🤖 AI Breakdown</button>
+                    <button className="ai-btn" onClick={handleAiBreakdownForExistingGoal} disabled={!selectedGoal}>🔄 AI Expand</button>
+                    <ul className="goal-list">
+                        {goals.map((goal) => (
+                            <GoalCard key={goal._id} goal={goal} onClick={() => dispatch(setSelectedGoal(goal))} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
+                        ))}
+                    </ul>
+                </div>
+            }
 
             <div className="kanban-board">
                 <h2>{selectedGoal ? `📌 ${selectedGoal.title}` : "Select a Goal"}</h2>
@@ -97,7 +109,9 @@ function Goals() {
                         <div className="kanban-columns">
                             <KanbanColumn title="Pending" status="pending" tickets={displayedTickets.filter(t => t.status === "pending")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan}/>
                             <KanbanColumn title="In Progress" status="in-progress" tickets={displayedTickets.filter(t => t.status === "in-progress")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                            <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
+                            {!isMobile && 
+                                <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
+                            }
                         </div>
                     </>
                 }
