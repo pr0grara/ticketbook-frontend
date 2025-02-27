@@ -1,30 +1,32 @@
+//Purely a shell testing component workspace
+
+//NOT TO BE INCLUDED IN PRODUCTION
+
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
 import { Trash2 } from "lucide-react";
-import GoalInput from "./goalInput.jsx";
-// import TicketInput from "../tickets/ticketInput.jsx";
 import useAPI from "../hooks/useAPI.js";
 import AICanvas from "../ai/AICanvas.jsx";
 import { fetchGoals, setSelectedGoal } from "../../redux/slices/goalsSlice";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { fetchTickets, setSelectedTickets } from "../../redux/slices/ticketsSlice.js";
 
-const userId = "6778de261a642d64cc04996a"; // Placeholder User ID
+console.log("TEST COMPONENT HAS BEEN INCLUDED.\nCHECK TestComponent.jsx")
+const userId = "6778de261a642d64cc04996a";
 
 function Goals() {
     const dispatch = useDispatch();
-    const { goals } = useSelector((state) => state.goals); //pull goals from redux state
-    const { tickets } = useSelector((state) => state.tickets); //pull tickets from redux state
-    const user = useSelector(state => state.user); //pull user from redux state
-    const selectedGoal = useSelector(state => state.goals.selectedGoal); // pull selectedGoal from redux state
-    const selectedTickets = useSelector(state => state.tickets.selectedTickets); // pull selectedTickets from redux state
+    const { goals } = useSelector((state) => state.goals);
+    const { tickets } = useSelector((state) => state.tickets);
+    const user = useSelector(state => state.user);
+    const selectedGoal = useSelector(state => state.goals.selectedGoal);
+    const selectedTickets = useSelector(state => state.tickets.selectedTickets);
 
-    //Use useMemo to derive computed state
     const displayedTickets = useMemo(() => {
         if (selectedTickets.length > 0) return selectedTickets;
-        if (selectedGoal) return tickets.filter(ticket => ticket.goalId === selectedGoal._id)
-        if (selectedTickets.length === 0) return tickets;
+        if (selectedGoal) return tickets.filter(ticket => ticket.goalId === selectedGoal._id);
+        return tickets;
     }, [selectedTickets, tickets, selectedGoal]);
 
     const [isDragging, setIsDragging] = useState(false);
@@ -36,45 +38,31 @@ function Goals() {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
         };
-
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    useEffect(() => { dispatch(fetchGoals(user)); }, [dispatch, user]); // Fetch goals for user
+    useEffect(() => { dispatch(fetchGoals(user)); }, [dispatch, user]);
 
     useEffect(() => {
-        if (!user && userId) dispatch(setUser(userId)); // Ensure user is set
-        if (!selectedGoal && user && tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: user })); // Fetch all user's tickets
-        if (selectedGoal) { //filter tickets belonging to selected goal
-            const goalTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id)
+        if (!user && userId) dispatch(setUser(userId));
+        if (!selectedGoal && user && tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: user }));
+        if (selectedGoal) {
+            const goalTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
             if (goalTickets.length === 0) dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }));
-            dispatch(setSelectedTickets({goal: selectedGoal, tickets: goalTickets}))
+            dispatch(setSelectedTickets({ goal: selectedGoal, tickets: goalTickets }));
         }
     }, [dispatch, selectedGoal, user, userId]);
 
-    useEffect(() => {
-        if (selectedGoal) dispatch(setSelectedTickets({goal: selectedGoal}));
-    }, [selectedGoal, tickets]);  //Ensure selectedTickets updates when tickets change
-
-    const {
-        // goals,
-        // tickets,
-        aiSuggestions,
-        // aiResponse,
-        handleGoalAdded,
-        aiSuggestBreakdown,
-        handleAiBreakdownForExistingGoal,
-        handleRemoveSuggestedTicket,
-        handleTicketDrop,
-        deleteItem,
-        // handleAiSubmit
+    const { 
+        aiSuggestions, 
+        handleGoalAdded, 
+        aiSuggestBreakdown, 
+        handleAiBreakdownForExistingGoal, 
+        handleRemoveSuggestedTicket, 
+        handleTicketDrop, 
+        deleteItem 
     } = useAPI(userId, selectedGoal);
-
-    useEffect(() => {
-        // debugger
-        console.log("AiSuggestion change in goal.jsx", aiSuggestions);
-    }, [aiSuggestions]);  // Logs whenever aiSuggestions changes
 
     const [{ isOver }, drop] = useDrop(() => ({
         accept: ["ticket", "goal"],
@@ -86,38 +74,31 @@ function Goals() {
 
     return (
         <div className="goals-container">
-            {!isMobile &&
-                <div className="goal-tree">
-                    <h2>🎯 Goals</h2>
-                    <GoalInput onGoalAdded={handleGoalAdded} />
-                    <button className="ai-btn" onClick={aiSuggestBreakdown}>🤖 AI Breakdown</button>
-                    <button className="ai-btn" onClick={handleAiBreakdownForExistingGoal} disabled={!selectedGoal}>🔄 AI Expand</button>
-                    <ul className="goal-list">
-                        {goals.map((goal) => (
-                            <GoalCard key={goal._id} goal={goal} onClick={() => dispatch(setSelectedGoal(goal))} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                        ))}
-                    </ul>
-                </div>
-            }
+            {/* 🔹 Goal Selection Bubbles */}
+            <div className="goal-selection">
+                {goals.map((goal) => (
+                    <button
+                        key={goal._id}
+                        className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""}`}
+                        onClick={() => !isMobile && dispatch(setSelectedGoal(goal))}
+                        onTouchStart={() => dispatch(setSelectedGoal(goal))}
+                    >
+                        {goal.title}
+                    </button>
+                ))}
+            </div>
 
-            <div className="kanban-board" style={{ overflowX: isMobile ? "auto" : "unset" }}>
-                <h2>{selectedGoal ? `📌 ${selectedGoal.title}` : "Select a Goal"}</h2>    
-                {
-                    <>
-                        {/* <TicketInput goalId={selectedGoal._id} userId={userId} onTicketAdded={handleTicketAdded} /> */}
-                        <div className="kanban-columns">
-                            <KanbanColumn title="Pending" status="pending" tickets={displayedTickets.filter(t => t.status === "pending")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan}/>
-                            <KanbanColumn title="In Progress" status="in-progress" tickets={displayedTickets.filter(t => t.status === "in-progress")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                            {!isMobile && 
-                                <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                            }
-                        </div>
-                    </>
-                }
+            {/* 🔹 Kanban Board */}
+            <div className="kanban-board">
+                <h2>{selectedGoal ? isMobile ? null : `${selectedGoal.title}` : isMobile ? null : "Select a Goal"}</h2>
+                <div className="kanban-columns">
+                    <KanbanColumn title="Pending" status="pending" tickets={displayedTickets.filter(t => t.status === "pending")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
+                    <KanbanColumn title="In Progress" status="in-progress" tickets={displayedTickets.filter(t => t.status === "in-progress")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
+                    {!isMobile && <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />}
+                </div>
             </div>
 
             <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} />
-
             <div
                 ref={drop}
                 className={`trash-can ${showTrashcan ? "visible" : ""}`}
@@ -206,6 +187,5 @@ function GoalCard({ goal, setIsDragging, onClick, selectedGoal, setShowTrashcan,
         </li>
     );
 }
-
 
 export default Goals;

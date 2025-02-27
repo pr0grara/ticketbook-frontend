@@ -2,6 +2,7 @@ import axios from "axios";
 import store from "../../redux/store"; // Import Redux store
 import { addTicket, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
 import { API_BASE_URL } from "../../config";
+import { addGoal } from "../../redux/slices/goalsSlice";
 
 async function parseAIResponse(res) {
     const createNewTicket = async (res) => {
@@ -38,6 +39,25 @@ async function parseAIResponse(res) {
         }
     }
 
+    const createNewGoal = async (aiRes) => {
+        const { user_id } = store.getState();
+        const { title, priority, deadline, category, description } = aiRes;
+        const newGoal = {
+            userId: user_id,
+            category,
+            title,
+            priority,
+            description,
+            deadline
+        };
+        try {
+            const res = await axios.post(`${API_BASE_URL}/goals/new`, newGoal);
+            return res.data;
+        } catch (e) {
+            return e
+        }
+    }
+
     const { action_type, advice, answer, dev_advice } = res;
     if (dev_advice) alert(dev_advice);
     
@@ -54,6 +74,10 @@ async function parseAIResponse(res) {
             const modifiedTicket = await modifyTicket(res)
             store.dispatch(addTicket(modifiedTicket)); //Update Redux state
             return "Ticket modified!"
+        case "create_goal":
+            const newGoal = await createNewGoal(res);
+            store.dispatch(addGoal(newGoal));
+            return "New Goal created!"
         default:
             return "unkown action_type in parseAIResponse()"
     }

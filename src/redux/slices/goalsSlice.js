@@ -11,7 +11,7 @@ const goalsSlice = createSlice({
     name: "goals",
     initialState: {
         goals: [],
-        selectedGoal: null,
+        selectedGoal: JSON.parse(localStorage.getItem("selectedGoal")) || null,
         status: "idle", // "idle" | "loading" | "succeeded" | "failed"
         error: null,
     },
@@ -19,6 +19,11 @@ const goalsSlice = createSlice({
         addGoal: (state, action) => { state.goals.push(action.payload); },
         removeGoal: (state, action) => { state.goals = state.goals.filter(goal => goal._id !== action.payload); },
         setSelectedGoal: (state, action) => {
+            if (state.selectedGoal?._id === action.payload._id) {
+                localStorage.removeItem("selectedGoal");
+            } else {
+                localStorage.setItem("selectedGoal", JSON.stringify(action.payload));
+            }
             state.selectedGoal = state.selectedGoal?._id === action.payload._id ? null : action.payload }
     },
     extraReducers: (builder) => {

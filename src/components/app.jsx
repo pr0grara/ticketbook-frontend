@@ -5,6 +5,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './landing/landing';
 import Tickets from './tickets/ticket';
+import TestComponent from './goals/TestComponent.jsx';
 import Goals from './goals/Goals';
 import DailyPlan from './ai/DailyPlan';
 import LoginPopup from './login/login_popup';
@@ -78,7 +79,7 @@ export default function App() {
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<LoginPopup />} />
                 <Route path="/tickets" element={<Tickets />} />
-                <Route path="/goals" element={<Goals />} />
+                <Route path="/goals" element={<TestComponent />} />
                 <Route path="/plan" element={<DailyPlan />} />
                 <Route path="/calendar" element={<CalendarView />} />
             </Routes>
