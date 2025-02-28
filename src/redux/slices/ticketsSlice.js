@@ -4,7 +4,6 @@ import { API_BASE_URL } from "../../config";
 
 export const fetchTickets = createAsyncThunk("tickets/fetchTickets", async (req) => {
     const { type, id } = req;
-    console.log("GOAL ID", id)
     let url = `${API_BASE_URL}/tickets/`;
     switch (type) {
         case "BY USER":
@@ -82,7 +81,15 @@ const ticketsSlice = createSlice({
             })
             .addCase(updateTicketStatus.fulfilled, (state, action) => {
                 const { ticketId, newStatus } = action.payload;
-                state.tickets = state.tickets.map(ticket =>
+
+                // Find the ticket and update its status
+                const ticket = state.tickets.find(ticket => ticket._id === ticketId);
+                if (ticket) {
+                    ticket.status = newStatus; // ✅ Directly mutate using Immer
+                }
+
+                // If selectedTickets needs to be updated, update it as well
+                state.selectedTickets = state.selectedTickets.map(ticket =>
                     ticket._id === ticketId ? { ...ticket, status: newStatus } : ticket
                 );
             })

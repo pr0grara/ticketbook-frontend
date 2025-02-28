@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
+import authAPI from "../../components/api/authAPI";
 
 export const fetchGoals = createAsyncThunk("goals/fetchGoals", async (userId) => {
-    const response = await axios.post(`${API_BASE_URL}/goals/foruser`, { userId });
+    const response = await authAPI.post("/goals/foruser", { userId });
     return response.data;
 });
 
@@ -11,7 +12,7 @@ const goalsSlice = createSlice({
     name: "goals",
     initialState: {
         goals: [],
-        selectedGoal: JSON.parse(localStorage.getItem("selectedGoal")) || null,
+        selectedGoal: null,
         status: "idle", // "idle" | "loading" | "succeeded" | "failed"
         error: null,
     },
@@ -19,12 +20,8 @@ const goalsSlice = createSlice({
         addGoal: (state, action) => { state.goals.push(action.payload); },
         removeGoal: (state, action) => { state.goals = state.goals.filter(goal => goal._id !== action.payload); },
         setSelectedGoal: (state, action) => {
-            if (state.selectedGoal?._id === action.payload._id) {
-                localStorage.removeItem("selectedGoal");
-            } else {
-                localStorage.setItem("selectedGoal", JSON.stringify(action.payload));
-            }
-            state.selectedGoal = state.selectedGoal?._id === action.payload._id ? null : action.payload }
+            state.selectedGoal = state.selectedGoal?._id === action.payload._id ? null : action.payload 
+        }
     },
     extraReducers: (builder) => {
         builder

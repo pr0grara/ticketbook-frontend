@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { fetchGoals, removeGoal } from "../../redux/slices/goalsSlice";
 import { updateTicketStatus, removeTicket } from "../../redux/slices/ticketsSlice";
 import { API_BASE_URL } from "../../config";
+import authAPI from '../api/authAPI';
 import axios from "axios";
 
 const useAPI = (userId, selectedGoal) => {
@@ -15,16 +16,12 @@ const useAPI = (userId, selectedGoal) => {
 
     // Fetch goals
     useEffect(() => {
-        axios.post(`${API_BASE_URL}/goals/foruser`, { userId })
+        authAPI.post("/goals/foruser", {userId})
+        // axios.post(`${API_BASE_URL}/goals/foruser`, { userId })
             .then((res) => setGoals(res.data))
+            // .then((res) => setGoals(res.data))
             .catch((err) => console.error(err));
     }, [userId]);
-
-    useEffect(() => {
-        // debugger
-        console.log("AiSuggestion change in useAPI.js", aiSuggestions);
-    }, [aiSuggestions]);  // Logs whenever aiSuggestions changes
-
 
     // Fetch tickets when a goal is selected
     useEffect(() => {

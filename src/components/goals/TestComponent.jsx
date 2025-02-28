@@ -8,18 +8,16 @@ import { useDrag, useDrop } from "react-dnd";
 import { Trash2 } from "lucide-react";
 import useAPI from "../hooks/useAPI.js";
 import AICanvas from "../ai/AICanvas.jsx";
-import { fetchGoals, setSelectedGoal } from "../../redux/slices/goalsSlice";
-import { setUser } from "../../redux/slices/userSlice.js";
+import { setSelectedGoal } from "../../redux/slices/goalsSlice";
 import { fetchTickets, setSelectedTickets } from "../../redux/slices/ticketsSlice.js";
 
 console.log("TEST COMPONENT HAS BEEN INCLUDED.\nCHECK TestComponent.jsx")
-const userId = "6778de261a642d64cc04996a";
 
 function Goals() {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets } = useSelector((state) => state.tickets);
-    const user = useSelector(state => state.user);
+    const userId = useSelector(state => state.userId);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
 
@@ -29,7 +27,7 @@ function Goals() {
         return tickets;
     }, [selectedTickets, tickets, selectedGoal]);
 
-    const [isDragging, setIsDragging] = useState(false);
+    const [, setIsDragging] = useState(false);
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -42,23 +40,19 @@ function Goals() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    useEffect(() => { dispatch(fetchGoals(user)); }, [dispatch, user]);
-
     useEffect(() => {
-        if (!user && userId) dispatch(setUser(userId));
-        if (!selectedGoal && user && tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: user }));
         if (selectedGoal) {
             const goalTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
-            if (goalTickets.length === 0) dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }));
+            if (goalTickets.length === 0) {
+                console.log("No tickets found for selected Goal, fetching from server...")
+                dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }))
+            };
             dispatch(setSelectedTickets({ goal: selectedGoal, tickets: goalTickets }));
         }
-    }, [dispatch, selectedGoal, user, userId]);
+    }, [dispatch, selectedGoal, userId, tickets]);
 
     const { 
         aiSuggestions, 
-        handleGoalAdded, 
-        aiSuggestBreakdown, 
-        handleAiBreakdownForExistingGoal, 
         handleRemoveSuggestedTicket, 
         handleTicketDrop, 
         deleteItem 
@@ -135,7 +129,6 @@ function KanbanColumn({ title, status, tickets, onDrop, setIsDragging, setTrashc
 function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition }) {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: "ticket",
-        item: { id: ticket._id, type: "ticket" },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
@@ -153,39 +146,39 @@ function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPositio
     }));
 
     return (
-        <div ref={drag} className="ticket-card" style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <div ref={drag} className="ticket-card" style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)" }}>
             {ticket.text}
         </div>
     );
 }
 
-function GoalCard({ goal, setIsDragging, onClick, selectedGoal, setShowTrashcan, setTrashcanPosition }) {
-    const [{ isDragging }, drag] = useDrag(() => ({
-        type: "goal",
-        item: { id: goal._id, type: "goal" },
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
-        item: (monitor) => {
-            setIsDragging(true);
-            const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 }; // Get position
-            setTrashcanPosition({ x, y });
-            setShowTrashcan(true);
-            return { id: goal._id, type: "goal" };
-        },
-        end: () => {
-            setIsDragging(false);
-            setShowTrashcan(false);
-        }
-    }));
+// function GoalCard({ goal, setIsDragging, onClick, selectedGoal, setShowTrashcan, setTrashcanPosition }) {
+//     const [{ isDragging }, drag] = useDrag(() => ({
+//         type: "goal",
+//         item: { id: goal._id, type: "goal" },
+//         collect: (monitor) => ({
+//             isDragging: !!monitor.isDragging(),
+//         }),
+//         item: (monitor) => {
+//             setIsDragging(true);
+//             const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 }; // Get position
+//             setTrashcanPosition({ x, y });
+//             setShowTrashcan(true);
+//             return { id: goal._id, type: "goal" };
+//         },
+//         end: () => {
+//             setIsDragging(false);
+//             setShowTrashcan(false);
+//         }
+//     }));
 
-    const isSelected = ((selectedGoal) => !selectedGoal ? false : goal._id === selectedGoal._id)
+//     const isSelected = ((selectedGoal) => !selectedGoal ? false : goal._id === selectedGoal._id)
 
-    return (
-        <li ref={drag} className={`goal-card ${isDragging ? "dragging" : "", isSelected(selectedGoal) ? "selected" : ""}`} onClick={onClick} style={{ opacity: isDragging ? 0.5 : 1 }}>
-            {goal.title}
-        </li>
-    );
-}
+//     return (
+//         <li ref={drag} className={`goal-card ${isDragging ? "dragging" : "", isSelected(selectedGoal) ? "selected" : ""}`} onClick={onClick} style={{ opacity: isDragging ? 0.5 : 1 }}>
+//             {goal.title}
+//         </li>
+//     );
+// }
 
 export default Goals;

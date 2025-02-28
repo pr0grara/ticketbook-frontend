@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from 'react-router-dom';
 import { handleAIRequest, parseAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
 
@@ -8,7 +7,6 @@ function AICanvas({ from }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isExpanded, setIsExpanded] = useState(false);
     const dispatch = useDispatch();
-    const navigate = useNavigate()
     const tickets = useSelector(state => state.tickets.tickets);
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
@@ -20,9 +18,9 @@ function AICanvas({ from }) {
     const [userInput, setUserInput] = useState("");
     const [conversation, setConversation] = useState([]);
 
-    useEffect(() => {
-        console.log("conversation history changed", conversation)
-    }, [conversation])
+    // useEffect(() => {
+    //     console.log("conversation history changed", conversation)
+    // }, [conversation])
 
     useEffect(() => {
         const handleResize = () => {
@@ -42,7 +40,6 @@ function AICanvas({ from }) {
 
         try {
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
-            debugger
             const res = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId })//send request to backend
             const parsedResponse = await parseAIResponse(res);//parse backend request
             dispatch(logInteraction({userMessage: userInput, aiResponse: parsedResponse}))//add interaction to redux state
@@ -81,7 +78,6 @@ function AICanvas({ from }) {
                 />
                 <button type="submit">Send</button>
             </form>
-            <button onClick={() => navigate('/plan')} >📝 Generate Daily Plan</button>
         </div>
     );
 }
