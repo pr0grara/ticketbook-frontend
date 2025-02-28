@@ -20,6 +20,7 @@ function Goals() {
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
 
     const displayedTickets = useMemo(() => {
+        if (!selectedGoal) return tickets;
         if (selectedTickets.length > 0) return selectedTickets;
         if (selectedGoal) return tickets.filter(ticket => ticket.goalId === selectedGoal._id);
         return tickets;
