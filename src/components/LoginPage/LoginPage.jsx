@@ -16,6 +16,10 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        console.log("🔄 Login Component Re-Rendered");
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);

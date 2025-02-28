@@ -49,6 +49,10 @@ function CalendarView() {
     };
 
     useEffect(() => {
+        console.log("🔄 Calendar Component Re-Rendered");
+    });
+
+    useEffect(() => {
         async function loadEvents() {
             const fetchedEvents = await fetchCalendarEvents();
             const formattedEvents = fetchedEvents.map((event, idx) => ({

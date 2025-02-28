@@ -18,6 +18,10 @@ function DailyPlan() {
     const [dailyPlan, setDailyPlan] = useState(null);
 
     useEffect(() => {
+        console.log("🔄 Daily Plan Component Re-Rendered");
+    });
+
+    useEffect(() => {
         console.log("generating daily plan")
         // handleAIRequest("prioritize", selectedGoal, tickets).then(setDailyPlan);
         // generateDailyPlan(selectedGoal).then(setDailyPlan);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import "../stylesheets/Navbar.scss"; // Import SCSS file
@@ -17,6 +17,10 @@ const Navbar = () => {
                 navigate("/login");
             })
     };
+
+    useEffect(() => {
+        console.log("🔄 Navbar Component Re-Rendered");
+    });
 
     return (
         <nav className="navbar">

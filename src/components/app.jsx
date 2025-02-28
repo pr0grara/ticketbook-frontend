@@ -34,10 +34,14 @@ export default function App() {
     const { loggedIn } = useSelector(state => state.session);
 
     useEffect(() => {
+        console.log("🔄 APP Component Re-Rendered");
+    });
+
+    useEffect(() => {
         checkStatus()
             .then(res => {
                 const status = res.loggedIn;
-                const userId = res.user.id;
+                const userId = res.user?.id;
                 if (status) {
                     dispatch(setLoggedIn())
                     dispatch(setUser(userId));

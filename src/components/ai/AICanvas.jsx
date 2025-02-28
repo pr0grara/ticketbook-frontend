@@ -23,6 +23,10 @@ function AICanvas({ from }) {
     // }, [conversation])
 
     useEffect(() => {
+        console.log("🔄 AICanvas Component Re-Rendered");
+    });
+
+    useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
         };
