@@ -7,20 +7,21 @@ import { setLoggedOut } from "../redux/slices/sessionSlice";
 
 const Navbar = () => {
     const { loggedIn } = useSelector(state => state.session);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogout = () => {
         authAPI.post('/auth/logout')
             .then(res => {
                 dispatch(setLoggedOut()) //change redux state
-                navigate("/login");
+                window.location.href = "/login"; // ✅ TEMP FIX: Avoid useNavigate
+                // navigate("/login");
             })
     };
 
-    useEffect(() => {
-        console.log("🔄 Navbar Component Re-Rendered");
-    });
+    // useEffect(() => {
+    //     console.log("🔄 Navbar Component Re-Rendered");
+    // });
 
     return (
         <nav className="navbar">

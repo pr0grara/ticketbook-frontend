@@ -1,0 +1,119 @@
+.ticket-space-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ticket-container {
+    margin: 5px;
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid grey;
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+}
+
+.ticket-item {
+    display: flex;
+    margin: 3px;
+}
+
+.ticket-date-container {
+    display: flex;
+    font-size: small;
+}
+
+.ticket-utility-container {
+    display: flex;
+    margin-right: 8px;
+    // position: absolute;
+    // right: 100px;
+    // top: 10px;
+}
+
+.compass-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ticket-actions {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    position: relative;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+}
+
+.ticket-action-icon {
+    width: 40px;
+    &:hover {
+        border-radius: 40px;
+        background-color: #9dd7fe;
+    }
+}
+
+.compass-popup {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    background-color: #bd8e17;
+    color: white;
+    font-size: 12px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+
+    &:hover {
+        background-color: #9dd7fe;
+        color: black;
+    }
+}
+
+.north {
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.south {
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.east {
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.west {
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+}

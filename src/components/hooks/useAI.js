@@ -3,15 +3,17 @@ import store from "../../redux/store"; // Import Redux store
 import { addTicket, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
 import { API_BASE_URL } from "../../config";
 import { addGoal } from "../../redux/slices/goalsSlice";
+import authAPI from "../api/authAPI";
 
 async function parseAIResponse(res) {
     const createNewTicket = async (res) => {
-        const { text, priority, priorityWeight, depends_on, deadline, status } = res;
+        const { title, text, priority, priorityWeight, depends_on, deadline, status, goalId } = res;
         const { user_id, goals } = store.getState();
         // debugger
         const newTicket = {
+            title,
             text,
-            goalId: goals.selectedGoal ? goals.selectedGoal._id : null,
+            goalId: goalId ? goalId : goals.selectedGoal ? goals.selectedGoal._id : null,
             userId: user_id,
             status: status || "pending",
             priority,
@@ -78,6 +80,15 @@ async function parseAIResponse(res) {
             const newGoal = await createNewGoal(res);
             store.dispatch(addGoal(newGoal));
             return "New Goal created!"
+        case "create_many_tickets":
+            const newTickets = res.tickets;
+            while (newTickets.length > 0) {
+                const newTicket = await createNewTicket(newTickets.pop())
+                store.dispatch(addTicket(newTicket)); //Update Redux state
+            }
+            return "New Tickets added!"
+        case "request_info":
+            return res.question
         default:
             return "unkown action_type in parseAIResponse()"
     }
@@ -87,12 +98,23 @@ async function parseAIResponse(res) {
 async function callAI(request) {
     try {
         const {userInput, context, requestType, conversation, aiHistory} = request;
-        const response = await axios.post(
-            // API_URL,
-            `${API_BASE_URL}/ai/request`,
-            { userInput, context, requestType, conversation, aiHistory },
-            { headers: { "Content-Type": "application/json" } }
-        );
+        
+        var response;
+        switch (requestType) {
+            case "advise ticket":
+                response = await authAPI.post(
+                    '/ai/advise-ticket',
+                    {userInput, context}
+                )
+                break
+            default:
+                response = await axios.post(
+                    `${API_BASE_URL}/ai/request`,
+                    { userInput, context, requestType, conversation, aiHistory },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+                break
+        }
         return response.data.response;
     } catch (error) {
         console.error("AI API Error:", error);
@@ -107,12 +129,12 @@ function prepareContext(contextGoals, contextTickets) {
         goals: contextGoals.map(goal => ({
             goal: goal.title,
             description: goal.description,
-            id: goal._id
+            goalId: goal._id
         })),
         allTickets: contextTickets.map(ticket => ({
             task: ticket.text,
             priority: ticket.priority,
-            id: ticket._id,
+            ticketId: ticket._id,
             status: ticket.status
         }))
     };
@@ -130,9 +152,9 @@ function refineAIOutput(rawOutput) {
 
 // 🚀 MAIN FUNCTION: Calls AI with Context & Instructions
 async function handleAIRequest(request) {
-    const { requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory } = request;
+    const { requestType, contextGoals, contextTickets, userInput, from, aiHistory } = request;
     const context = prepareContext(contextGoals, contextTickets);
-    const aiResponse = await callAI({userInput, context, requestType, conversation, from, aiHistory});
+    const aiResponse = await callAI({userInput, context, requestType, from, aiHistory});
     return refineAIOutput(aiResponse);
 }
 

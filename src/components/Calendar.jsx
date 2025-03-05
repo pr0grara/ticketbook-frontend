@@ -4,17 +4,16 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCalendarEvents } from "./api/calendarAPI";
-import GoogleLoginButton from "./buttons/GoogleLoginButton";
+// import GoogleLoginButton from "./buttons/GoogleLoginButton";
 import AICanvas from './ai/AICanvas.jsx';
 import { setSelectedTickets } from "../redux/slices/ticketsSlice.js";
 
-const localizer = momentLocalizer(moment);
 
 function CalendarView() {
+    const localizer = momentLocalizer(moment);
     const [events, setEvents] = useState([]);
     const dispatch = useDispatch();
     const { tickets } = useSelector((state) => state.tickets);
-    const { selectedTickets } = useSelector((state) => state.tickets.selectedTickets)
 
     const goalColors = [
         "red",
@@ -93,7 +92,7 @@ function CalendarView() {
         <>
             <div style={{ height: "600px" }}>
                 <Calendar localizer={localizer} events={events} startAccessor="start" endAccessor="end" onSelectEvent={handleSelectEvent} eventPropGetter={eventStyleGetter} />
-                <GoogleLoginButton />
+                {/* <GoogleLoginButton /> */}
             </div>
             <AICanvas from="from_calendar"/>
         </>

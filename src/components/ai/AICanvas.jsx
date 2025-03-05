@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, parseAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
@@ -22,17 +22,33 @@ function AICanvas({ from }) {
     //     console.log("conversation history changed", conversation)
     // }, [conversation])
 
+    const { externalInteractions } = useSelector(state => state.ai)
+
+    useEffect(() => {
+        const newAdvice = externalInteractions[0]?.aiResponse.advice;
+
+        if (!!newAdvice) {
+            setAiResponse(prev => prev + "\n" + externalInteractions[0]?.aiResponse.advice);
+            conversation.push({ "role": "system", "content": newAdvice })
+            setConversation(conversation);
+        }
+    }, [externalInteractions])
+
     useEffect(() => {
         console.log("🔄 AICanvas Component Re-Rendered");
     });
 
     useEffect(() => {
-        const handleResize = () => {
+        const handleResizeListener = () => {
             setIsMobile(window.innerWidth <= 768);
         };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener("resize", handleResizeListener);
+        return () => window.removeEventListener("resize", handleResizeListener);
     }, []);
+
+    const handleResize = () => {
+
+    }
 
     const handleAiSubmit = async (e) => {
         e.preventDefault();
@@ -44,8 +60,8 @@ function AICanvas({ from }) {
 
         try {
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
-            const res = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId })//send request to backend
-            const parsedResponse = await parseAIResponse(res);//parse backend request
+            const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId })//send request to backend
+            const parsedResponse = await parseAIResponse(aiResponse);//parse backend request
             dispatch(logInteraction({userMessage: userInput, aiResponse: parsedResponse}))//add interaction to redux state
             
             setAiResponse(prev => prev + "\n" + parsedResponse);
@@ -53,6 +69,7 @@ function AICanvas({ from }) {
             conversation.push({ "role": "system", "content": parsedResponse })
             setConversation(conversation);
             setUserInput("");
+            console.log(conversation)
         } catch (err) {
             console.error("AI error:", err);
             setAiResponse(prev => prev + "\n⚠️ AI service is currently unavailable.");

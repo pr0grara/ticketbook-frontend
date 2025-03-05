@@ -1,9 +1,3 @@
-.goals-container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-}
-
 /* 📜 Left Panel: Goal List */
 .goal-tree {
     width: 280px;
@@ -67,34 +61,61 @@
 }
 
 /* Ticket Styling */
+.ticket-list-title {
+    margin: 20px;
+    font-size: large;
+    font-weight: 500;
+}
+
+.ticket-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid grey;
+    min-width: 20vw;
+    max-width: 20vw;
+    height: 100vh;
+}
+
 .ticket-card {
     background: white;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 5px;
+    padding: 5px 10px;
+    // margin: 5px 0;
+    // border-radius: 5px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid lightgrey;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     cursor: grab;
     transition: 0.2s;
+    font-size: .85rem;
+    background-color: whitesmoke;
+    max-width: 80%;
 }
 
 .ticket-card:hover {
     background: #f0f0f0;
 }
 
-.goals-container {
+.goal-and-ticket-container {
     display: flex;
     flex-direction: column;
+    width: 80vw;
+}
+
+.goals-container {
+    display: flex;
+    flex-direction: row;
 }
 
 .goal-selection {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 10px;
     gap: 10px;
 }
 
 .goal-toggle {
+    font-family: Nunito;
     padding: 7px 10px;
     font-size: 16px;
     border: 2px solid #ddd;
@@ -103,6 +124,7 @@
     color: #333;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+    max-height: 50px;
 }
 
 .goal-toggle:hover {
@@ -110,9 +132,9 @@
 }
 
 .goal-toggle.selected {
-    background-color: #0044cc;
+    background-color: #3694de;
     color: white;
-    border-color: #0044cc;
+    border-color: #3694de;
 }
 
 .kanban-board {

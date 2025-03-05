@@ -29,8 +29,8 @@ export const updateTicketStatus = createAsyncThunk(
 
 export const updateTicket = createAsyncThunk(
     "tickets/updateTicket",
-    async ({ ticketId, ticketToUpdate }) => {
-        const response = await axios.patch(`${API_BASE_URL}/tickets/${ticketId}/update`, { ticket: ticketToUpdate });
+    async ({ ticketId, ticket }) => {
+        const response = await axios.patch(`${API_BASE_URL}/tickets/update/${ticketId}`, { ticket });
         return response.data;  // Return data for Redux update
     }
 );
@@ -48,6 +48,7 @@ const ticketsSlice = createSlice({
     initialState: {
         tickets: [],
         selectedTickets: [],
+        userActivatedTickets: [],
         status: "idle",
         error: null,
     },
@@ -63,6 +64,28 @@ const ticketsSlice = createSlice({
                 selectedTickets = [...state.tickets.filter(t => t.goalId === goal._id)]
             }
             state.selectedTickets = selectedTickets;
+        },
+        setUserActivatedTickets: (state, action) => {
+            const { userActivatedTicket } = action.payload;
+            let userActivatedTickets = []
+            console.log(state.userActivatedTickets.some(item => item._id === userActivatedTicket._id));
+            if (state.userActivatedTickets.length === 0) { //case if user activated is empty
+                userActivatedTickets = [userActivatedTicket];
+            } else if (state.userActivatedTickets.some(item => item._id === userActivatedTicket._id)) { //if user activated already contains ticket
+                userActivatedTickets = state.userActivatedTickets.filter(tick => tick._id !== userActivatedTicket._id)
+            } else {
+                userActivatedTickets = [...state.userActivatedTickets, userActivatedTicket];
+            }
+            state.userActivatedTickets = userActivatedTickets;
+        },
+        clearUserActivatedTickets: (state, action) => {
+            const { clearAll, clearOne } = action.payload;
+            let userActivatedTickets = [];
+            if (clearAll) state.userActivatedTickets = [];
+            if (clearOne) {
+                userActivatedTickets = state.userActivatedTickets.filter(tick => tick._id !== clearOne)
+            }
+            state.userActivatedTickets = userActivatedTickets;
         }
     },
     extraReducers: (builder) => {
@@ -116,5 +139,5 @@ const ticketsSlice = createSlice({
     },
 });
 
-export const { addTicket, removeTicket, setSelectedTickets } = ticketsSlice.actions;
+export const { addTicket, removeTicket, setSelectedTickets, setUserActivatedTickets, clearUserActivatedTickets } = ticketsSlice.actions;
 export default ticketsSlice.reducer;

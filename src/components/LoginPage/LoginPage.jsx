@@ -5,6 +5,9 @@ import { API_BASE_URL } from "../../config";
 import authAPI from "../api/authAPI";
 import { setLoggedIn } from "../../redux/slices/sessionSlice";
 import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/slices/userSlice";
+import { fetchGoals } from "../../redux/slices/goalsSlice";
+import { fetchTickets } from "../../redux/slices/ticketsSlice";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -30,10 +33,22 @@ const LoginPage = () => {
                 await axios.post(`${API_BASE_URL}/users/new`, { firstname, email, password });
             };
 
-            const response = await authAPI.post("/auth/login", { email, password });
-            console.log("Login Response Headers:", response.headers);
-            console.log("Login successful: ", response.data);
+            const response = await authAPI.post("/auth/login", { email, password }, { withCredentials: true });
+            const { success, userId } = response.data;
+            if (!success) throw new Error("Login failed");
+            
+            dispatch(setUser(userId))
             dispatch(setLoggedIn())
+            await Promise.all([
+                dispatch(fetchGoals(userId)),
+                dispatch(fetchTickets({ type: "BY USER", id: userId }))
+            ]);
+
+            console.log("✅ All Data Fetched, Now Navigating...");
+            setTimeout(() => {
+                console.log("🚀 Navigating Now...");
+                navigate('/goals');
+            }, 3000);
         } catch (err) {
             setError("Invalid email or password");
         }

@@ -1,32 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React, { startTransition } from "react";
+import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import './index.scss';
-import Root from './components/root';
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import "./index.scss";
+import App from "./components/app";
 import store from "./redux/store";
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from "./reportWebVitals";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  window.store = store;
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/service-worker.js").then(
-        (reg) => console.log("✅ Service Worker registered:", reg.scope),
-        (err) => console.error("❌ Service Worker registration failed:", err)
-      );
-    });
+// ✅ Move the router definition to index.js
+const router = createBrowserRouter([
+  { path: "/login", element: <App page="login" /> },
+  { path: "/tickets", element: <App page="tickets" /> },
+  { path: "/goals", element: <App page="goals" /> },
+  { path: "/plan", element: <App page="plan" /> },
+  { path: "/calendar", element: <App page="calendar" /> }
+], {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true
   }
+});
 
+document.addEventListener("DOMContentLoaded", () => {
+  window.store = store;
   const root = ReactDOM.createRoot(document.getElementById("root"));
-  root.render(
-    <Provider store={store}>
-      <DndProvider backend={HTML5Backend}>
-        <Root />
-      </DndProvider>
-    </Provider>
-  );
+
+  startTransition(() => {
+    root.render(
+      <Provider store={store}>
+        <DndProvider backend={HTML5Backend}>
+          <RouterProvider router={router} /> {/* ✅ Wrap App inside RouterProvider here */}
+        </DndProvider>
+      </Provider>
+    );
+  });
+
   reportWebVitals();
 });

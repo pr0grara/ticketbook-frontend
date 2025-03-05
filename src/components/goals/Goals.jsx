@@ -7,7 +7,12 @@ import { Trash2 } from "lucide-react";
 import useAPI from "../hooks/useAPI.js";
 import AICanvas from "../ai/AICanvas.jsx";
 import { setSelectedGoal } from "../../redux/slices/goalsSlice";
-import { fetchTickets, setSelectedTickets } from "../../redux/slices/ticketsSlice.js";
+import { clearUserActivatedTickets, fetchTickets, setSelectedTickets, setUserActivatedTickets } from "../../redux/slices/ticketsSlice.js";
+import { checkStatus } from "../api/authAPI.js";
+import { setLoggedIn, setLoggedOut } from "../../redux/slices/sessionSlice.js";
+import { setUser } from "../../redux/slices/userSlice.js";
+import { fetchGoals } from "../../redux/slices/goalsSlice.js";
+import TicketSpace from '../tickets/TicketSpace.jsx';
 
 // const userId = "6778de261a642d64cc04996a"; // Placeholder User ID
 
@@ -18,11 +23,12 @@ function Goals() {
     const userId = useSelector(state => state.userId);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
+    const userActivatedTickets = useSelector(state => state.tickets.userActivatedTickets);
 
     const displayedTickets = useMemo(() => {
-        if (!selectedGoal) return tickets;
-        if (selectedTickets.length > 0) return selectedTickets;
-        if (selectedGoal) return tickets.filter(ticket => ticket.goalId === selectedGoal._id);
+        if (!selectedGoal) return tickets.filter(ticket => ticket.status !== "done");
+        if (selectedTickets.length > 0) return selectedTickets.filter(ticket => ticket.status !== "done");
+        if (selectedGoal) return tickets.filter(ticket => ticket.goalId === selectedGoal._id).filter(ticket=> ticket.status !== "done");
         return tickets;
     }, [selectedTickets, tickets, selectedGoal]);
 
@@ -31,11 +37,33 @@ function Goals() {
     const [showTrashcan, setShowTrashcan] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+    console.count("🎯 Goals Component Rendered");
+
     useEffect(() => {
+        console.log("✅ Goals Component Mounted");
+    }, []);
+    useEffect(() => {        
         console.log("🔄 Goals Component Re-Rendered");
+        // window.location.reload()
     });
+
+    useEffect(() => {        
+        checkStatus()
+            .then(res => {
+                const status = res.loggedIn;
+                const userId = res.user?.id;
+                if (status) {
+                    if (goals.length === 0) dispatch(fetchGoals(userId));
+                    if (tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: userId }));
+                }
+                if (!status) dispatch(setLoggedOut())
+            })
+        console.log("HIT")
+        // setInterval(() => console.log("sec counter"), 1000)
+
+    }, [dispatch]);
     
-    useEffect(() => {
+    useEffect(() => {        
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
         };
@@ -43,12 +71,12 @@ function Goals() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    useEffect(() => {
+    useEffect(() => {        
         if (selectedGoal) {
             const goalTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
             if (goalTickets.length === 0) {
                 console.log("No tickets found for selected Goal, fetching from server...")
-                dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }))
+                // dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }))
             };
             dispatch(setSelectedTickets({ goal: selectedGoal, tickets: goalTickets }));
         }
@@ -69,33 +97,50 @@ function Goals() {
         }),
     }));
 
+    const handleSelectedGoal = (goal) => {
+        dispatch(clearUserActivatedTickets({clearAll: true}))
+        dispatch(setSelectedGoal(goal))
+    }
+
+    const isUserActivated = (ticket) => {
+        return userActivatedTickets.includes(ticket)
+    }
+
     return (
+        <>
         <div className="goals-container">
             {/* 🔹 Goal Selection Bubbles */}
-            <div className="goal-selection">
-                {goals.map((goal) => (
-                    <button
-                        key={goal._id}
-                        className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""}`}
-                        onClick={() => !isMobile && dispatch(setSelectedGoal(goal))}
-                        onTouchStart={() => dispatch(setSelectedGoal(goal))}
-                    >
-                        {goal.title}
-                    </button>
-                ))}
+            <div className="ticket-list-container">
+                <div className="ticket-list-title">Tickets</div>
+                {displayedTickets.map(ticket => <TicketCard ticket={ticket} dispatch={dispatch} setIsDragging={setIsDragging} setShowTrashcan={setShowTrashcan} setTrashcanPosition={setTrashcanPosition} userActivated={() => isUserActivated(ticket)} key={ticket._id}/>)}
+            </div>
+            <div className="goal-and-ticket-container">
+                <div className="ticket-list-title">Goals</div>
+                <div className="goal-selection">
+                    {goals.map((goal) => (
+                        <button
+                            key={goal._id}
+                            className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""}`}
+                            onClick={() => !isMobile && handleSelectedGoal(goal)}
+                            onTouchStart={() => handleSelectedGoal(goal)}
+                        >
+                            {goal.title}
+                        </button>
+                    ))}
+                </div>
+                <TicketSpace />
             </div>
 
             {/* 🔹 Kanban Board */}
-            <div className="kanban-board">
+            {/* <div className="kanban-board">
                 <h2>{selectedGoal ? isMobile ? null : `${selectedGoal.title}` : isMobile ? null : "Select a Goal"}</h2>
                 <div className="kanban-columns">
                     <KanbanColumn title="Pending" status="pending" tickets={displayedTickets.filter(t => t.status === "pending")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
                     <KanbanColumn title="In Progress" status="in-progress" tickets={displayedTickets.filter(t => t.status === "in-progress")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
                     {!isMobile && <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />}
                 </div>
-            </div>
+            </div> */}
 
-            <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} />
             <div
                 ref={drop}
                 className={`trash-can ${showTrashcan ? "visible" : ""}`}
@@ -110,6 +155,8 @@ function Goals() {
                 <p>Drop here to delete</p>
             </div>
         </div>
+        <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} />
+        </>
     );
 }
 
@@ -129,7 +176,7 @@ function KanbanColumn({ title, status, tickets, onDrop, setIsDragging, setTrashc
     );
 }
 
-function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition }) {
+function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated }) {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: "ticket",
         collect: (monitor) => ({
@@ -148,9 +195,16 @@ function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPositio
         }
     }));
 
+    const isUserActivatedTicket = userActivated(ticket);
+
     return (
-        <div ref={drag} className="ticket-card" style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)" }}>
-            {ticket.text}
+        <div 
+            ref={drag} 
+            onTouchStart={() => dispatch(setUserActivatedTickets({userActivatedTicket: ticket}))} 
+            onClick={() => dispatch(setUserActivatedTickets({userActivatedTicket: ticket}))} 
+            className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
+            style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)", backgroundColor: isUserActivatedTicket && "#3694de", color: isUserActivatedTicket && "white" }}>
+                {ticket.title}
         </div>
     );
 }

@@ -1,5 +1,5 @@
 // export const PROD_MODE = process.env.NODE_ENV === "production"; // Auto-detect env
-export const PROD_MODE = true;
+export const PROD_MODE = false;
 export const PROD_URL = "https://api.arabuilds.com/api";
 export const DEV_URL = "http://localhost:5000/api";
 

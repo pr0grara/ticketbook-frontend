@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchGoals, removeGoal } from "../../redux/slices/goalsSlice";
-import { updateTicketStatus, removeTicket } from "../../redux/slices/ticketsSlice";
+import { updateTicketStatus, removeTicket, setUserActivatedTickets, clearUserActivatedTickets } from "../../redux/slices/ticketsSlice";
 import { API_BASE_URL } from "../../config";
 import authAPI from '../api/authAPI';
 import axios from "axios";
 
-const useAPI = (userId, selectedGoal) => {
+const useAPI = () => {
     const dispatch = useDispatch();
     
+    const userId = useSelector(state => state.userId);
+    const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const [goals, setGoals] = useState([]);
     const [activeTickets, setActiveTickets] = useState([]);
     const [aiSuggestions, setAiSuggestions] = useState([]);
@@ -32,7 +34,12 @@ const useAPI = (userId, selectedGoal) => {
         }
     }, [selectedGoal]);
 
-    const getGoals = () => dispatch(fetchGoals(userId));
+    const fetchGoalById = async (goalId) => {
+        const goal = await authAPI.get(`/goals/byid/${goalId}`)
+        return goal;
+    }
+
+    // const getGoals = () => dispatch(fetchGoals(userId));
 
     // Add new goal
     const handleGoalAdded = (newGoal) => setGoals([...goals, newGoal]);
@@ -111,6 +118,7 @@ const useAPI = (userId, selectedGoal) => {
 
                 // ✅ Dispatch action to update Redux state
                 dispatch(removeTicket(item.id));
+                dispatch(clearUserActivatedTickets({ clearOne: item.id }))
 
             } else if (item.type === "goal") {
                 await axios.delete(`${API_BASE_URL}/goals/delete/${item.id}`);
@@ -157,7 +165,8 @@ const useAPI = (userId, selectedGoal) => {
         activeTickets,
         aiSuggestions,
         aiResponse,
-        getGoals,
+        // getGoals,
+        fetchGoalById,
         handleGoalAdded,
         handleTicketAdded,
         aiSuggestBreakdown,

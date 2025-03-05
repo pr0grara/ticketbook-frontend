@@ -13,6 +13,11 @@ const store = configureStore({
         session: sessionReducer,
         ai: aiReducer
     },
+    // middleware: (getDefaultMiddleWare) =>
+    //     getDefaultMiddleWare({
+    //         serializableCheck: false,
+    //         immutableCheck: false,
+    //     })
 });
 
 export default store;
