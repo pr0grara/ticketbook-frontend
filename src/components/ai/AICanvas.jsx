@@ -87,7 +87,7 @@ function AICanvas({ from }) {
                 <div className="ai-output">
                     {aiResponse ? aiResponse.split("\n").map((line, index) => (
                         <p key={index}>{line}</p>
-                    )) : <p className="placeholder">Ask AI for help related to your goals...</p>}
+                    )) : <p className="placeholder">Create new goals, add tickets, ask me for advice...</p>}
                 </div>
             )}
             <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from}> 

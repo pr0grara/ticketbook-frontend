@@ -11,6 +11,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // ✅ Move the router definition to index.js
 const router = createBrowserRouter([
+  { path: "/", element: <App page="login" /> },
   { path: "/login", element: <App page="login" /> },
   { path: "/tickets", element: <App page="tickets" /> },
   { path: "/goals", element: <App page="goals" /> },

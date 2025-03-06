@@ -2,7 +2,7 @@
 .trash-can {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 10px;
     background: white;
     padding: 10px;
     border-radius: 8px;
@@ -11,17 +11,19 @@
     align-items: center;
     flex-direction: column;
     transition: 0.2s;
-    max-height: 100px;
-    max-width: 125px;
+    max-height: 60px;
+    max-width: 70px;
 }
 
 .trash-can.visible {
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.trash-can p {
+.trash-can div {
     margin-top: 5px;
-    font-size: 14px;
+    font-size: 10px;
     color: gray;
 }
 

@@ -20,6 +20,7 @@ export default function App({ page }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate(); // ✅ Now it works since App is inside RouterProvider
+    const { userId } = useSelector(state=> state)
 
     console.count("🔄 App Component Rendered");
     console.log(`⏳ Render Time: ${performance.now()}ms`);
@@ -29,7 +30,11 @@ export default function App({ page }) {
         checkStatus()
             .then(res => {
                 const loggedIn = res.loggedIn;
-                if (loggedIn) return dispatch(setLoggedIn())
+                if (loggedIn) {
+                    dispatch(setLoggedIn())
+                    if (!userId) dispatch(setUser(res.user.id))
+                        return
+                } 
                 return dispatch(setLoggedOut())
             });
     }, []);
@@ -52,6 +57,7 @@ export default function App({ page }) {
     return (
         <>
             <Navbar />
+            {page === "" && <LoginPage />}
             {page === "login" && <LoginPage />}
             {page === "tickets" && <Tickets />}
             {page === "goals" && <Goals />}

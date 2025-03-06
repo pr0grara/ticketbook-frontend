@@ -45,10 +45,7 @@ const LoginPage = () => {
             ]);
 
             console.log("✅ All Data Fetched, Now Navigating...");
-            setTimeout(() => {
-                console.log("🚀 Navigating Now...");
-                navigate('/goals');
-            }, 3000);
+            navigate('/goals');
         } catch (err) {
             setError("Invalid email or password");
         }

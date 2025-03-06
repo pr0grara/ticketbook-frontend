@@ -10,6 +10,12 @@
     margin-bottom: 10px;
 }
 
+.goal-list-title {
+    margin: 20px;
+    font-size: large;
+    font-weight: 500;
+}
+
 .goal-list {
     list-style: none;
     padding: 0;
@@ -62,9 +68,16 @@
 
 /* Ticket Styling */
 .ticket-list-title {
-    margin: 20px;
+    margin-top: 20px;
     font-size: large;
     font-weight: 500;
+}
+
+.subtitle {
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid black;
 }
 
 .ticket-list-container {

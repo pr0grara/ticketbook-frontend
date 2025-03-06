@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
 import { Trash2 } from "lucide-react";
-// import GoalInput from "./goalInput.jsx";
-// import TicketInput from "../tickets/ticketInput.jsx";
 import useAPI from "../hooks/useAPI.js";
 import AICanvas from "../ai/AICanvas.jsx";
 import { setSelectedGoal } from "../../redux/slices/goalsSlice";
@@ -13,8 +11,6 @@ import { setLoggedIn, setLoggedOut } from "../../redux/slices/sessionSlice.js";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { fetchGoals } from "../../redux/slices/goalsSlice.js";
 import TicketSpace from '../tickets/TicketSpace.jsx';
-
-// const userId = "6778de261a642d64cc04996a"; // Placeholder User ID
 
 function Goals() {
     const dispatch = useDispatch();
@@ -37,16 +33,6 @@ function Goals() {
     const [showTrashcan, setShowTrashcan] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-    console.count("🎯 Goals Component Rendered");
-
-    useEffect(() => {
-        console.log("✅ Goals Component Mounted");
-    }, []);
-    useEffect(() => {        
-        console.log("🔄 Goals Component Re-Rendered");
-        // window.location.reload()
-    });
-
     useEffect(() => {        
         checkStatus()
             .then(res => {
@@ -59,7 +45,6 @@ function Goals() {
                 if (!status) dispatch(setLoggedOut())
             })
         console.log("HIT")
-        // setInterval(() => console.log("sec counter"), 1000)
 
     }, [dispatch]);
     
@@ -109,13 +94,14 @@ function Goals() {
     return (
         <>
         <div className="goals-container">
-            {/* 🔹 Goal Selection Bubbles */}
             <div className="ticket-list-container">
                 <div className="ticket-list-title">Tickets</div>
+                <div className="subtitle">small tasks belonging to a Goal</div>
                 {displayedTickets.map(ticket => <TicketCard ticket={ticket} dispatch={dispatch} setIsDragging={setIsDragging} setShowTrashcan={setShowTrashcan} setTrashcanPosition={setTrashcanPosition} userActivated={() => isUserActivated(ticket)} key={ticket._id}/>)}
             </div>
             <div className="goal-and-ticket-container">
-                <div className="ticket-list-title">Goals</div>
+            {/* 🔹 Goal Selection Bubbles */}
+                <div className="goal-list-title">Goals</div>
                 <div className="goal-selection">
                     {goals.map((goal) => (
                         <button
@@ -131,48 +117,22 @@ function Goals() {
                 <TicketSpace />
             </div>
 
-            {/* 🔹 Kanban Board */}
-            {/* <div className="kanban-board">
-                <h2>{selectedGoal ? isMobile ? null : `${selectedGoal.title}` : isMobile ? null : "Select a Goal"}</h2>
-                <div className="kanban-columns">
-                    <KanbanColumn title="Pending" status="pending" tickets={displayedTickets.filter(t => t.status === "pending")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                    <KanbanColumn title="In Progress" status="in-progress" tickets={displayedTickets.filter(t => t.status === "in-progress")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-                    {!isMobile && <KanbanColumn title="Done" status="done" tickets={displayedTickets.filter(t => t.status === "done")} onDrop={handleTicketDrop} setIsDragging={setIsDragging} selectedGoal={selectedGoal} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />}
-                </div>
-            </div> */}
-
             <div
                 ref={drop}
                 className={`trash-can ${showTrashcan ? "visible" : ""}`}
                 style={{
                     position: "absolute",
-                    top: `${trashcanPosition.y - 50}px`,
-                    left: `${trashcanPosition.x + 50}px`, // Adjust offset
+                    top: `${trashcanPosition.y + 25}px`,
+                    left: `${trashcanPosition.x - 40}px`, // Adjust offset
                     transition: "top 0.1s, left 0.1s"
                 }}
             >
-                <Trash2 size={40} color={isOver ? "red" : "black"} />
-                <p>Drop here to delete</p>
+                <Trash2 size={"50px"} color={isOver ? "red" : "black"} />
+                <div>Drop to delete</div>
             </div>
         </div>
         <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} />
         </>
-    );
-}
-
-function KanbanColumn({ title, status, tickets, onDrop, setIsDragging, setTrashcanPosition, setShowTrashcan }) {
-    const [, drop] = useDrop(() => ({
-        accept: "ticket",
-        drop: (item) => onDrop(item.id, status),
-    }));
-
-    return (
-        <div ref={drop} className="kanban-column">
-            <h3>{title}</h3>
-            {tickets.map((ticket) => (
-                <TicketCard key={ticket._id} ticket={ticket} useDrag={useDrag} setIsDragging={setIsDragging} setTrashcanPosition={setTrashcanPosition} setShowTrashcan={setShowTrashcan} />
-            ))}
-        </div>
     );
 }
 
@@ -208,35 +168,5 @@ function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPositio
         </div>
     );
 }
-
-// function GoalCard({ goal, setIsDragging, onClick, selectedGoal, setShowTrashcan, setTrashcanPosition }) {
-//     const [{ isDragging }, drag] = useDrag(() => ({
-//         type: "goal",
-//         item: { id: goal._id, type: "goal" },
-//         collect: (monitor) => ({
-//             isDragging: !!monitor.isDragging(),
-//         }),
-//         item: (monitor) => {
-//             setIsDragging(true);
-//             const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 }; // Get position
-//             setTrashcanPosition({ x, y });
-//             setShowTrashcan(true);
-//             return { id: goal._id, type: "goal" };
-//         },
-//         end: () => {
-//             setIsDragging(false);
-//             setShowTrashcan(false);
-//         }
-//     }));
-
-//     const isSelected = ((selectedGoal) => !selectedGoal ? false : goal._id === selectedGoal._id)
-
-//     return (
-//         <li ref={drag} className={`goal-card ${isDragging ? "dragging" : "", isSelected(selectedGoal) ? "selected" : ""}`} onClick={onClick} style={{ opacity: isDragging ? 0.5 : 1 }}>
-//             {goal.title}
-//         </li>
-//     );
-// }
-
 
 export default Goals;

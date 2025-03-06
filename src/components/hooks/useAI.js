@@ -7,9 +7,8 @@ import authAPI from "../api/authAPI";
 
 async function parseAIResponse(res) {
     const createNewTicket = async (res) => {
-        const { title, text, priority, priorityWeight, depends_on, deadline, status, goalId } = res;
+        const { title, text, priority, priorityWeight, depends_on, deadline, status, goalId, checklist, notes } = res;
         const { user_id, goals } = store.getState();
-        // debugger
         const newTicket = {
             title,
             text,
@@ -18,6 +17,8 @@ async function parseAIResponse(res) {
             status: status || "pending",
             priority,
             priorityWeight,
+            checklist, 
+            notes,
             depends_on,
             deadline
         };
@@ -135,6 +136,8 @@ function prepareContext(contextGoals, contextTickets) {
             task: ticket.text,
             priority: ticket.priority,
             ticketId: ticket._id,
+            notes: ticket.notes,
+            checklist: ticket.checklist,
             status: ticket.status
         }))
     };

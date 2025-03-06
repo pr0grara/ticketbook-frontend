@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../stylesheets/Navbar.scss"; // Import SCSS file
 import authAPI, { checkStatus } from "./api/authAPI";
 import { setLoggedOut } from "../redux/slices/sessionSlice";
+import { clearUser } from "../redux/slices/userSlice";
 
 const Navbar = () => {
     const { loggedIn } = useSelector(state => state.session);
@@ -13,6 +14,7 @@ const Navbar = () => {
     const handleLogout = () => {
         authAPI.post('/auth/logout')
             .then(res => {
+                dispatch(clearUser())
                 dispatch(setLoggedOut()) //change redux state
                 window.location.href = "/login"; // ✅ TEMP FIX: Avoid useNavigate
                 // navigate("/login");

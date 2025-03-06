@@ -117,3 +117,124 @@
     top: 50%;
     transform: translateY(-50%);
 }
+
+.checklist-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    // border: 1px solid red;
+    font-size: small;
+}
+
+.ticket-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    .even {
+        order: 1;
+    }
+    .odd {
+        order: 2;
+    }
+
+} 
+
+.checklist-item {
+    // width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-basis: calc(50% - 8px);
+    padding: 4px;
+    font-size: 15px;
+    border-bottom: 1px dotted;
+    margin-bottom: 1rem;
+}
+
+.checked-list-item {
+    text-decoration: line-through;
+}
+
+.add-checklist-container, .add-note-container {
+    display: flex;
+    justify-content: space-between;
+    border-radius: 6px;
+    border: 1px solid black;
+    input {
+        border: none;
+        background-color: transparent;
+    }
+    div { //ADD button
+        width: 30%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        padding: 7px 0px;
+        color: black;
+        background-color: #3594dd;
+        background: rgb(2, 0, 36);
+        background: linear-gradient(90deg, #ffffff 0%, rgba(65, 113, 131, 0.6407738095238095) 25%,rgba(56, 152, 225, 0.801) 100%);        // background-color: #8c47c5;
+        border-radius: 0 6px 6px 0;
+        transition: all 0.2s ease-in-out;
+        &:hover{
+            cursor: pointer;
+            background-color: #000000 !important;
+            color: white;
+        }
+    }
+}
+
+.ticket-note-input, .note-input, .checklist-input {
+    width: 70%;
+} 
+
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    font-size: small;
+    // border: 1px solid red;
+} 
+
+.ticket-notes {
+    border: 1px solid black;
+    margin: 10px 2rem;
+    :last-child {
+            border-bottom: none;
+        }
+}
+
+.note-item {
+    // width: 70%;
+    display: flex;
+    justify-content: space-between;
+    // border-radius: 6px;
+    border-bottom: 1px solid black;
+
+    input {
+        width: 95%;
+        border: none;
+        background-color: transparent;
+        padding: 5px;
+    }
+    button {
+
+    }
+}
+
+.activate-notes, .activate-checklist {
+    font-size: 1rem;
+    color: #0056b3;
+    &:hover {
+        cursor: pointer;
+        color: rgb(0, 0, 160);
+    }
+}
+
+.checklist-trash {
+    &:hover{
+        cursor: pointer;
+    }
+}
