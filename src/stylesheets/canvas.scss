@@ -5,7 +5,7 @@
     left: 0vw;
     width: 100%;
     min-height: 20vh;
-    max-height: 30vh;
+    max-height: 40vh;
     // background: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 20px 20px 0px 0px;
@@ -35,6 +35,7 @@
 .ai-input {
     display: flex;
     justify-content: center;
+    width: 90%;
     gap: 8px;
 }
 
@@ -49,24 +50,57 @@
 }
 
 .ai-input button {
-    margin: 10px;
-    padding: 10px 16px;
     background: #007bff;
-    color: white;
     border: none;
-    border-radius: 4px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    transition: background 0.3s ease-in-out;
 }
 
 .ai-input button:hover {
     background: #0056b3;
 }
 
+.ai-input button:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+.send-icon {
+    color: white;
+    width: 24px;
+    height: 24px;
+}
+
+.loading-icon {
+    color: white;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+/* 🔄 Spinning animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /* Mobile-specific styles */
 @media (max-width: 768px) {
     .ai-canvas {
         // max-width: 100%;
-        height: 50px;
+        // height: 20vh;
         /* Reduced height for better mobile layout */
         padding: 10px;
     }
@@ -74,21 +108,22 @@
     .ai-canvas.collapsed {
         /* Minimized mode */
         min-height: 30px;
-        overflow: hidden;
+        // overflow: hidden;
         width: 95%;
     }
 
     .ai-canvas.expanded {
-        height: 300px;
+        // height: 300px;
+        padding: 0px;
         /* Expanded view for more content */
     }
 
     .toggle-ai-btn {
         display: block;
-        width: 50%;
-        padding: 10px;
+        width: 12%;
+        padding: 6px;
         font-size: 16px;
-        background-color: #007bff;
+        background-color: #007bff78;
         color: white;
         border: none;
         cursor: pointer;

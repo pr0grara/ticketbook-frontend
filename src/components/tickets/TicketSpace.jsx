@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Ticket from './Ticket.jsx';
 
 const TicketSpace = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const { loggedIn } = useSelector(state => state.session);
     const { userActivatedTickets } = useSelector(state => state.tickets);
     // const [tickets, setTickets] = useState(userActivatedTickets || []);
@@ -31,7 +32,7 @@ const TicketSpace = () => {
     return (
         <nav className="ticket-space-container">
             {tickets.map(ticket => <Ticket ticket={ticket} key={ticket._id}/>)}
-            <div className="ticket-list-spaceholder"></div>
+            {!isMobile && <div className="ticket-list-spaceholder"></div>}
         </nav>
     );
 };

@@ -1,11 +1,14 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, parseAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
+import { Send, Loader, ChevronDown, ChevronUp } from "lucide-react";
 
 function AICanvas({ from }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // ✅ Track AI processing
+
     const dispatch = useDispatch();
     const tickets = useSelector(state => state.tickets.tickets);
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
@@ -13,30 +16,19 @@ function AICanvas({ from }) {
     const goals = useSelector(state => state.goals);
     const userId = useSelector(state => state.userId);
     const aiHistory = useSelector(state => state.ai);
+    const { externalInteractions } = useSelector(state => state.ai);
 
     const [aiResponse, setAiResponse] = useState("");
     const [userInput, setUserInput] = useState("");
     const [conversation, setConversation] = useState([]);
 
-    // useEffect(() => {
-    //     console.log("conversation history changed", conversation)
-    // }, [conversation])
-
-    const { externalInteractions } = useSelector(state => state.ai)
-
     useEffect(() => {
         const newAdvice = externalInteractions[0]?.aiResponse.advice;
-
         if (!!newAdvice) {
-            setAiResponse(prev => prev + "\n" + externalInteractions[0]?.aiResponse.advice);
-            conversation.push({ "role": "system", "content": newAdvice })
-            setConversation(conversation);
+            setAiResponse(prev => prev + "\n" + newAdvice);
+            setConversation(prev => [...prev, { role: "system", content: newAdvice }]);
         }
-    }, [externalInteractions])
-
-    useEffect(() => {
-        console.log("🔄 AICanvas Component Re-Rendered");
-    });
+    }, [externalInteractions]);
 
     useEffect(() => {
         const handleResizeListener = () => {
@@ -46,41 +38,45 @@ function AICanvas({ from }) {
         return () => window.removeEventListener("resize", handleResizeListener);
     }, []);
 
-    const handleResize = () => {
-
-    }
-
     const handleAiSubmit = async (e) => {
         e.preventDefault();
-        if (!userInput.trim()) return;
-        
+        if (!userInput.trim() || isLoading) return;
+
+        setIsLoading(true); // ✅ Show loading animation
+
         const requestType = "user message";
         let contextTickets = [];
         if (tickets.length > 0) contextTickets = selectedTickets.length > 0 ? selectedTickets : tickets;
 
         try {
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
-            const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId })//send request to backend
-            const parsedResponse = await parseAIResponse(aiResponse);//parse backend request
-            dispatch(logInteraction({userMessage: userInput, aiResponse: parsedResponse}))//add interaction to redux state    
+            const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId });
+
+            const parsedResponse = await parseAIResponse(aiResponse);
+            dispatch(logInteraction({ userMessage: userInput, aiResponse: parsedResponse }));
+
             setAiResponse(prev => prev + "\n" + parsedResponse);
-            conversation.push({ "role": "user", "content": userInput })
-            conversation.push({ "role": "system", "content": parsedResponse })
-            setConversation(conversation);
+            setConversation(prev => [
+                ...prev,
+                { role: "user", content: userInput },
+                { role: "system", content: parsedResponse }
+            ]);
+
             setUserInput("");
-            console.log(conversation)
         } catch (err) {
             console.error("AI error:", err);
             setAiResponse(prev => prev + "\n⚠️ AI service is currently unavailable.");
+        } finally {
+            setIsLoading(false); // ✅ Hide loading animation
         }
     };
 
     return (
         <div className={`ai-canvas ${isMobile ? (isExpanded ? " expanded" : "collapsed") : ""}`}>
             {isMobile && (
-                <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
-                    {isExpanded ? "Hide AI" : "Show AI"}
-                </button>
+            <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
+                {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+            </button>
             )}
             {(!isMobile || isExpanded) && (
                 <div className="ai-output">
@@ -89,14 +85,16 @@ function AICanvas({ from }) {
                     )) : <p className="placeholder">Create new goals, add tickets, ask me for advice...</p>}
                 </div>
             )}
-            <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from}> 
+            <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from}>
                 <input
                     type="text"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     placeholder="Type your request..."
                 />
-                <button type="submit">Send</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? <Loader className="loading-icon" /> : <Send className="send-icon" />}
+                </button>
             </form>
         </div>
     );
