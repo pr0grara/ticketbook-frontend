@@ -24,8 +24,10 @@ export default function Ticket({ ticket }) {
     }, [ticket]);
 
     useEffect(() => {
-
-    }, [checklist])
+        if (JSON.stringify(ticket.checklist) !== JSON.stringify(checklist)) {
+            setChecklist(ticket.checklist || []);
+        }
+    }, [ticket.checklist]);
 
     const humanDate = (date) => {
         return new Date(date).toLocaleDateString('en-US', {

@@ -121,8 +121,11 @@ const useAPI = () => {
                 dispatch(clearUserActivatedTickets({ clearOne: item.id }))
 
             } else if (item.type === "goal") {
-                await axios.delete(`${API_BASE_URL}/goals/delete/${item.id}`);
+                const deleteReceipt = await axios.delete(`${API_BASE_URL}/goals/delete/${item.id}`);
                 dispatch(removeGoal(item.id));
+                for (const deletedTicketID of deleteReceipt.data?.deletedTicketIds) {
+                    dispatch(removeTicket(deletedTicketID))
+                }
             }
         } catch (err) {
             console.error("Error deleting item:", err);

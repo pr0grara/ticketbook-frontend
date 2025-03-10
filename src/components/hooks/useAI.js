@@ -1,19 +1,22 @@
 import axios from "axios";
 import store from "../../redux/store"; // Import Redux store
-import { addTicket, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
+import { addTicket, setSelectedTickets, updateTicket } from "../../redux/slices/ticketsSlice"; //Import Redux action
 import { API_BASE_URL } from "../../config";
-import { addGoal } from "../../redux/slices/goalsSlice";
+import { addGoal, setSelectedGoal } from "../../redux/slices/goalsSlice";
 import authAPI from "../api/authAPI";
 
 async function parseAIResponse(res) {
     const createNewTicket = async (res) => {
+        if (res.status === "completed") {
+            return res.newTicket
+        };
         const { title, text, priority, priorityWeight, depends_on, deadline, status, goalId, checklist, notes } = res;
-        const { user_id, goals } = store.getState();
+        const { userId, goals } = store.getState();
         const newTicket = {
             title,
             text,
             goalId: goalId ? goalId : goals.selectedGoal ? goals.selectedGoal._id : null,
-            userId: user_id,
+            userId,
             status: status || "pending",
             priority,
             priorityWeight,
@@ -43,10 +46,15 @@ async function parseAIResponse(res) {
     }
 
     const createNewGoal = async (aiRes) => {
-        const { user_id } = store.getState();
+        const { status } = aiRes;
+
+        if (status && status === "completed") {
+            return {newGoal: aiRes.newGoal, newTickets: aiRes.newTickets };
+        }
+        const { userId } = store.getState();
         const { title, priority, deadline, category, description } = aiRes;
         const newGoal = {
-            userId: user_id,
+            userId,
             category,
             title,
             priority,
@@ -55,51 +63,72 @@ async function parseAIResponse(res) {
         };
         try {
             const res = await axios.post(`${API_BASE_URL}/goals/new`, newGoal);
-            return res.data;
+            return { newGoal: res.data, newTickets: [] };
         } catch (e) {
             return e
         }
     }
 
-    const { action_type, advice, answer, dev_advice } = res;
+    const { action_type, advice, answer, dev_advice, status } = res;
     if (dev_advice) alert(dev_advice);
-    
+    let writeBool = false;
+    if (status !== "completed") writeBool = true;
+
     switch (action_type) {
         case "provide_advice":
+            if (res.status === "completed") return res.message.advice;
             return advice;
         case "provide_answer":
+            if (res.status === "completed") return res.message.answer;
             return answer
         case "create_ticket":
             const newTicket = await createNewTicket(res)
             store.dispatch(addTicket(newTicket)); //Update Redux state
             return "New ticket added!"
-        case "modify_ticket":
-            const modifiedTicket = await modifyTicket(res)
-            store.dispatch(addTicket(modifiedTicket)); //Update Redux state
-            return "Ticket modified!"
-        case "create_goal":
-            const newGoal = await createNewGoal(res);
-            store.dispatch(addGoal(newGoal));
-            return "New Goal created!"
         case "create_many_tickets":
-            const newTickets = res.tickets;
-            while (newTickets.length > 0) {
-                const newTicket = await createNewTicket(newTickets.pop())
-                store.dispatch(addTicket(newTicket)); //Update Redux state
+            const newTickets = res.status === "completed" ? res.newTickets : res.tickets;
+            for (const newTicket of newTickets) {
+                if (res.status === "complete") {
+                    store.dispatch(addTicket(newTicket))
+                } else {
+                    const createdTicket = await createNewTicket(newTicket);
+                    store.dispatch(addTicket(createdTicket)); //Update Redux state\
+                }
             }
             return "New Tickets added!"
+        case "modify_ticket":
+            // const modifiedTicket = await modifyTicket(res)
+            const modifiedTicket = res.updated_ticket;
+            store.dispatch(updateTicket({modifiedTicket})); //Update Redux state
+            return "Ticket modified!"
+        case "create_goal":
+            const newGoalObj = await createNewGoal(res);
+            store.dispatch(addGoal(newGoalObj.newGoal));
+            for (const newTicket of newGoalObj.newTickets) {
+                store.dispatch(addTicket(newTicket.newTicket));
+            }
+            store.dispatch(setSelectedGoal(newGoalObj.newGoal))
+            store.dispatch(setSelectedTickets({newGoal: true, newTickets: newGoalObj.newTickets.map(newTick => newTick.newTicket)}))
+
+
+            return "New Goal created!"
         case "request_info":
             return res.question
+        case "error":
+            return res.message
+        case "fatal_error":
+            return "Fatal AI Error"
         default:
-            return "unkown action_type in parseAIResponse()"
+            console.error("Unknown action_type in parseAIResponse():", res);
+            return `Unkown action_type: "${action_type}", in parseAIResponse()`
     }
 }
 
 // 🏗️ FOUNDATION LAYER: Calls GPT-4o with basic reasoning power
 async function callAI(request) {
+    const { userId } = store.getState()
     try {
         const {userInput, context, requestType, conversation, aiHistory} = request;
-        
         var response;
         switch (requestType) {
             case "advise ticket":
@@ -111,7 +140,7 @@ async function callAI(request) {
             default:
                 response = await axios.post(
                     `${API_BASE_URL}/ai/request`,
-                    { userInput, context, requestType, conversation, aiHistory },
+                    { userInput, context, requestType, conversation, aiHistory, userId },
                     { headers: { "Content-Type": "application/json" } }
                 );
                 break
@@ -145,6 +174,7 @@ function prepareContext(contextGoals, contextTickets) {
 
 // 🏗️ POST-PROCESSING LAYER: Cleans & Validates AI Output
 function refineAIOutput(rawOutput) {
+    if (typeof rawOutput === "object") return rawOutput;
     try {
         return JSON.parse(rawOutput); // ✅ Ensure valid JSON output
     } catch (error) {
@@ -155,9 +185,9 @@ function refineAIOutput(rawOutput) {
 
 // 🚀 MAIN FUNCTION: Calls AI with Context & Instructions
 async function handleAIRequest(request) {
-    const { requestType, contextGoals, contextTickets, userInput, from, aiHistory } = request;
+    const { requestType, contextGoals, contextTickets, userInput, from, aiHistory, userId } = request;
     const context = prepareContext(contextGoals, contextTickets);
-    const aiResponse = await callAI({userInput, context, requestType, from, aiHistory});
+    const aiResponse = await callAI({userInput, context, requestType, from, aiHistory, userId});
     return refineAIOutput(aiResponse);
 }
 

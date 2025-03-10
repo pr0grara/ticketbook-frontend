@@ -87,7 +87,12 @@
     border-right: 1px solid grey;
     min-width: 20vw;
     max-width: 20vw;
-    height: 100vh;
+    min-height: 100vh;
+}
+
+.ticket-list-spaceholder {
+    border: 1px solid transparent;
+    min-height: 200px;
 }
 
 .ticket-card {
@@ -102,7 +107,7 @@
     transition: 0.2s;
     font-size: .85rem;
     background-color: whitesmoke;
-    max-width: 80%;
+    max-width: 75%;
 }
 
 .ticket-card:hover {
@@ -128,16 +133,17 @@
 }
 
 .goal-toggle {
+    display: flex;
+    align-items: center;
     font-family: Nunito;
     padding: 7px 10px;
-    font-size: 16px;
+    font-size: 1rem;
     border: 2px solid #ddd;
     border-radius: 5px;
     background-color: whitesmoke;
     color: #333;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    max-height: 50px;
 }
 
 .goal-toggle:hover {

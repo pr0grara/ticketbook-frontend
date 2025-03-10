@@ -29,7 +29,8 @@ export const updateTicketStatus = createAsyncThunk(
 
 export const updateTicket = createAsyncThunk(
     "tickets/updateTicket",
-    async ({ ticketId, ticket }) => {
+    async ({ ticketId, ticket, modifiedTicket }) => {
+        if (!!modifiedTicket) return modifiedTicket;
         const response = await axios.patch(`${API_BASE_URL}/tickets/update/${ticketId}`, { ticket });
         return response.data;  // Return data for Redux update
     }
@@ -56,28 +57,34 @@ const ticketsSlice = createSlice({
         addTicket: (state, action) => { state.tickets.push(action.payload); },
         removeTicket: (state, action) => { state.tickets = state.tickets.filter(ticket => ticket._id !== action.payload) },
         setSelectedTickets: (state, action) => {
-            const { event, goal } = action.payload;
+            const { event, goal, newGoal, newTickets } = action.payload;
             let selectedTickets = []
             if (event) {
                 selectedTickets = [...state.tickets.filter(t => t._id === event._id)];
             } else if (goal) {
                 selectedTickets = [...state.tickets.filter(t => t.goalId === goal._id)]
+            } else if (newGoal) {
+                selectedTickets = newTickets;
             }
             state.selectedTickets = selectedTickets;
         },
         setUserActivatedTickets: (state, action) => {
             const { userActivatedTicket } = action.payload;
-            let userActivatedTickets = []
-            console.log(state.userActivatedTickets.some(item => item._id === userActivatedTicket._id));
-            if (state.userActivatedTickets.length === 0) { //case if user activated is empty
-                userActivatedTickets = [userActivatedTicket];
-            } else if (state.userActivatedTickets.some(item => item._id === userActivatedTicket._id)) { //if user activated already contains ticket
-                userActivatedTickets = state.userActivatedTickets.filter(tick => tick._id !== userActivatedTicket._id)
+
+            let newUserActivatedTickets;
+            if (state.userActivatedTickets.length === 0) {
+                newUserActivatedTickets = [userActivatedTicket];
+            } else if (state.userActivatedTickets.some(item => item._id === userActivatedTicket._id)) {
+                newUserActivatedTickets = state.userActivatedTickets.filter(tick => tick._id !== userActivatedTicket._id);
             } else {
-                userActivatedTickets = [...state.userActivatedTickets, userActivatedTicket];
+                newUserActivatedTickets = [...state.userActivatedTickets, userActivatedTicket];
             }
-            state.userActivatedTickets = userActivatedTickets;
+
+            state.userActivatedTickets = [...newUserActivatedTickets]; // ✅ Always create a new reference
+
+            console.log("✅ Updated userActivatedTickets:", JSON.parse(JSON.stringify(state.userActivatedTickets))); // Debugging
         },
+
         clearUserActivatedTickets: (state, action) => {
             const { clearAll, clearOne } = action.payload;
             let userActivatedTickets = [];
@@ -124,18 +131,27 @@ const ticketsSlice = createSlice({
             })
             .addCase(updateTicket.fulfilled, (state, action) => {
                 const updatedTicket = action.payload;
-                console.log("🟢 Before Update:", JSON.parse(JSON.stringify(state.tickets)));
+                console.log("🟢 Before Update:", JSON.parse(JSON.stringify(state.userActivatedTickets)));
 
-                const index = state.tickets.findIndex(ticket => ticket._id === updatedTicket._id);
+                // ✅ Update `tickets` array (global)
+                state.tickets = state.tickets.map(ticket =>
+                    ticket._id === updatedTicket._id
+                        ? { ...updatedTicket, checklist: [...updatedTicket.checklist || []] }
+                        : ticket
+                );
 
-                if (index !== -1) {
-                    state.tickets[index] = updatedTicket; // ✅ Replace existing ticket correctly
-                } else {
-                    console.warn("⚠️ Ticket not found in state, adding it instead.");
-                    state.tickets.push(updatedTicket); // ✅ If ticket is missing, add it to state
-                }
-                console.log("🔵 After Update:", JSON.parse(JSON.stringify(state.tickets)));
+                // ✅ Ensure `userActivatedTickets` is updated **only if it contains the modified ticket**
+                state.userActivatedTickets = state.userActivatedTickets.some(t => t._id === updatedTicket._id)
+                    ? state.userActivatedTickets.map(ticket =>
+                        ticket._id === updatedTicket._id
+                            ? { ...updatedTicket, checklist: [...updatedTicket.checklist || []] } // ✅ New object reference
+                            : ticket
+                    )
+                    : [...state.userActivatedTickets]; // ✅ Keep same reference if unchanged
+
+                console.log("🔵 After Update:", JSON.parse(JSON.stringify(state.userActivatedTickets))); // Debugging
             });
+
     },
 });
 

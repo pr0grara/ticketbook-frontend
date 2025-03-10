@@ -11,7 +11,7 @@ function AICanvas({ from }) {
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const goals = useSelector(state => state.goals);
-    const userId = useSelector(state => state.user ? state.user.id : null);
+    const userId = useSelector(state => state.userId);
     const aiHistory = useSelector(state => state.ai);
 
     const [aiResponse, setAiResponse] = useState("");
@@ -62,8 +62,7 @@ function AICanvas({ from }) {
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
             const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId })//send request to backend
             const parsedResponse = await parseAIResponse(aiResponse);//parse backend request
-            dispatch(logInteraction({userMessage: userInput, aiResponse: parsedResponse}))//add interaction to redux state
-            
+            dispatch(logInteraction({userMessage: userInput, aiResponse: parsedResponse}))//add interaction to redux state    
             setAiResponse(prev => prev + "\n" + parsedResponse);
             conversation.push({ "role": "user", "content": userInput })
             conversation.push({ "role": "system", "content": parsedResponse })
@@ -80,7 +79,7 @@ function AICanvas({ from }) {
         <div className={`ai-canvas ${isMobile ? (isExpanded ? " expanded" : "collapsed") : ""}`}>
             {isMobile && (
                 <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
-                    {isExpanded ? "Hide AI" : "Show AI 🤖"}
+                    {isExpanded ? "Hide AI" : "Show AI"}
                 </button>
             )}
             {(!isMobile || isExpanded) && (
