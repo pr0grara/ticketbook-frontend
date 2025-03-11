@@ -86,11 +86,11 @@ function Goals() {
             console.log("🚮 Dropped Item:", item);
             deleteItem(item); // ✅ Directly call the delete function
 
-            setTimeout(() => {
-                console.log("✅ Dragging Ended Successfully");
-                setIsDragging(false);
-                setShowTrashcan(false);
-            }, 50);
+            // setTimeout(() => {
+            //     console.log("✅ Dragging Ended Successfully");
+            //     setIsDragging(false);
+            //     setShowTrashcan(false);
+            // }, 50);
         },
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
@@ -189,12 +189,12 @@ function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPositio
             isDragging: !!monitor.isDragging(),
         }),
         end: () => {
-            setIsDragging(false);
-            setShowTrashcan(false);
-            // setTimeout(() => {
-            //     setIsDragging(false);
-            //     setShowTrashcan(false);
-            // }, 5);
+            // setIsDragging(false);
+            // setShowTrashcan(false);
+            setTimeout(() => {
+                setIsDragging(false);
+                setShowTrashcan(false);
+            }, 50);
         }
     });
 
