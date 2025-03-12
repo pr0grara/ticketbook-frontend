@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { handleAIRequest, parseAIResponse } from "../hooks/useAI.js";
+import { handleAIRequest, handleAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
 import { Send, Loader, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -42,7 +42,7 @@ function AICanvas({ from }) {
         e.preventDefault();
         if (!userInput.trim() || isLoading) return;
 
-        setIsLoading(true); // ✅ Show loading animation
+        setIsLoading(true); // Show loading animation
 
         const requestType = "user message";
         let contextTickets = [];
@@ -50,18 +50,18 @@ function AICanvas({ from }) {
 
         try {
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
+            //Send request to backend
             const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId });
-
-            const parsedResponse = await parseAIResponse(aiResponse);
-            dispatch(logInteraction({ userMessage: userInput, aiResponse: parsedResponse }));
-
-            setAiResponse(prev => prev + "\n" + parsedResponse);
+            //Handle response
+            const handledResponse = await handleAIResponse(aiResponse);
+            //Update React/Redux
+            dispatch(logInteraction({ userMessage: userInput, aiResponse: handledResponse }));
+            setAiResponse(prev => prev + "\n" + handledResponse);
             setConversation(prev => [
                 ...prev,
                 { role: "user", content: userInput },
-                { role: "system", content: parsedResponse }
+                { role: "system", content: handledResponse }
             ]);
-
             setUserInput("");
         } catch (err) {
             console.error("AI error:", err);

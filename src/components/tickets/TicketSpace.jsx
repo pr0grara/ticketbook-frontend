@@ -8,9 +8,8 @@ const TicketSpace = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const { loggedIn } = useSelector(state => state.session);
     const { userActivatedTickets } = useSelector(state => state.tickets);
-    // const [tickets, setTickets] = useState(userActivatedTickets || []);
+    const [height, setHeight] = useState(400)
 
-    // const tickets = userActivatedTickets.map(ticket => ({ ...ticket })); // ✅ Ensure new references
 
     useEffect(() => {
         // console.log("🔄 TicketSpace Component Re-Rendered");
@@ -32,7 +31,13 @@ const TicketSpace = () => {
     return (
         <nav className="ticket-space-container">
             {tickets.map(ticket => <Ticket ticket={ticket} key={ticket._id}/>)}
-            {!isMobile && <div className="ticket-list-spaceholder"></div>}
+            {!isMobile && 
+                <div 
+                    className="ticket-list-spaceholder"
+                    style={{
+                        height: `${height}px`
+                    }}
+                ></div>}
         </nav>
     );
 };

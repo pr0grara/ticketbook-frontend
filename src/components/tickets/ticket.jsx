@@ -19,15 +19,22 @@ export default function Ticket({ ticket }) {
     const [checklist, setChecklist] = useState(ticket.checklist || []);
     const [newChecklistItem, setNewChecklistItem] = useState(""); // New item input
 
+    // if (ticket.checklist?.length > 0) setShowChecklist(true);
+
     useEffect(() => {
         console.log("🔄 Ticket Component Re-Rendered", ticket);
     }, [ticket]);
 
     useEffect(() => {
+        if (ticket.checklist?.length > 0) setShowChecklist(true);
         if (JSON.stringify(ticket.checklist) !== JSON.stringify(checklist)) {
             setChecklist(ticket.checklist || []);
         }
     }, [ticket.checklist]);
+
+    useEffect(() => {
+        if (ticket.notes?.length > 0) setShowNotes(true);
+    }, [ticket.notes]);
 
     const humanDate = (date) => {
         return new Date(date).toLocaleDateString('en-US', {
@@ -88,8 +95,9 @@ export default function Ticket({ ticket }) {
     };
 
     const handleHelp = async (ticket) => {
-        const goalResponse = await fetchGoalById(ticket.goalId);
-        const goal = goalResponse.data;
+        let goalResponse;
+        if (!!ticket.goalId) goalResponse = await fetchGoalById(ticket.goalId);
+        const goal = goalResponse?.data || "";
         const request = {
             contextGoals: [goal],
             contextTickets: [ticket],
@@ -152,6 +160,7 @@ export default function Ticket({ ticket }) {
             <div className="ticket-item checklist-container">
                 <div className="activate-checklist" onClick={()=>setShowChecklist(!showChecklist)}>{showChecklist ? "(-) Hide Checklist" : "(+) Show Checklist" }</div>
                 {showChecklist && checklist.length > 0 && (
+                    <>
                     <div className="ticket-checklist">
                         {checklist.map((item, index) => (
                             <div key={index} className={`checklist-item ${index%2===0 ? "even":"odd"}`}>
@@ -170,29 +179,30 @@ export default function Ticket({ ticket }) {
                             </div>
                         ))}
                     </div>
+                    <div className="add-checklist-container">
+                        <input
+                            type="text"
+                            value={newChecklistItem}
+                            onChange={(e) => setNewChecklistItem(e.target.value)}
+                            placeholder="New checklist item..."
+                            className="checklist-input"
+                            onKeyDown={handlekeydown}
+                            data-type="new-checklist"
+
+                        />
+                        <div onClick={handleAddChecklistItem}>ADD ITEM</div>
+                    </div>
+                    </>
                 )}
 
-                {/* Add New Checklist Item */}
-                <div className="add-checklist-container">
-                    <input
-                        type="text"
-                        value={newChecklistItem}
-                        onChange={(e) => setNewChecklistItem(e.target.value)}
-                        placeholder="New checklist item..."
-                        className="checklist-input"
-                        onKeyDown={handlekeydown}
-                        data-type="new-checklist"
-
-                    />
-                    <div onClick={handleAddChecklistItem}>ADD ITEM</div>
-                </div>
             </div>
 
             {/* Notes Section */}
             <div className="ticket-item notes-container">
                 <div className="activate-notes" onClick={() => setShowNotes(!showNotes)}>{showNotes ? "(-) Hide Notes" : "(+) Show Notes"}</div>
                 {showNotes && (
-                    <div className="ticket-notes">
+                    <>
+                    <div className="ticket-notes" style={{border: `${notes.length === 0 ? "none" : ""}`}}>
                         {notes.map((note, index) => (
                             <div key={index} className="note-item">
                                 <input
@@ -210,20 +220,21 @@ export default function Ticket({ ticket }) {
                             </div>
                         ))}
                     </div>
+                    <div className="add-note-container">
+                        <input
+                            type="text"
+                            value={userInput}
+                            onChange={(e) => setUserInput(e.target.value)}
+                            placeholder="Add a note..."
+                            className="ticket-note-input"
+                            // onKeyDown={handlekeydown}
+                            onKeyDown={handlekeydown}
+                            data-type="new-note"
+                        />
+                        <div onClick={handleAddNote} style={{ backgroundColor:"rgba(140, 71, 197)"}}>ADD NOTE</div>
+                    </div>
+                    </>
                 )}
-                <div className="add-note-container">
-                    <input
-                        type="text"
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        placeholder="Add a note..."
-                        className="ticket-note-input"
-                        // onKeyDown={handlekeydown}
-                        onKeyDown={handlekeydown}
-                        data-type="new-note"
-                    />
-                    <div onClick={handleAddNote} style={{ backgroundColor:"rgba(140, 71, 197)"}}>ADD NOTE</div>
-                </div>
             </div>
         </div>
     );

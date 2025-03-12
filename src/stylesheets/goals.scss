@@ -10,10 +10,34 @@
     margin-bottom: 10px;
 }
 
+.goal-list-header-container {
+    display: inline-block;
+    // flex-direction: column;
+    // width: auto;
+}
+
 .goal-list-title {
-    margin: 20px;
+    margin: 20px 20px 0px 20px;
     font-size: large;
     font-weight: 500;
+}
+
+.goal-subtitle {
+    font-size: small;
+    margin-left: 20px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid black;
+    display: inline-block;
+}
+
+.goal-tutorial {
+    font-size: medium;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-bottom: 5px;
+    font-style: italic;
+    color: grey;
+    // display: inline-block;
 }
 
 .goal-list {
@@ -90,6 +114,16 @@
     min-height: 100vh;
 }
 
+.ticket-tutorial {
+    font-size: medium;
+    margin-left: 20px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    font-style: italic;
+    color: grey;
+    // display: inline-block;
+}
+
 .ticket-list-spaceholder {
     border: 1px solid transparent;
     min-height: 200px;
@@ -139,12 +173,16 @@
     font-family: Nunito;
     padding: 7px 10px;
     font-size: 1rem;
-    border: 2px solid #ddd;
+    border: 1px solid #3695de44;
     border-radius: 5px;
     background-color: whitesmoke;
     color: #333;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+}
+
+.is-bucket {
+    border: 1px solid #dea33644;
 }
 
 .goal-toggle:hover {
@@ -155,6 +193,12 @@
     background-color: #3694de;
     color: white;
     border-color: #3694de;
+}
+
+.is-bucket.selected {
+    color: black;
+    background-color: #dea336;
+    border-color: #dea336;
 }
 
 .kanban-board {

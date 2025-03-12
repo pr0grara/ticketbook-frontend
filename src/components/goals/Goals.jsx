@@ -20,7 +20,6 @@ function Goals() {
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     
     const memoizedTickets = useMemo(() => tickets, [tickets]);
-    const memoizedGoals = useMemo(() => goals, [goals]);
 
     const displayedTickets = useMemo(() => {
         if (!selectedGoal) return memoizedTickets.filter(ticket => ticket.status !== "done");
@@ -112,7 +111,8 @@ function Goals() {
         <div className="goals-container">
             <div className="ticket-list-container">
                 <div className="ticket-list-title">Tickets</div>
-                <div className="subtitle">small tasks belonging to a Goal</div>
+                <div className="subtitle">Small tasks</div>
+                <div className="ticket-tutorial">{displayedTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
                 {displayedTickets.map(ticket => (
                     <TicketCard 
                         ticket={ticket} 
@@ -128,7 +128,11 @@ function Goals() {
             </div>
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
-                <div className="goal-list-title">Goals</div>
+                <div className="goal-list-header-container">
+                    <div className="goal-list-title">Goals and Buckets</div>
+                    <div className="goal-subtitle">Group your tickets into larger goals and buckets</div>
+                    <div className="goal-tutorial">{goals.length === 0 && `Type something like "I'd like to get better at cooking" or "Open a new business" to create your first goal or "New bucket Finance" to create a general purpose "Finance" bucket.`}</div>
+                </div>
                 <div className="goal-selection">
                         {goals.map((goal) => (
                             <GoalCard 
@@ -257,12 +261,12 @@ const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTra
     return (
         <button
             ref={drag} // ✅ Attach drag here
-            className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""}`}
+            className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""} ${goal.isBucket && "is-bucket"}`}
             onClick={() => !isMobile && handleSelectedGoal(goal)}
             onTouchStart={() => handleSelectedGoal(goal)}
             style={{
                 opacity: isDragging ? 0.5 : 1,
-                transform: isDragging ? "scale(1.1)" : "scale(1)"
+                transform: isDragging ? "scale(1.1)" : "scale(1)",
             }}
         >
             {goal.title}

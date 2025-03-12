@@ -3,5 +3,4 @@ export const PROD_MODE = true;
 export const PROD_URL = "https://api.arabuilds.com/api";
 export const DEV_URL = "http://localhost:5000/api";
 
-console.log(PROD_MODE)
 export const API_BASE_URL = PROD_MODE ? PROD_URL : DEV_URL;

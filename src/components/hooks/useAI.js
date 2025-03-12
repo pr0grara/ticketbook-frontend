@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../../config";
 import { addGoal, setSelectedGoal } from "../../redux/slices/goalsSlice";
 import authAPI from "../api/authAPI";
 
-async function parseAIResponse(res) {
+async function handleAIResponse(res) {
     const createNewTicket = async (res) => {
         if (res.status === "completed") {
             return res.newTicket
@@ -109,8 +109,6 @@ async function parseAIResponse(res) {
             }
             store.dispatch(setSelectedGoal(newGoalObj.newGoal))
             store.dispatch(setSelectedTickets({newGoal: true, newTickets: newGoalObj.newTickets.map(newTick => newTick.newTicket)}))
-
-
             return "New Goal created!"
         case "request_info":
             return res.question
@@ -119,8 +117,9 @@ async function parseAIResponse(res) {
         case "fatal_error":
             return "Fatal AI Error"
         default:
-            console.error("Unknown action_type in parseAIResponse():", res);
-            return `Unkown action_type: "${action_type}", in parseAIResponse()`
+            debugger
+            console.error("Unknown action_type in handleAIResponse():", res);
+            return `Unkown action_type: "${action_type}", in handleAIResponse()`
     }
 }
 
@@ -191,4 +190,4 @@ async function handleAIRequest(request) {
     return refineAIOutput(aiResponse);
 }
 
-export { handleAIRequest, parseAIResponse };
+export { handleAIRequest, handleAIResponse };
