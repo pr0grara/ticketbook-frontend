@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 // import "../stylesheets/TicketSpace.scss"; // Import SCSS file
 import Ticket from './Ticket.jsx';
+// import Ticket from './TicketTest.jsx';
 
 const TicketSpace = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);

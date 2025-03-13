@@ -1,34 +1,69 @@
-#tickets-page {
-    // height: 100vh;
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
+.ticket-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
 }
 
-#tickets-container {
-    // max-width: 70%;
-    // height: 100%;
-    // display: flex;
-    // justify-content: wrap;
+.editable {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
-// .ticket-container {
-//     display: flex;
-//         /* Enables Flexbox */
-//         flex-direction: column;
-//         /* Stacks items vertically */
-//         gap: 10px;
-//         /* Space between items */
-//         max-width: 300px;
-//         /* Prevents stretching */
-//         margin: auto;
-//         /* Centers the list */
-// }
+.editable:hover {
+    background-color: #f3f3f3;
+}
 
-// .ticket-item {
-//     background: #f8f9fa;
-//     padding: 10px;
-//     border-radius: 5px;
-//     font-size: 18px;
-//     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-// }
+.edit-field {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.editable-text {
+    font-size: 16px;
+    font-family: inherit;
+    padding: 5px;
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    height: auto;
+    /* Adjusts to content */
+    display: block;
+    line-height: 1.5;
+}
+
+/* Makes textarea look the same as the div */
+.editable-textarea {
+    all: unset;
+    /* Removes default textarea styling */
+    font-size: inherit;
+    font-family: inherit;
+    width: 60vw;
+    height: auto;
+    line-height: inherit;
+    display: block;
+    padding: 5px;
+    background: transparent;
+    border: 1px solid grey;
+    resize: none;
+    overflow: hidden;
+}
+
+.cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: red;
+}
+
+.loading {
+    font-size: 12px;
+    color: #666;
+    margin-left: 10px;
+}

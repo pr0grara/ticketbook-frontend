@@ -136,6 +136,12 @@ async function callAI(request) {
                     {userInput, context}
                 )
                 break
+            case "daily plan":
+                response = await authAPI.post(
+                    '/ai/daily-plan',
+                    { context }
+                )
+                break
             default:
                 response = await axios.post(
                     `${API_BASE_URL}/ai/request`,
@@ -173,6 +179,7 @@ function prepareContext(contextGoals, contextTickets) {
 
 // 🏗️ POST-PROCESSING LAYER: Cleans & Validates AI Output
 function refineAIOutput(rawOutput) {
+    debugger
     if (typeof rawOutput === "object") return rawOutput;
     try {
         return JSON.parse(rawOutput); // ✅ Ensure valid JSON output

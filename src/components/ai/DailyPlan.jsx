@@ -16,12 +16,13 @@ function DailyPlan() {
 
     const { generateDailyPlan, confirmDailyPlan } = useAPI(userId, selectedGoal);
     const [dailyPlan, setDailyPlan] = useState(null);
+    const [aiPlan, setAiPlan] = useState(null)
 
     useEffect(() => {
         console.log("🔄 Daily Plan Component Re-Rendered");
     });
 
-    useEffect(() => {
+    const handleAiPlan = () => {
         console.log("generating daily plan")
         // handleAIRequest("prioritize", selectedGoal, tickets).then(setDailyPlan);
         // generateDailyPlan(selectedGoal).then(setDailyPlan);
@@ -30,23 +31,26 @@ function DailyPlan() {
         let contextGoals = !!selectedGoal ? [selectedGoal] : goals;
 
         if (!selectedGoal && goals) handleAIRequest({ requestType, contextGoals, contextTickets, aiHistory }).then(plan => {
-            setDailyPlan(plan)})
-            
-        if (selectedGoal && goals) handleAIRequest({requestType, contextGoals, contextTickets, aiHistory }).then(plan => {
-            setDailyPlan(plan)})
-    }, [selectedGoal, tickets]);
+            setAiPlan(plan)
+        })
+
+        if (selectedGoal && goals) handleAIRequest({ requestType, contextGoals, contextTickets, aiHistory }).then(plan => {
+            setAiPlan(plan)
+        })
+    }
 
     useEffect(() => {
-        console.log("🔥 Current dailyPlan:", dailyPlan, typeof dailyPlan);
-        if (dailyPlan === null) console.log("✅ dailyPlan is NULL");
-    }, [dailyPlan])
+        console.log("🔥 Current aiPlan:", aiPlan, typeof aiPlan);
+        if (aiPlan === null) console.log("✅ aiPlan is NULL");
+    }, [aiPlan])
 
     return (
         <div className="daily-plan">
-            <h3>📅 AI-Powered Daily Plan</h3>
-            {dailyPlan !== null && Object.keys(dailyPlan || {}).length > 0 ? (
+            <h3>Daily Plan</h3>
+            <button onClick={() => handleAiPlan()}>Suggest a plan?</button>
+            {aiPlan !== null && Object.keys(aiPlan || {}).length > 0 ? (
                 <ul>
-                    {Object.entries(dailyPlan).map(([timeSlot, tasks]) => (
+                    {Object.entries(aiPlan).map(([timeSlot, tasks]) => (
                         <li key={timeSlot}>
                             <strong>{timeSlot}:</strong>
                             <ul>
@@ -64,7 +68,7 @@ function DailyPlan() {
             ) : (
                 <p>Loading AI suggestions...</p>
             )}
-            <button onClick={() => confirmDailyPlan(dailyPlan)}>✔ Confirm Plan</button>
+            <button onClick={() => confirmDailyPlan(aiPlan)}>✔ Confirm Plan</button>
         </div>
     );
 }

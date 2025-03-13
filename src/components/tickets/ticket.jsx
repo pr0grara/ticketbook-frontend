@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import useAPI from "../hooks/useAPI.js";
 import { Trash2 } from "lucide-react";
 import { clearUserActivatedTickets, updateTicket, updateTicketStatus } from "../../redux/slices/ticketsSlice.js";
@@ -8,18 +8,27 @@ import { handleAIRequest } from "../hooks/useAI.js";
 import wind_rose from "../../icons/wind_rose.png"
 
 export default function Ticket({ ticket }) {
+    const { deleteItem, fetchGoalById } = useAPI();
     const dispatch = useDispatch();
-    const { selectedGoal } = useSelector(state => state.goals);
-    const [notes, setNotes] = useState(ticket.notes || []);
-    const [userInput, setUserInput] = useState("");
+    
+    // UI State
     const [showNotes, setShowNotes] = useState(false);
     const [showChecklist, setShowChecklist] = useState(false);
     const [showActions, setShowActions] = useState(false);
-    const [selectedAction, setSelectedAction] = useState(null);
+    
+    // User Input
+    const [userInput, setUserInput] = useState("");
+    
+    //Ticket Data State
+    const [notes, setNotes] = useState(ticket.notes || []);
     const [checklist, setChecklist] = useState(ticket.checklist || []);
     const [newChecklistItem, setNewChecklistItem] = useState(""); // New item input
 
-    // if (ticket.checklist?.length > 0) setShowChecklist(true);
+
+    // Inline Editing State
+    const [editingField, setEditingField] = useState(null);
+    const [tempValue, setTempValue] = useState("");
+    const [loadingField, setLoadingField] = useState(null);
 
     useEffect(() => {
         console.log("🔄 Ticket Component Re-Rendered", ticket);
@@ -42,7 +51,35 @@ export default function Ticket({ ticket }) {
         });
     };
 
-    const { deleteItem, fetchGoalById } = useAPI();
+    //Handle Inline Editing Activation
+    const handleEdit = (field, value) => {
+        setEditingField(field);
+        setTempValue(value);
+    };
+
+    //Auto-Save on Blur
+    const handleBlur = async (field, value) => {
+        // debugger
+        // if (value === tempValue) {
+        //     setEditingField(null);
+        //     return;
+        // }
+        
+        if (ticket[field] === tempValue) {
+            setEditingField(null);
+            return
+        }
+
+        setLoadingField(field);
+        dispatch(updateTicket({ ticketId: ticket._id, ticket: { [field]: tempValue } }));
+        setLoadingField(null);
+        setEditingField(null);
+    };
+
+    //Cancel Inline Editing
+    const handleCancel = () => {
+        setEditingField(null);
+    };
 
     const markDone = () => {
         dispatch(updateTicketStatus({ ticketId: ticket._id, newStatus: "done" }));
@@ -142,7 +179,14 @@ export default function Ticket({ ticket }) {
                         )}
                     </div>
                 </div>
-                <div className="ticket">{ticket.text}</div>
+                {/* <div className="ticket">{ticket.text}</div> */}
+                {editingField === "text" ? (
+                    <div className="edit-field">
+                        <textarea className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("text", tempValue)} />
+                    </div>
+                ) : (
+                    <p className="editable" onClick={() => handleEdit("text", ticket.text)}>{ticket.text}</p>
+                )}
             </div>
             <div className="ticket-item" style={{ fontSize: "small" }}>{ticket.status}</div>
             <div className="ticket-date-container">
@@ -159,7 +203,7 @@ export default function Ticket({ ticket }) {
             {/* Checklist Section */}
             <div className="ticket-item checklist-container">
                 <div className="activate-checklist" onClick={()=>setShowChecklist(!showChecklist)}>{showChecklist ? "(-) Hide Checklist" : "(+) Show Checklist" }</div>
-                {showChecklist && checklist.length > 0 && (
+                {showChecklist && (
                     <>
                     <div className="ticket-checklist">
                         {checklist.map((item, index) => (
@@ -169,9 +213,6 @@ export default function Ticket({ ticket }) {
                                         type="checkbox"
                                         checked={item.status === "checked"}
                                         onChange={() => handleToggleChecklistItem(index)}
-                                        // onKeyDown={handlekeydown}
-                                        // data-type="existing-checklist"
-                                        // data-index={index}
                                     />
                                     <span className={item.status==="checked" ? "checked-list-item" : ""} >{item.item}</span>
                                 </div>
