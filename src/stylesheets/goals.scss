@@ -231,6 +231,11 @@
 @media (max-width: 768px) {
     .ticket-list-container {
         // width: 100vw;
+        min-height: unset;
+    }
+
+    .ticket-list-spaceholder {
+        min-height: 250px;
     }
 
     .goal-and-ticket-container {

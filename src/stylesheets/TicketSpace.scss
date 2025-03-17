@@ -23,6 +23,7 @@
     display: flex;
     margin: 3px;
     width: 90%;
+    font-weight: 800;
 }
 
 .ticket-date-container {
@@ -147,12 +148,12 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: stretch;
-    .even {
-        order: 1;
-    }
-    .odd {
-        order: 2;
-    }
+    // .even {
+    //     order: 1;
+    // }
+    // .odd {
+    //     order: 2;
+    // }
 
 } 
 
@@ -318,4 +319,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@media (max-width: 768px) {
+    .checklist-item {
+        flex-basis: calc(100% - 8px);
+    } 
 }

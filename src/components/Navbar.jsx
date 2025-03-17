@@ -35,7 +35,7 @@ const Navbar = () => {
                 <Link to="/calendar" className="nav-link">Calendar</Link>
             </div>
             <div className="nav-right">
-                <img src={theme === "light" ? nightmode : daymode} className="theme-selector" onClick={() => dispatch(setTheme(theme === "light" ? "dark" : "light"))} title="toggle between day and night mode"/>
+                <img src={darkMode(theme) ? daymode : nightmode} className="theme-selector" onClick={() => dispatch(setTheme(theme === "light" ? "dark" : "light"))} title="toggle between day and night mode"/>
                 {loggedIn ? (
                     <button onClick={handleLogout} className="nav-button logout-btn">
                         Logout

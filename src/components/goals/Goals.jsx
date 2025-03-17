@@ -111,6 +111,12 @@ function Goals() {
     return (
         <>
         <div className={`goals-container${darkMode(theme) ? " dark-mode" : ""}`}>
+            {isMobile && (
+                <>
+                    <div className="ticket-list-spaceholder"></div>
+                    <TicketSpace />
+                </>
+            )}
             <div className="ticket-list-container">
                 <div className="ticket-list-title">Tickets</div>
                 <div className="subtitle">All of your open tickets</div>
@@ -126,7 +132,7 @@ function Goals() {
                         key={ticket._id}
                     />
                 ))}
-                <div className="ticket-list-spaceholder"></div>
+                {!isMobile && <div className="ticket-list-spaceholder"></div>}
             </div>
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
@@ -149,7 +155,7 @@ function Goals() {
                             />
                         ))}
                 </div>
-                <TicketSpace />
+            {!isMobile && <TicketSpace />}
             </div>
 
             <div
