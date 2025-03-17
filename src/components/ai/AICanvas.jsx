@@ -3,11 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, handleAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
 import { Send, Loader, ChevronDown, ChevronUp } from "lucide-react";
+import { setIsLoading } from "../../redux/slices/sessionSlice.js";
+import { darkMode } from "../../util/theme_util.js";
 
 function AICanvas({ from }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // ✅ Track AI processing
+    // const [isLoading, setIsLoading] = useState(false); // ✅ Track AI processing
+    const { isLoading } = useSelector(state => state.session);
 
     const dispatch = useDispatch();
     const tickets = useSelector(state => state.tickets.tickets);
@@ -17,6 +20,7 @@ function AICanvas({ from }) {
     const userId = useSelector(state => state.userId);
     const aiHistory = useSelector(state => state.ai);
     const { externalInteractions } = useSelector(state => state.ai);
+    const { theme } = useSelector(state => state.session);
 
     const [aiResponse, setAiResponse] = useState("");
     const [userInput, setUserInput] = useState("");
@@ -26,6 +30,7 @@ function AICanvas({ from }) {
         const newAdvice = externalInteractions[0]?.aiResponse.advice;
         if (!!newAdvice) {
             setAiResponse(prev => prev + "\n" + newAdvice);
+            if (!isExpanded) setIsExpanded(true)
             setConversation(prev => [...prev, { role: "system", content: newAdvice }]);
         }
     }, [externalInteractions]);
@@ -42,7 +47,7 @@ function AICanvas({ from }) {
         e.preventDefault();
         if (!userInput.trim() || isLoading) return;
 
-        setIsLoading(true); // Show loading animation
+        dispatch(setIsLoading(true)); // Show loading animation
 
         const requestType = "user message";
         let contextTickets = [];
@@ -67,12 +72,12 @@ function AICanvas({ from }) {
             console.error("AI error:", err);
             setAiResponse(prev => prev + "\n⚠️ AI service is currently unavailable.");
         } finally {
-            setIsLoading(false); // ✅ Hide loading animation
+            dispatch(setIsLoading(false)); // ✅ Hide loading animation
         }
     };
 
     return (
-        <div className={`ai-canvas ${isMobile ? (isExpanded ? " expanded" : "collapsed") : ""}`}>
+        <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode-canvas" : ""}`}>
             {isMobile && (
             <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
                 {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}

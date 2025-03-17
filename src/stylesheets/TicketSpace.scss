@@ -1,24 +1,28 @@
 .ticket-space-container {
     display: flex;
     flex-direction: column;
+    position: relative;
     justify-content: center;
     align-items: center;
+    // border-top: 3px solid grey;
 }
 
 .ticket-container {
-    margin: 5px;
-    width: 70vw;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    border: 1px solid grey;
-    border-radius: 8px;
-    padding: 10px;
+    align-items: center;
+    border-bottom: 1px dashed grey;
+    // border-radius: 8px;
+    // padding: 10px;
     position: relative;
+    padding-bottom: 20px;
 }
 
 .ticket-item {
     display: flex;
     margin: 3px;
+    width: 90%;
 }
 
 .ticket-date-container {
@@ -27,6 +31,9 @@
 }
 
 .ticket-utility-container {
+    // position: absolute;
+    top: calc(50% - 20px);
+    left: 5px;
     display: flex;
     margin-right: 8px;
     // position: absolute;
@@ -60,10 +67,14 @@
 }
 
 .ticket-action-icon {
-    width: 40px;
+    width: 30px;
+    // background-color: #818383c2;
+    border-radius: 50%;
+    transition: all 0.777s ease-in-out;
     &:hover {
-        border-radius: 40px;
-        background-color: #9dd7fe;
+        background-color: #58ccf6;
+        background-color: whitesmoke;
+        transition: all 0.2s ease-in-out;
     }
 }
 
@@ -78,12 +89,13 @@
 
 .action-button {
     width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    padding: 8px;
+    // height: 50px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     position: absolute;
-    background-color: #bd8e17;
+    background-color: rgb(54, 149, 222);
     color: white;
     font-size: 12px;
     transition: transform 0.2s ease, background-color 0.3s ease;
@@ -95,25 +107,26 @@
 }
 
 .north {
-    top: -20px;
+    top: 0px;
     left: 50%;
     transform: translateX(-50%);
+    transition: all .2s ease-in-out;
 }
 
 .south {
-    bottom: -20px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .east {
-    right: -20px;
+    right: -10px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .west {
-    left: -20px;
+    left: -10px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -127,6 +140,8 @@
 }
 
 .ticket-checklist {
+    border: 1px solid black;
+    margin: 10px 2rem;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -142,29 +157,48 @@
 } 
 
 .checklist-item {
-    // width: 45%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-basis: calc(50% - 8px);
-    padding: 4px;
-    font-size: 15px;
-    border-bottom: 1px dotted;
-    margin-bottom: 1rem;
+    // padding: 4px;
+    // font-size: 15px;
+    // border-bottom: 1px dashed;
+    // margin-bottom: 1rem;
+}
+
+.checklist-input-container {
+    display: flex;
+    width: 100%;
+    position: relative;
+}
+
+.checklist-item input {
+    // font-size: 1.2rem;
+    border: none;
+    outline: none;
+    padding: 10px;
+    overflow: visible;
 }
 
 .checked-list-item {
     text-decoration: line-through;
+    width: 100%;
+}
+
+.unchecked-list-item {
+    width: 100%;
 }
 
 .add-checklist-container, .add-note-container {
     display: flex;
     justify-content: space-between;
     border-radius: 6px;
-    border: 1px solid black;
+    // border: 1px solid black;
     input {
         border: none;
         background-color: transparent;
+        color: white;
     }
     div { //ADD button
         width: 30%;
@@ -189,6 +223,7 @@
 
 .ticket-note-input, .note-input, .checklist-input {
     width: 70%;
+    outline: none;
 } 
 
 .notes-container {
@@ -211,13 +246,15 @@
     display: flex;
     justify-content: space-between;
     // border-radius: 6px;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid white;
+    position: relative;
 
     input {
         width: 95%;
         border: none;
         background-color: transparent;
         padding: 5px;
+        color: white;
     }
     button {
 
@@ -225,11 +262,11 @@
 }
 
 .activate-notes, .activate-checklist {
-    font-size: 1rem;
-    color: #0056b3;
+    font-size: .85rem;
+    color: #58ccf6;
     &:hover {
         cursor: pointer;
-        color: rgb(0, 0, 160);
+        color: #00bbff;
     }
 }
 
@@ -237,4 +274,48 @@
     &:hover{
         cursor: pointer;
     }
+}
+
+.note-controls, .checklist-controls {
+    display: flex;
+}
+
+.remove-note, .remove-checklist {
+    font-size: 1.75rem;
+    color: darkred;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.remove-note-disabled, .remove-checklist-disabled {
+    display: none;
+}
+
+.remove-note:hover, .remove-checklist:hover {
+    cursor: pointer;
+}
+
+.add-note, .add-checklist {
+    font-size: 1.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: green;
+}
+
+.add-note-disabled, .add-checklist-disabled {
+    display: none;
+}
+
+.add-note:hover, .add-checklist:hover {
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+}
+
+.note-item span, .checked-list-item span {
+    font-size: 1.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

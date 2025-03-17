@@ -4,10 +4,11 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import authAPI from "../api/authAPI";
 import { setLoggedIn } from "../../redux/slices/sessionSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/slices/userSlice";
 import { fetchGoals } from "../../redux/slices/goalsSlice";
 import { fetchTickets } from "../../redux/slices/ticketsSlice";
+import { darkMode } from "../../util/theme_util";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ const LoginPage = () => {
     const [firstname, setFirstname] = useState("");
     const [error, setError] = useState(null);
     const [isSignUp, setIsSignUp] = useState(false);
+
+    const { theme } = useSelector(state => state.session)
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -52,7 +55,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className={`login-container${darkMode(theme) ? " dark-mode" : ""}`}>
             <div className="login-box">
                 <h2>{isSignUp ? "Create Account" : "Login"}</h2>
                 <form onSubmit={handleSubmit}>

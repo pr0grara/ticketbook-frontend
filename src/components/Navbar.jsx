@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import "../stylesheets/Navbar.scss"; // Import SCSS file
 import authAPI, { checkStatus } from "./api/authAPI";
-import { setLoggedOut } from "../redux/slices/sessionSlice";
+import { setLoggedOut, setTheme } from "../redux/slices/sessionSlice";
 import { clearUser } from "../redux/slices/userSlice";
+import { darkMode } from "../util/theme_util";
+import nightmode from '../icons/night-mode.png'
+import daymode from '../icons/day-mode.png'
 
 const Navbar = () => {
-    const { loggedIn } = useSelector(state => state.session);
+    const { loggedIn, theme } = useSelector(state => state.session);
     // const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -20,19 +22,20 @@ const Navbar = () => {
                 // navigate("/login");
             })
     };
-
+    
     // useEffect(() => {
     //     console.log("🔄 Navbar Component Re-Rendered");
     // });
 
     return (
-        <nav className="navbar">
+        <nav className={`navbar${darkMode(theme) ? " dark-mode" : ""}`}>
             <div className="nav-left">
-                <Link to="/goals" className="nav-logo">Goals</Link>
+                <Link to="/goals" className="nav-link">Goals</Link>
                 {/* <Link to="/plan" className="nav-link">Daily Plan</Link> */}
                 <Link to="/calendar" className="nav-link">Calendar</Link>
             </div>
             <div className="nav-right">
+                <img src={theme === "light" ? nightmode : daymode} className="theme-selector" onClick={() => dispatch(setTheme(theme === "light" ? "dark" : "light"))} title="toggle between day and night mode"/>
                 {loggedIn ? (
                     <button onClick={handleLogout} className="nav-button logout-btn">
                         Logout

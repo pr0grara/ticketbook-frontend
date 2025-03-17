@@ -12,6 +12,7 @@
 
 .goal-list-header-container {
     display: inline-block;
+    // color: white;
     // flex-direction: column;
     // width: auto;
 }
@@ -26,7 +27,7 @@
     font-size: small;
     margin-left: 20px;
     margin-bottom: 5px;
-    border-bottom: 1px solid black;
+    // border-bottom: 1px solid black;
     display: inline-block;
 }
 
@@ -95,23 +96,29 @@
     margin-top: 20px;
     font-size: large;
     font-weight: 500;
+    padding-left: 10px;
+    // color: #ffcec5;
+    font-weight: 600;
 }
 
 .subtitle {
     font-size: small;
     margin-top: 5px;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid black;
+    margin-bottom: .5rem;
+    padding-left: 10px;
+    
+    // border-bottom: 1px solid black;
 }
 
 .ticket-list-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border-right: 1px solid grey;
-    min-width: 20vw;
-    max-width: 20vw;
+    // align-items: center;
+    // border-right: 3px solid grey;
+    // min-width: 20vw;
+    // max-width: 20vw;
     min-height: 100vh;
+    padding-left: 1rem;
 }
 
 .ticket-tutorial {
@@ -130,25 +137,25 @@
 }
 
 .ticket-card {
-    background: white;
     padding: 5px 10px;
-    // margin: 5px 0;
-    // border-radius: 5px;
+    margin-right: 10px;
     margin-bottom: 8px;
-    border-bottom: 1px solid lightgrey;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    // border-bottom: 1px solid lightgrey;
+    // box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     cursor: grab;
     transition: 0.2s;
-    font-size: .85rem;
-    background-color: whitesmoke;
+    font-size: .9rem;
+    font-weight: 600;
     max-width: 75%;
 }
 
 .ticket-card:hover {
     background: #f0f0f0;
+    color: black;
 }
 
 .goal-and-ticket-container {
+    // background: #191919;
     display: flex;
     flex-direction: column;
     width: 80vw;
@@ -167,22 +174,26 @@
     gap: 10px;
 }
 
+.dark-mode .goal-toggle {
+    background-color: #191919;
+    color: white;
+}
+
 .goal-toggle {
     display: flex;
     align-items: center;
     font-family: Nunito;
     padding: 7px 10px;
     font-size: 1rem;
-    border: 1px solid #3695de44;
+    border: 1px solid #3695de77;
     border-radius: 5px;
-    background-color: whitesmoke;
-    color: #333;
+    // background-color: whitesmoke;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .is-bucket {
-    border: 1px solid #dea33644;
+    border: 1px solid #dea33677;
 }
 
 .goal-toggle:hover {
@@ -219,7 +230,7 @@
 
 @media (max-width: 768px) {
     .ticket-list-container {
-        min-width: 100vw;
+        // width: 100vw;
     }
 
     .goal-and-ticket-container {

@@ -179,7 +179,6 @@ function prepareContext(contextGoals, contextTickets) {
 
 // 🏗️ POST-PROCESSING LAYER: Cleans & Validates AI Output
 function refineAIOutput(rawOutput) {
-    debugger
     if (typeof rawOutput === "object") return rawOutput;
     try {
         return JSON.parse(rawOutput); // ✅ Ensure valid JSON output

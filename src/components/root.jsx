@@ -5,7 +5,7 @@ const Root = ({ store }) => {
     return (
         // <Provider store={store}>
         //     <HashRouter>
-                <App />
+        <App />
                 /* <Landing /> */
             /* </HashRouter>
         </Provider> */

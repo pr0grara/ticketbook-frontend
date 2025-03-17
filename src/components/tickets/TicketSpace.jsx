@@ -31,7 +31,7 @@ const TicketSpace = () => {
 
     return (
         <nav className="ticket-space-container">
-            {tickets.map(ticket => <Ticket ticket={ticket} key={ticket._id}/>)}
+            {tickets.map(ticket => <Ticket ticket={ticket} key={ticket._id} isMobile={isMobile}/>)}
             {!isMobile && 
                 <div 
                     className="ticket-list-spaceholder"

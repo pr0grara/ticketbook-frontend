@@ -11,12 +11,14 @@ import { setLoggedIn, setLoggedOut } from "../../redux/slices/sessionSlice.js";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { fetchGoals } from "../../redux/slices/goalsSlice.js";
 import TicketSpace from '../tickets/TicketSpace.jsx';
+import { darkMode } from "../../util/theme_util.js";
 
 function Goals() {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
     const userId = useSelector(state => state.userId);
+    const { theme } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     
     const memoizedTickets = useMemo(() => tickets, [tickets]);
@@ -108,10 +110,10 @@ function Goals() {
 
     return (
         <>
-        <div className="goals-container">
+        <div className={`goals-container${darkMode(theme) ? " dark-mode" : ""}`}>
             <div className="ticket-list-container">
                 <div className="ticket-list-title">Tickets</div>
-                <div className="subtitle">Small tasks</div>
+                <div className="subtitle">All of your open tickets</div>
                 <div className="ticket-tutorial">{displayedTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
                 {displayedTickets.map(ticket => (
                     <TicketCard 
@@ -129,8 +131,8 @@ function Goals() {
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
                 <div className="goal-list-header-container">
-                    <div className="goal-list-title">Goals and Buckets</div>
-                    <div className="goal-subtitle">Group your tickets into larger goals and buckets</div>
+                        <div className="goal-list-title">Goals and Buckets</div>
+                        <div className="goal-subtitle">Group your tickets into <span style={{ color: "#3695de" }}>goals</span> and <span style={{ color: "#dea336" }}>buckets</span></div>
                     <div className="goal-tutorial">{goals.length === 0 && `Type something like "I'd like to get better at cooking" or "Open a new business" to create your first goal or "New bucket Finance" to create a general purpose "Finance" bucket.`}</div>
                 </div>
                 <div className="goal-selection">

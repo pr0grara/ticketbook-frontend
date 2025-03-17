@@ -1,0 +1,65 @@
+.dark-mode {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode .navbar {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode .nav-link {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode .ticket-list-container {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode-canvas {
+    background: #191919f0;
+    color: white;
+} 
+
+.dark-mode-canvas .ai-output, .dark-mode-canvas input {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode input {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode .ticket-container {
+    background: #191919;
+    color: white;
+}
+
+.dark-mode .goal-and-ticket-container {
+    color: white;
+}
+
+.dark-mode .ticket-checklist {
+    border: 1px solid white;
+}
+
+.dark-mode .ticket-notes {
+    border: 1px solid white;
+}
+
+.dark-mode {
+    .goal-toggle:hover {
+        color: black;
+    }
+
+    .login-container {
+        background: #191919;
+    }
+    
+    .login-box {
+        background: #232323;
+    }
+}
