@@ -68,13 +68,13 @@ function AICanvas({ from }) {
                 { role: "system", content: handledResponse }
             ]);
             setUserInput("");
+            document.querySelector('.canvas-input').blur()
         } catch (err) {
             console.error("AI error:", err);
             setAiResponse(prev => prev + "\n⚠️ AI service is currently unavailable.");
         } finally {
             if (!isExpanded) setIsExpanded(true);
             dispatch(setIsLoading(false)); // ✅ Hide loading animation
-            document.querySelector('.canvas-input').blur()
         }
     };
 
