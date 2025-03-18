@@ -105,6 +105,18 @@ export default function Ticket({ ticket, isMobile }) {
         }
     };
 
+    const setFocus = ({index, item, query}) => {
+        setTimeout(() => {
+            let items = document.querySelectorAll(query)
+            try {
+                console.log('focusing item')
+                items[index].focus()
+            } catch {
+                setFocus({index, item, query})
+            }
+        }, 100)
+    }
+
     const handleAddTicketItem = ({index, item}) => {
         switch (item) {
             case "note":
@@ -112,12 +124,14 @@ export default function Ticket({ ticket, isMobile }) {
                 newNotes.splice(index + 1, 0, "");
                 setNotes(newNotes);
                 dispatch(updateTicket({ ticketId: ticket._id, ticket: { notes: newNotes } }));
+                setFocus({index: index+1, item, query: ".note-input"})
                 break
             case "checklist":
                 const newChecklist = [...checklist];
                 newChecklist.splice(index + 1, 0, {item: "", status: "unchecked"});
                 setChecklist(newChecklist);
                 dispatch(updateTicket({ ticketId: ticket._id, ticket: { checklist: newChecklist } }))
+                setFocus({ index: index + 1, item, query: ".checklist-input" })
                 break
             default:
                 return alert("no valid action for ticket item");
@@ -129,6 +143,7 @@ export default function Ticket({ ticket, isMobile }) {
         let newNotes = notes.filter((_, i) => i !== index);
         setNotes(newNotes);
         dispatch(updateTicket({ ticketId: ticket._id, ticket: { notes: newNotes } }));
+        setFocus({index: index - 1, query: ".note-item"})
     };
 
     const handleEditNote = (index, newValue, commit) => {
@@ -179,6 +194,7 @@ export default function Ticket({ ticket, isMobile }) {
             const updatedChecklist = checklist.filter((_, i) => i !== index);
             setChecklist(updatedChecklist);
             dispatch(updateTicket({ ticketId: ticket._id, ticket: { checklist: updatedChecklist } }));
+            setFocus({index: index-1, query: ".checklist-input"})
         }
     };
 
@@ -198,20 +214,40 @@ export default function Ticket({ ticket, isMobile }) {
     };
 
     const handlekeydown = (e) => {
+        let { index, checklist, note } = e.target.dataset;
+        index = parseInt(index);
         if (e.key === "Enter") {
             switch (e.target.dataset.type) {
                 case "existing-checklist":
-
+                    handleAddTicketItem({ index, item: "checklist" })                    
                     break
                 case "new-checklist":
                     return handleAddChecklistItem();
                 case "existing-note":
-                    const { index, note } = e.target.dataset;
-                    return handleEditNote(index, note, true);
+                    handleEditNote(index, note, true);
+                    handleAddTicketItem({ index, item: "note" })
+                    break
                 case "new-note":
                     return handleAddNote()
                 default:
                     return;
+            }
+        }
+
+        if (e.key === "Backspace") {
+            switch (e.target.dataset.type) {
+                case "existing-note":
+                    if (e.target.value.length === 0) {
+                        handleDeleteNote(index)
+                    }
+                    break
+                case "existing-checklist":
+                    if (e.target.value.length === 0) {
+                        handleDeleteChecklistItem(index)
+                    }
+                    break
+                default:
+                    return
             }
         }
     }
@@ -284,8 +320,12 @@ export default function Ticket({ ticket, isMobile }) {
                                     <input 
                                         type="text"
                                         value={item.item}
-                                        className={item.status === "checked" ? "checked-list-item" : "unchecked-list-item"} 
+                                        data-type="existing-checklist"
+                                        data-checklist={item}
+                                        data-index={index}
+                                        className={`checklist-input ${item.status === "checked" ? "checked-list-item" : "unchecked-list-item"}`}
                                         onChange={(e) => handleEditTicketItem({index, newValue: e.target.value, item: "checklist"})}
+                                        onKeyDown={handlekeydown}
                                     />
                                     {/* <span className={item.status==="checked" ? "checked-list-item" : ""} >{item.item}</span> */}
                                 </div>
@@ -334,7 +374,7 @@ export default function Ticket({ ticket, isMobile }) {
                                     value={note}
                                     onChange={(e) => handleEditNote(index, e.target.value)}
                                     className="note-input"
-                                    onKeyDown={handlekeydown}
+                                    onKeyDown={(e) => handlekeydown(e, {index, item: "note"})}
                                     data-type="existing-note"
                                     data-note={note}
                                     data-index={index}

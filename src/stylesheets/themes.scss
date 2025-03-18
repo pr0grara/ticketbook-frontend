@@ -47,7 +47,9 @@
 }
 
 .dark-mode .ticket-notes {
-    border: 1px solid white;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
 }
 
 .dark-mode {
@@ -61,5 +63,9 @@
     
     .login-box {
         background: #232323;
+    }
+
+    .note-item {
+        border-bottom: 1px solid white;
     }
 }

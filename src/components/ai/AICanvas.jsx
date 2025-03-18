@@ -74,6 +74,7 @@ function AICanvas({ from }) {
         } finally {
             if (!isExpanded) setIsExpanded(true);
             dispatch(setIsLoading(false)); // ✅ Hide loading animation
+            document.querySelector('.canvas-input').blur()
         }
     };
 
@@ -95,6 +96,7 @@ function AICanvas({ from }) {
                 <input
                     type="text"
                     value={userInput}
+                    className="canvas-input"
                     onChange={(e) => setUserInput(e.target.value)}
                     placeholder="Type your request..."
                 />

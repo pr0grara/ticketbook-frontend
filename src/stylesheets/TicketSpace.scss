@@ -235,7 +235,9 @@
 } 
 
 .ticket-notes {
-    border: 1px solid black;
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
     margin: 10px 2rem;
     :last-child {
             border-bottom: none;
@@ -247,7 +249,7 @@
     display: flex;
     justify-content: space-between;
     // border-radius: 6px;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid black;
     position: relative;
 
     input {
@@ -255,7 +257,6 @@
         border: none;
         background-color: transparent;
         padding: 5px;
-        color: white;
     }
     button {
 
