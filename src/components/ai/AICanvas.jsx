@@ -54,6 +54,7 @@ function AICanvas({ from }) {
         if (tickets.length > 0) contextTickets = selectedTickets.length > 0 ? selectedTickets : tickets;
 
         try {
+            document.querySelector('.canvas-input').blur()//blur input before getting response from backend
             let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
             //Send request to backend
             const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId });
@@ -68,7 +69,6 @@ function AICanvas({ from }) {
                 { role: "system", content: handledResponse }
             ]);
             setUserInput("");
-            document.querySelector('.canvas-input').blur()
         } catch (err) {
             console.error("AI error:", err);
             setAiResponse(prev => prev + "\n⚠️ AI service is currently unavailable.");
