@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useAPI from "../hooks/useAPI.js";
 import { Trash2 } from "lucide-react";
@@ -22,6 +22,9 @@ export default function Ticket({ ticket, isMobile }) {
     const [showChecklist, setShowChecklist] = useState(false);
     const [showChecklistControls, setShowChecklistControls] = useState(false)
     const [showActions, setShowActions] = useState(false);
+    const [selectedAction, setSelectedAction] = useState(null);
+    const [fadeOut, setFadeOut] = useState(false);
+    const actionRef = useRef(null);
     
     // User Input
     const [userInput, setUserInput] = useState("");
@@ -54,6 +57,18 @@ export default function Ticket({ ticket, isMobile }) {
             // dispatch(updateTicket({ticketId: ticket._id, ticket: {...ticket, notes: [""]}}))
         }
     }, [ticket.notes]);
+
+    useEffect(() => {
+        if (showActions) {
+            document.body.style.overflow = "hidden"; // Disable scroll
+        } else {
+            document.body.style.overflow = ""; // Restore scroll
+        }
+
+        return () => {
+            document.body.style.overflow = ""; // Cleanup when component unmounts
+        };
+    }, [showActions]);
 
     const humanDate = (date) => {
         return new Date(date).toLocaleDateString('en-US', {
@@ -252,8 +267,64 @@ export default function Ticket({ ticket, isMobile }) {
         }
     }
 
+    const handleTouchStart = (e) => {
+        e.preventDefault(); // Stop scrolling
+        if ("vibrate" in navigator) {
+            navigator.vibrate(30); // 30ms vibration
+        }
+        setFadeOut(false);
+        setShowActions(true);
+    };
+
+    // 🟡 Detect drag over action buttons
+    const handleTouchMove = (e) => {
+        if (!showActions) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const buttons = Array.from(actionRef.current?.children || []);
+        console.log(buttons)
+        let newSelectedAction = null;
+        buttons.forEach((button) => {
+            const rect = button.getBoundingClientRect();
+            if (
+                touch.clientX >= rect.left &&
+                touch.clientX <= rect.right &&
+                touch.clientY >= rect.top &&
+                touch.clientY <= rect.bottom
+            ) {
+                newSelectedAction = button.dataset.action;
+            }
+        });
+        if (newSelectedAction !== selectedAction) {
+            setSelectedAction(newSelectedAction);
+            if ("vibrate" in navigator) {
+                navigator.vibrate(30); // 30ms vibration
+            }
+        }
+    };
+
+    // 🔴 Trigger action or close menu
+    const handleTouchEnd = () => {
+        if (selectedAction) {
+            if (selectedAction === "delete") {
+                deleteItem({ type: "ticket", id: ticket._id });
+            } else if (selectedAction === "mark-done") {
+                markDone();
+            } else if (selectedAction === "get-help") {
+                handleHelp(ticket);
+                dispatch(setIsLoading(true))
+            }
+        }
+
+        setFadeOut(true);
+        setTimeout(() => {
+            setShowActions(false);
+            setSelectedAction(null);
+        }, 200); // Matches CSS fade-out duration
+    };
+
     return (
-        <div className="ticket-container">
+        <div className="ticket-container" onTouchEnd={(e)=> !!showActions ? handleTouchEnd(e) : null}>
             {!isMobile &&
                 <div className="ticket-button-container">
                     <div className="ticket-button done" onClick={() => { markDone(); setShowActions(false); }}>✔️ mark done</div>
@@ -265,12 +336,24 @@ export default function Ticket({ ticket, isMobile }) {
                 {isMobile && 
                 <div className="ticket-utility-container">
                     <div className="compass-container">
-                        <img src={darkMode(theme) ? joystickDark : joystick} alt="" className="ticket-action-icon" onMouseDown={() => setShowActions(!showActions)} />
+                        <img 
+                            src={darkMode(theme) ? joystickDark : joystick} 
+                            alt="" 
+                            className="ticket-action-icon" 
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                        />
                         {showActions && (
-                            <div className="compass-popup" onClick={() => setShowActions(!showActions)}>
-                                <button className="action-button north" onMouseUp={() => { deleteItem({ type: "ticket", id: ticket._id }); setShowActions(false); }}>Delete</button>
-                                <button className="action-button east" onMouseUp={() => { markDone(); setShowActions(false); }}>Done</button>
-                                <button className="action-button south" onMouseUp={() => { handleHelp(ticket); setShowActions(false); dispatch(setIsLoading(true))}}>Help</button>
+                                <div className={`compass-popup ${fadeOut ? "fade-out" : "show"}`} ref={actionRef}>
+                                <button data-action="delete"
+                                    className={`action-button north ${selectedAction === "delete" ? "selected" : ""}`} 
+                                >delete</button>
+                                <button data-action="mark-done"
+                                    className={`action-button east ${selectedAction === "mark-done" ? "selected" : ""}`} 
+                                >mark done</button>
+                                <button data-action="get-help"
+                                    className={`action-button south ${selectedAction === "get-help" ? "selected" : ""}`} 
+                                >get help</button>
                             </div>
                         )}
                     </div>

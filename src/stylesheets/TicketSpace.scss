@@ -11,12 +11,12 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     border-bottom: 1px dashed grey;
     // border-radius: 8px;
     // padding: 10px;
     position: relative;
     padding-bottom: 20px;
+    padding-left: 1rem;
 }
 
 .ticket-item {
@@ -81,11 +81,25 @@
 
 .compass-popup {
     position: absolute;
-    width: 150px;
-    height: 150px;
+    width: 125px;
+    height: 125px;
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    // touch-action: none;
+}
+
+.compass-popup.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.compass-popup.fade-out {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
 .action-button {
@@ -100,11 +114,24 @@
     color: white;
     font-size: 12px;
     transition: transform 0.2s ease, background-color 0.3s ease;
+    // transition: background 0.1s ease-in-out, transform 0.1s ease-in-out;
+    z-index: 100;
 
     &:hover {
         background-color: #9dd7fe;
         color: black;
     }
+}
+
+.action-button:active {
+    // transform: scale(0.98);
+}
+
+.action-button.selected {
+    background: blue;
+    color: white;
+    // transform: scale(1.01);
+    box-shadow: 0px 0px 10px rgba(0, 0, 255, 0.7);
 }
 
 .north {
@@ -239,9 +266,6 @@
     border-left: 1px solid black;
     border-right: 1px solid black;
     margin: 10px 2rem;
-    :last-child {
-            border-bottom: none;
-        }
 }
 
 .note-item {
