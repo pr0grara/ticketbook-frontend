@@ -26,14 +26,14 @@ export default function App({ page }) {
     console.log(`⏳ Render Time: ${performance.now()}ms`);
 
     useEffect(() => {
-        console.time("✅ checkStatus Execution Time");
+        console.time("checkStatus Execution Time");
         checkStatus()
             .then(res => {
                 const loggedIn = res.loggedIn;
                 if (loggedIn) {
                     dispatch(setLoggedIn())
                     if (!userId) dispatch(setUser(res.user.id))
-                        return
+                    return
                 } 
                 return dispatch(setLoggedOut())
             });

@@ -17,7 +17,7 @@ const LoginPage = () => {
     const [error, setError] = useState(null);
     const [isSignUp, setIsSignUp] = useState(false);
 
-    const { theme } = useSelector(state => state.session)
+    const { theme, loggedIn } = useSelector(state => state.session)
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -25,6 +25,10 @@ const LoginPage = () => {
     useEffect(() => {
         console.log("🔄 Login Component Re-Rendered");
     });
+
+    useEffect(() => {
+        if (loggedIn) navigate('/goals')
+    }, loggedIn)
 
     const handleSubmit = async (e) => {
         e.preventDefault();

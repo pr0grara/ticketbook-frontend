@@ -23,26 +23,10 @@ function Goals() {
     const userId = useSelector(state => state.userId);
     const { theme, showTickets, isMobile } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
-    
-    const memoizedTickets = useMemo(() => tickets, [tickets]);
-
-    const openTickets = useMemo(() => {
-        if (!selectedGoal) return memoizedTickets.filter(ticket => ticket.status !== "done");
-        if (selectedTickets.length > 0) return selectedTickets.filter(ticket => ticket.status !== "done");
-        if (selectedGoal) return memoizedTickets.filter(ticket => ticket.goalId === selectedGoal._id).filter(ticket=> ticket.status !== "done");
-        return memoizedTickets;
-    }, [selectedTickets, memoizedTickets, selectedGoal]);
-
-    const closedTickets = useMemo(() => {
-        if (!selectedGoal) return memoizedTickets.filter(ticket => ticket.status === "done");
-        if (selectedTickets.length > 0) return selectedTickets.filter(ticket => ticket.status === "done");
-        if (selectedGoal) return memoizedTickets.filter(ticket => ticket.goalId === selectedGoal._id).filter(ticket => ticket.status === "done");
-    }, [selectedTickets, memoizedTickets, selectedGoal])
 
     const [, setIsDragging] = useState(false);
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
-    // const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     useEffect(() => {        
         checkStatus()
@@ -62,7 +46,6 @@ function Goals() {
     useEffect(() => {        
         const handleResize = () => {
             dispatch(setIsMobile(window.innerWidth <= 768))
-            // setIsMobile(window.innerWidth <= 768);
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
@@ -96,12 +79,6 @@ function Goals() {
 
             console.log("🚮 Dropped Item:", item);
             deleteItem(item); // ✅ Directly call the delete function
-
-            // setTimeout(() => {
-            //     console.log("✅ Dragging Ended Successfully");
-            //     setIsDragging(false);
-            //     setShowTrashcan(false);
-            // }, 50);
         },
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
@@ -127,46 +104,6 @@ function Goals() {
                     <TicketSpace />
                 </>
             )}
-            {/* <div className="ticket-list-container">
-                <div className="ticket-list-title">Tickets</div>
-                <div className="subtitle">All open and closed tickets</div>
-                <div className="ticket-tutorial">{openTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
-                <div className="open-tickets-container">
-                    <div className="open-tickets-selector" onClick={()=>dispatch(setShowTickets({...showTickets, openTickets: !showTickets.openTickets}))}>
-                        <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})`}} />
-                        Open Tickets
-                    </div>
-                    {showTickets.openTickets && openTickets.map(ticket => (
-                        <TicketCard 
-                            ticket={ticket} 
-                            dispatch={dispatch} 
-                            setIsDragging={setIsDragging} 
-                            setShowTrashcan={setShowTrashcan} 
-                            setTrashcanPosition={setTrashcanPosition} 
-                            userActivated={() => isUserActivated(ticket)} 
-                            key={ticket._id}
-                        />
-                    ))}
-                </div>
-                <div className="closed-tickets-container">
-                        <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, closedTickets: !showTickets.closedTickets }))}>
-                            <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.closedTickets ? "90deg" : "0deg"})` }} />
-                            Closed Tickets
-                        </div>                    
-                        {showTickets.closedTickets && closedTickets.map(ticket => (
-                        <TicketCard 
-                            ticket={ticket} 
-                            dispatch={dispatch} 
-                            setIsDragging={setIsDragging} 
-                            setShowTrashcan={setShowTrashcan} 
-                            setTrashcanPosition={setTrashcanPosition} 
-                            userActivated={() => isUserActivated(ticket)} 
-                            key={ticket._id}
-                        />
-                    ))}
-                </div>
-                {!isMobile && <div className="ticket-list-spaceholder"></div>}
-            </div> */}
             <TicketList />
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
@@ -210,88 +147,29 @@ function Goals() {
     );
 }
 
-// function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated }) {
-//     let touchStartTime = 0;
-//     const isUserActivatedTicket = useMemo(() => userActivated(ticket), [ticket, userActivated]);
-
-//     // ✅ Memoize drag item object
-//     const dragItem = useMemo(() => ({
-//         id: ticket._id,
-//         type: "ticket"
-//     }), [ticket._id]);
-
-//     // ✅ useDrag() with latest API (React DnD v14+)
-//     const [{ isDragging }, drag] = useDrag({
-//         type: "ticket",
-//         item: (monitor) => {
-//             const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 };
-//             setTrashcanPosition({ x, y });
-//             setIsDragging(true);
-//             setShowTrashcan(true);
-//             return dragItem; // ✅ Return the memoized dragItem
-//         },
-//         collect: (monitor) => ({
-//             isDragging: !!monitor.isDragging(),
-//         }),
-//         end: () => {
-//             // setIsDragging(false);
-//             // setShowTrashcan(false);
-//             setTimeout(() => {
-//                 setIsDragging(false);
-//                 setShowTrashcan(false);
-//             }, 50);
-//         }
-//     });
-
-//     const handleTouchStart = () => {
-//         console.log("STARTED COUNTING TOUCH TIME")
-//         touchStartTime = Date.now();
-//     };
-
-//     const handleTouchEnd = () => {
-//         const touchDuration = Date.now() - touchStartTime;
-//         console.log(touchDuration)
-//         if (touchDuration < 150) { // ✅ Short tap detected
-//             dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
-//         }
-//     };
-
-//     return (
-//         <div 
-//             ref={drag} 
-//             onTouchStart={handleTouchStart} 
-//             onTouchEndCapture={handleTouchEnd}
-//             onClick={() => dispatch(setUserActivatedTickets({userActivatedTicket: ticket}))} 
-//             className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
-//             style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)", backgroundColor: isUserActivatedTicket && "#3694de", color: isUserActivatedTicket && "white" }}
-//         >
-//             {ticket.title}
-//         </div>
-//     );
-// }
-
 const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTrashcan, setTrashcanPosition, setIsDragging }) => {
-    // ✅ Memoize drag item object
+    const [touchStartTime, setTouchStartTime] = useState(0);
+    const [touchMoved, setTouchMoved] = useState(false); // Track movement to differentiate drag vs tap
+
+    // Memoize drag item object
     const dragItem = useMemo(() => ({
         id: goal._id,
         type: "goal"
     }), [goal._id]);
 
-    // ✅ useDrag() with latest API (React DnD v14+)
     const [{ isDragging }, drag] = useDrag({
         type: "goal",
         item: (monitor) => {
-            console.log("Drag Start - Goal:", goal._id);
             const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 };
             setTrashcanPosition({ x, y });
             setShowTrashcan(true);
             setIsDragging(true);
-            return dragItem; // ✅ Return the memoized dragItem
+            return dragItem;
         },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
-        end: (item, monitor) => {
+        end: () => {
             setTimeout(() => {
                 setIsDragging(false);
                 setShowTrashcan(false);
@@ -299,15 +177,36 @@ const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTra
         }
     });
 
+    // Handle quick taps separately from dragging
+    const handleTouchStart = (e) => {
+        setTouchStartTime(Date.now());
+        setTouchMoved(false); // Reset movement detection
+    };
+
+    const handleTouchMove = () => {
+        setTouchMoved(true); // If the user moves their finger, it's likely a drag
+    };
+
+    const handleTouchEnd = () => {
+        const touchDuration = Date.now() - touchStartTime;
+
+        if (!touchMoved && touchDuration < 200) { // Allow faster taps
+            handleSelectedGoal(goal);
+        }
+    };
+
     return (
         <button
-            ref={drag} // ✅ Attach drag here
-            className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""} ${goal.isBucket && "is-bucket"}`}
+            ref={drag}
+            className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""} ${goal.isBucket ? "is-bucket" : ""}`}
             onClick={() => !isMobile && handleSelectedGoal(goal)}
-            onTouchStart={() => handleSelectedGoal(goal)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
             style={{
                 opacity: isDragging ? 0.5 : 1,
                 transform: isDragging ? "scale(1.1)" : "scale(1)",
+                touchAction: "manipulation" // Improves touch response on mobile
             }}
         >
             {goal.title}
