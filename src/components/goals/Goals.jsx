@@ -7,33 +7,42 @@ import AICanvas from "../ai/AICanvas.jsx";
 import { setSelectedGoal } from "../../redux/slices/goalsSlice";
 import { clearUserActivatedTickets, fetchTickets, setSelectedTickets, setUserActivatedTickets } from "../../redux/slices/ticketsSlice.js";
 import { checkStatus } from "../api/authAPI.js";
-import { setLoggedIn, setLoggedOut } from "../../redux/slices/sessionSlice.js";
+import { setIsMobile, setLoggedIn, setLoggedOut, setShowTickets } from "../../redux/slices/sessionSlice.js";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { fetchGoals } from "../../redux/slices/goalsSlice.js";
 import TicketSpace from '../tickets/TicketSpace.jsx';
+import TicketList from "../tickets/TicketList.jsx";
 import { darkMode } from "../../util/theme_util.js";
+import chevron from '../../icons/chevron.png';
+import chevronWhite from '../../icons/chevron-white.png';
 
 function Goals() {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
     const userId = useSelector(state => state.userId);
-    const { theme } = useSelector(state => state.session);
+    const { theme, showTickets, isMobile } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     
     const memoizedTickets = useMemo(() => tickets, [tickets]);
 
-    const displayedTickets = useMemo(() => {
+    const openTickets = useMemo(() => {
         if (!selectedGoal) return memoizedTickets.filter(ticket => ticket.status !== "done");
         if (selectedTickets.length > 0) return selectedTickets.filter(ticket => ticket.status !== "done");
         if (selectedGoal) return memoizedTickets.filter(ticket => ticket.goalId === selectedGoal._id).filter(ticket=> ticket.status !== "done");
         return memoizedTickets;
     }, [selectedTickets, memoizedTickets, selectedGoal]);
 
+    const closedTickets = useMemo(() => {
+        if (!selectedGoal) return memoizedTickets.filter(ticket => ticket.status === "done");
+        if (selectedTickets.length > 0) return selectedTickets.filter(ticket => ticket.status === "done");
+        if (selectedGoal) return memoizedTickets.filter(ticket => ticket.goalId === selectedGoal._id).filter(ticket => ticket.status === "done");
+    }, [selectedTickets, memoizedTickets, selectedGoal])
+
     const [, setIsDragging] = useState(false);
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    // const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     useEffect(() => {        
         checkStatus()
@@ -52,7 +61,8 @@ function Goals() {
     
     useEffect(() => {        
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
+            dispatch(setIsMobile(window.innerWidth <= 768))
+            // setIsMobile(window.innerWidth <= 768);
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
@@ -117,23 +127,47 @@ function Goals() {
                     <TicketSpace />
                 </>
             )}
-            <div className="ticket-list-container">
+            {/* <div className="ticket-list-container">
                 <div className="ticket-list-title">Tickets</div>
-                <div className="subtitle">All of your open tickets</div>
-                <div className="ticket-tutorial">{displayedTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
-                {displayedTickets.map(ticket => (
-                    <TicketCard 
-                        ticket={ticket} 
-                        dispatch={dispatch} 
-                        setIsDragging={setIsDragging} 
-                        setShowTrashcan={setShowTrashcan} 
-                        setTrashcanPosition={setTrashcanPosition} 
-                        userActivated={() => isUserActivated(ticket)} 
-                        key={ticket._id}
-                    />
-                ))}
+                <div className="subtitle">All open and closed tickets</div>
+                <div className="ticket-tutorial">{openTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
+                <div className="open-tickets-container">
+                    <div className="open-tickets-selector" onClick={()=>dispatch(setShowTickets({...showTickets, openTickets: !showTickets.openTickets}))}>
+                        <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})`}} />
+                        Open Tickets
+                    </div>
+                    {showTickets.openTickets && openTickets.map(ticket => (
+                        <TicketCard 
+                            ticket={ticket} 
+                            dispatch={dispatch} 
+                            setIsDragging={setIsDragging} 
+                            setShowTrashcan={setShowTrashcan} 
+                            setTrashcanPosition={setTrashcanPosition} 
+                            userActivated={() => isUserActivated(ticket)} 
+                            key={ticket._id}
+                        />
+                    ))}
+                </div>
+                <div className="closed-tickets-container">
+                        <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, closedTickets: !showTickets.closedTickets }))}>
+                            <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.closedTickets ? "90deg" : "0deg"})` }} />
+                            Closed Tickets
+                        </div>                    
+                        {showTickets.closedTickets && closedTickets.map(ticket => (
+                        <TicketCard 
+                            ticket={ticket} 
+                            dispatch={dispatch} 
+                            setIsDragging={setIsDragging} 
+                            setShowTrashcan={setShowTrashcan} 
+                            setTrashcanPosition={setTrashcanPosition} 
+                            userActivated={() => isUserActivated(ticket)} 
+                            key={ticket._id}
+                        />
+                    ))}
+                </div>
                 {!isMobile && <div className="ticket-list-spaceholder"></div>}
-            </div>
+            </div> */}
+            <TicketList />
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
                 <div className="goal-list-header-container">
@@ -157,7 +191,6 @@ function Goals() {
                 </div>
             {!isMobile && <TicketSpace />}
             </div>
-
             <div
                 ref={drop}
                 className={`trash-can ${showTrashcan ? "visible" : ""}`}
@@ -177,65 +210,65 @@ function Goals() {
     );
 }
 
-function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated }) {
-    let touchStartTime = 0;
-    const isUserActivatedTicket = useMemo(() => userActivated(ticket), [ticket, userActivated]);
+// function TicketCard({ ticket, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated }) {
+//     let touchStartTime = 0;
+//     const isUserActivatedTicket = useMemo(() => userActivated(ticket), [ticket, userActivated]);
 
-    // ✅ Memoize drag item object
-    const dragItem = useMemo(() => ({
-        id: ticket._id,
-        type: "ticket"
-    }), [ticket._id]);
+//     // ✅ Memoize drag item object
+//     const dragItem = useMemo(() => ({
+//         id: ticket._id,
+//         type: "ticket"
+//     }), [ticket._id]);
 
-    // ✅ useDrag() with latest API (React DnD v14+)
-    const [{ isDragging }, drag] = useDrag({
-        type: "ticket",
-        item: (monitor) => {
-            const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 };
-            setTrashcanPosition({ x, y });
-            setIsDragging(true);
-            setShowTrashcan(true);
-            return dragItem; // ✅ Return the memoized dragItem
-        },
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
-        end: () => {
-            // setIsDragging(false);
-            // setShowTrashcan(false);
-            setTimeout(() => {
-                setIsDragging(false);
-                setShowTrashcan(false);
-            }, 50);
-        }
-    });
+//     // ✅ useDrag() with latest API (React DnD v14+)
+//     const [{ isDragging }, drag] = useDrag({
+//         type: "ticket",
+//         item: (monitor) => {
+//             const { x, y } = monitor.getClientOffset() || { x: 0, y: 0 };
+//             setTrashcanPosition({ x, y });
+//             setIsDragging(true);
+//             setShowTrashcan(true);
+//             return dragItem; // ✅ Return the memoized dragItem
+//         },
+//         collect: (monitor) => ({
+//             isDragging: !!monitor.isDragging(),
+//         }),
+//         end: () => {
+//             // setIsDragging(false);
+//             // setShowTrashcan(false);
+//             setTimeout(() => {
+//                 setIsDragging(false);
+//                 setShowTrashcan(false);
+//             }, 50);
+//         }
+//     });
 
-    const handleTouchStart = () => {
-        console.log("STARTED COUNTING TOUCH TIME")
-        touchStartTime = Date.now();
-    };
+//     const handleTouchStart = () => {
+//         console.log("STARTED COUNTING TOUCH TIME")
+//         touchStartTime = Date.now();
+//     };
 
-    const handleTouchEnd = () => {
-        const touchDuration = Date.now() - touchStartTime;
-        console.log(touchDuration)
-        if (touchDuration < 150) { // ✅ Short tap detected
-            dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
-        }
-    };
+//     const handleTouchEnd = () => {
+//         const touchDuration = Date.now() - touchStartTime;
+//         console.log(touchDuration)
+//         if (touchDuration < 150) { // ✅ Short tap detected
+//             dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
+//         }
+//     };
 
-    return (
-        <div 
-            ref={drag} 
-            onTouchStart={handleTouchStart} 
-            onTouchEndCapture={handleTouchEnd}
-            onClick={() => dispatch(setUserActivatedTickets({userActivatedTicket: ticket}))} 
-            className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
-            style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)", backgroundColor: isUserActivatedTicket && "#3694de", color: isUserActivatedTicket && "white" }}
-        >
-            {ticket.title}
-        </div>
-    );
-}
+//     return (
+//         <div 
+//             ref={drag} 
+//             onTouchStart={handleTouchStart} 
+//             onTouchEndCapture={handleTouchEnd}
+//             onClick={() => dispatch(setUserActivatedTickets({userActivatedTicket: ticket}))} 
+//             className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
+//             style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)", backgroundColor: isUserActivatedTicket && "#3694de", color: isUserActivatedTicket && "white" }}
+//         >
+//             {ticket.title}
+//         </div>
+//     );
+// }
 
 const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTrashcan, setTrashcanPosition, setIsDragging }) => {
     // ✅ Memoize drag item object

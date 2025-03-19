@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
+import authAPI from "../../components/api/authAPI";
 
 export const fetchTickets = createAsyncThunk("tickets/fetchTickets", async (req) => {
     const { type, id } = req;
@@ -44,6 +45,15 @@ export const updateTicketPriority = createAsyncThunk(
     }
 );
 
+export const updateTicketsOrder = createAsyncThunk(
+    "user/updateTicketsOrder",
+    async ({ userId, newTickets }) => {
+        const res = await authAPI.patch(`/tickets/update-order/${userId}`, { newTickets })
+        // debugger
+        return res.data;
+    }
+);
+
 const ticketsSlice = createSlice({
     name: "tickets",
     initialState: {
@@ -59,14 +69,18 @@ const ticketsSlice = createSlice({
         setSelectedTickets: (state, action) => {
             const { event, goal, newGoal, newTickets } = action.payload;
             let selectedTickets = []
+            let sortedTickets;
             if (event) {
                 selectedTickets = [...state.tickets.filter(t => t._id === event._id)];
+                sortedTickets = selectedTickets.sort((a, b) => a.order - b.order)
             } else if (goal) {
                 selectedTickets = [...state.tickets.filter(t => t.goalId === goal._id)]
+                sortedTickets = selectedTickets.sort((a, b) => a.order - b.order)
             } else if (newGoal) {
                 selectedTickets = newTickets;
+                sortedTickets = selectedTickets.sort((a, b) => a.order - b.order)
             }
-            state.selectedTickets = selectedTickets;
+            state.selectedTickets = sortedTickets;
         },
         setUserActivatedTickets: (state, action) => {
             const { userActivatedTicket } = action.payload;
@@ -150,6 +164,18 @@ const ticketsSlice = createSlice({
                     : [...state.userActivatedTickets]; // ✅ Keep same reference if unchanged
 
                 console.log("🔵 After Update:", JSON.parse(JSON.stringify(state.userActivatedTickets))); // Debugging
+            })
+            .addCase(updateTicketsOrder.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateTicketsOrder.fulfilled, (state, action) => {
+                state.loading = false;
+                const updatedTickets = action.payload;
+                state.tickets = updatedTickets;
+            })
+            .addCase(updateTicketsOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
 
     },

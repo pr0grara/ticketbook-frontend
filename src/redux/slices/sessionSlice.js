@@ -6,7 +6,12 @@ const sessionSlice = createSlice({
     initialState: {
         loggedIn: false,
         theme: "",
-        isLoading: false
+        isLoading: false,
+        showTickets: {
+            openTickets: true,
+            closedTickets: false
+        },
+        isMobile: false
     },
     reducers: {
         setLoggedIn: (state, action) => { 
@@ -20,9 +25,15 @@ const sessionSlice = createSlice({
         },
         setIsLoading: (state, action) => {
             return { ...state, isLoading: action.payload }
+        },
+        setShowTickets: (state, action) => {
+            return { ...state, showTickets: action.payload }
+        },
+        setIsMobile: (state, action) => {
+            return { ...state, isMobile: action.payload }
         }
     },
 });
 
-export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading } = sessionSlice.actions;
+export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile } = sessionSlice.actions;
 export default sessionSlice.reducer;

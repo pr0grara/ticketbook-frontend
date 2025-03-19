@@ -59,14 +59,16 @@ export default function Ticket({ ticket, isMobile }) {
     }, [ticket.notes]);
 
     useEffect(() => {
-        if (showActions) {
-            document.body.style.overflow = "hidden"; // Disable scroll
-        } else {
-            document.body.style.overflow = ""; // Restore scroll
-        }
+        const preventScroll = (e) => {
+            if (showActions) {
+                e.preventDefault();
+            }
+        };
+
+        document.addEventListener("touchmove", preventScroll, { passive: false });
 
         return () => {
-            document.body.style.overflow = ""; // Cleanup when component unmounts
+            document.removeEventListener("touchmove", preventScroll);
         };
     }, [showActions]);
 
@@ -106,8 +108,8 @@ export default function Ticket({ ticket, isMobile }) {
         setEditingField(null);
     };
 
-    const markDone = () => {
-        dispatch(updateTicketStatus({ ticketId: ticket._id, newStatus: "done" }));
+    const markDone = (markIncompleteBool) => {
+        dispatch(updateTicketStatus({ ticketId: ticket._id, newStatus: markIncompleteBool ? "pending" : "done" }));
         dispatch(clearUserActivatedTickets({ clearOne: ticket._id }));
     };
 
@@ -155,10 +157,12 @@ export default function Ticket({ ticket, isMobile }) {
     }
 
     const handleDeleteNote = (index) => {
-        let newNotes = notes.filter((_, i) => i !== index);
-        setNotes(newNotes);
-        dispatch(updateTicket({ ticketId: ticket._id, ticket: { notes: newNotes } }));
-        setFocus({index: index - 1, query: ".note-item"})
+        if (notes.length > 1) {
+            let newNotes = notes.filter((_, i) => i !== index);
+            setNotes(newNotes);
+            dispatch(updateTicket({ ticketId: ticket._id, ticket: { notes: newNotes } }));
+            setFocus({index: index - 1, query: ".note-input"})
+        }
     };
 
     const handleEditNote = (index, newValue, commit) => {
@@ -205,7 +209,7 @@ export default function Ticket({ ticket, isMobile }) {
     };
 
     const handleDeleteChecklistItem = (index) => {
-        if (checklist.length > 2) {
+        if (checklist.length > 1) {
             const updatedChecklist = checklist.filter((_, i) => i !== index);
             setChecklist(updatedChecklist);
             dispatch(updateTicket({ ticketId: ticket._id, ticket: { checklist: updatedChecklist } }));
@@ -267,11 +271,27 @@ export default function Ticket({ ticket, isMobile }) {
         }
     }
 
+    const triggerHapticFeedback = () => {
+        if ("vibrate" in navigator) {
+            // ✅ Works on Android & some browsers
+            navigator.vibrate(30);
+
+        // } else if (window.navigator?.haptics?.impactOccurred) {
+        //     // ✅ Works on iPhone (Native Haptic Engine)
+        //     window.navigator.haptics.impactOccurred("medium");
+        } else if (typeof window !== "undefined") {
+                try {
+                    window.ReactNativeWebView?.postMessage("hapticFeedback"); // Used in WebViews
+                    window?.webkit?.messageHandlers?.hapticFeedback?.postMessage("impact"); // Safari workaround
+                } catch (e) {
+                    console.warn("Haptic feedback not supported:", e);
+                }
+        }
+    };
+
     const handleTouchStart = (e) => {
         e.preventDefault(); // Stop scrolling
-        if ("vibrate" in navigator) {
-            navigator.vibrate(30); // 30ms vibration
-        }
+        triggerHapticFeedback();
         setFadeOut(false);
         setShowActions(true);
     };
@@ -297,9 +317,7 @@ export default function Ticket({ ticket, isMobile }) {
         });
         if (newSelectedAction !== selectedAction) {
             setSelectedAction(newSelectedAction);
-            if ("vibrate" in navigator) {
-                navigator.vibrate(30); // 30ms vibration
-            }
+            triggerHapticFeedback();
         }
     };
 
@@ -327,8 +345,8 @@ export default function Ticket({ ticket, isMobile }) {
         <div className="ticket-container" onTouchEnd={(e)=> !!showActions ? handleTouchEnd(e) : null}>
             {!isMobile &&
                 <div className="ticket-button-container">
-                    <div className="ticket-button done" onClick={() => { markDone(); setShowActions(false); }}>✔️ mark done</div>
-                    <div className="ticket-button help" onClick={() => { handleHelp(ticket); setShowActions(false); dispatch(setIsLoading(true));}}>➰ get help</div>
+                    <div className={`ticket-button ${ticket.status === "done" ? "help" : "done"}`} onClick={() => { markDone(ticket.status === "done"); setShowActions(false); }}>{ticket.status === "done" ? "🔙 mark incomplete" : "✔️ mark done"}</div>
+                    {ticket.status !== "done" && <div className="ticket-button help" onClick={() => { handleHelp(ticket); setShowActions(false); dispatch(setIsLoading(true));}}>➰ get help</div>}
                     <div className="ticket-button delete" onClick={() => { deleteItem({ type: "ticket", id: ticket._id }); setShowActions(false); }}>✖️ delete</div>
                 </div>
             }

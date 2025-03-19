@@ -114,12 +114,9 @@
 .ticket-list-container {
     display: flex;
     flex-direction: column;
-    // align-items: center;
-    // border-right: 3px solid grey;
-    // min-width: 20vw;
-    // max-width: 20vw;
+    min-width: 25vw;
     min-height: 100vh;
-    padding-left: 1rem;
+    padding-left: .7rem;
 }
 
 .ticket-tutorial {
@@ -137,8 +134,20 @@
     min-height: 400px;
 }
 
+.open-tickets-selector, .closed-tickets-selector {
+    margin-bottom: 10px;
+    img {
+        height: 15px;
+        margin-right: 5px;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+
 .ticket-card {
     padding: 5px 10px;
+    padding-left: 20px;
     margin-right: 10px;
     margin-bottom: 8px;
     // border-bottom: 1px solid lightgrey;
@@ -176,7 +185,7 @@
 }
 
 .dark-mode .goal-toggle {
-    background-color: #191919;
+    background-color: #212121;
     color: white;
 }
 
@@ -236,7 +245,7 @@
     }
 
     .ticket-list-spaceholder {
-        min-height: 250px;
+        min-height: 60vh;
     }
 
     .goal-and-ticket-container {
