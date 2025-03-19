@@ -16,7 +16,7 @@
     // padding: 10px;
     position: relative;
     padding-bottom: 20px;
-    padding-left: 1rem;
+    margin-left: 1rem;
 }
 
 .ticket-item {
@@ -358,5 +358,9 @@
 
     .ticket-notes {
         margin: 10px;
+    }
+
+    .ticket-container {
+        width: calc(100% - 1rem);
     }
 }

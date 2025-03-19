@@ -49,7 +49,7 @@ function TicketList() {
             filteredOpenTickets = tickets.filter(ticket => ticket.status !== "done")
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
             
-            filteredClosedTickets = tickets.filter(ticket => ticket.status !== "done")
+            filteredClosedTickets = tickets.filter(ticket => ticket.status === "done")
             sortedClosedTickets = filteredClosedTickets.sort((a, b) => a.order - b.order)
             
             setOpenTickets(sortedOpenTickets)
@@ -202,6 +202,7 @@ function TicketList() {
                         moveTicket={moveTicket}
                         index={index}
                         ticketList="openTickets"
+                        isMobile={isMobile}
                     />
                 ))}
             </div>
@@ -223,6 +224,7 @@ function TicketList() {
                         moveTicket={moveTicket}
                         index={index}
                         ticketList="closedTickets"
+                        isMobile={isMobile}
                     />
                 ))}
             </div>
@@ -245,11 +247,14 @@ function TicketList() {
     )
 }
 
-function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList }) {
-    let touchStartTime = 0;
+function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList, isMobile }) {
+    const [touchStartTime, setTouchStartTime] = useState(0);
+    const [touchMoved, setTouchMoved] = useState(false);
+    const [canDrag, setCanDrag] = useState(false); // Prevent accidental drag
+
     const isUserActivatedTicket = useMemo(() => userActivated(ticket), [ticket, userActivated]);
 
-    //Memoize drag item object
+    // Memoize drag item object
     const dragItem = useMemo(() => ({
         id: ticket._id,
         ticketList,
@@ -258,17 +263,19 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         type: "ticket"
     }), [ticket._id, index]);
 
-    //useDrag() with latest API (React DnD v14+)
+    // Prevent drag activation until `canDrag` is true
     const [{ isDragging }, drag] = useDrag({
         type: "ticket",
+        canDrag: () => canDrag, // Only enable drag when allowed
         item: (monitor) => {
+            if (!canDrag) return null; // Prevent drag if disabled
             let { x, y } = monitor.getClientOffset() || { x: 0, y: 0 };
             x = x + scrollOffset.x;
-            y = y + scrollOffset.y
+            y = y + scrollOffset.y;
             setTrashcanPosition({ x, y });
             setIsDragging(true);
             setShowTrashcan(true);
-            return dragItem; //Return the memoized dragItem
+            return dragItem;
         },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
@@ -281,64 +288,59 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         }
     });
 
-    // const [{ isDragging }, drag] = useDrag({
-    //     type: "ticket",
-    //     item: dragItem,
-    //     collect: (monitor) => ({
-    //         isDragging: !!monitor.isDragging(),
-    //     }),
-    //     end: () => {
-    //         setTimeout(() => {
-    //             setIsDragging(false);
-    //             setShowTrashcan(false);
-    //         }, 50);
-    //     }
-    // });
-
     const [, drop] = useDrop({
         accept: "ticket",
         drop: (draggedItem) => {
             if (draggedItem.index !== index) {
                 moveTicket(draggedItem.index, index, draggedItem.ticketList, draggedItem.ticket);
-                draggedItem.index = index; // Update dragged item's index
+                draggedItem.index = index;
             }
         }
     });
 
-    const handleTouchStart = () => {
-        console.log(`STARTED COUNTING TOUCH TIME`)
-        touchStartTime = Date.now();
+    const handleTouchStart = (e) => {
+        setTouchStartTime(Date.now());
+        setTouchMoved(false);
+        setCanDrag(false); // Prevent drag from starting immediately
+        e.stopPropagation();
+
+        // Enable drag **only after** 500ms
+        setTimeout(() => {
+            setCanDrag(true);
+        }, 150);
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchMove = () => {
+        setTouchMoved(true); // If user moves, mark movement
+    };
+
+    const handleTouchEnd = (e) => {
         const touchDuration = Date.now() - touchStartTime;
-        console.log(touchDuration)
-        if (touchDuration < 150) { //Short tap detected
+        console.log(touchDuration, "ms", touchMoved ? "Moved" : "Tapped");
+
+        if (!touchMoved && touchDuration < 150) {
+            // Short tap → Activate ticket selection
+            e.preventDefault()
             dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
+        } else if (touchMoved && touchDuration < 150) {
+            // Quick swipe → Allow scroll, prevent drag
+            console.log("Quick swipe detected, ignoring drag.");
+        } else if (touchMoved && touchDuration >= 150) {
+            // Long press + move → Activate drag
+            console.log("Long press + move, drag allowed.");
+            e.preventDefault(); // Stops scrolling to ensure drag works
         }
+
+        setCanDrag(false); // Reset drag ability after touch ends
     };
 
-    // return (
-    //     <div
-    //         ref={drag}
-    //         onTouchStart={handleTouchStart}
-    //         onTouchEndCapture={handleTouchEnd}
-    //         onClick={() => dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }))}
-    //         className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
-    //         style={{ opacity: isDragging ? 0.5 : 1, transform: isDragging ? "scale(1.15)" : "scale(1)", backgroundColor: isUserActivatedTicket && "#3694de", color: isUserActivatedTicket && "white" }}
-    //     >
-    //         {ticket.title}
-    //     </div>
-    // );
     return (
         <div
             ref={(node) => drag(drop(node))} // 🟢 Make ticket both draggable & droppable
-            onTouchStart={() => (touchStartTime = Date.now())}
-            onTouchEndCapture={() => {
-                const touchDuration = Date.now() - touchStartTime;
-                if (touchDuration < 150) dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
-            }}
-            onClick={() => dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }))}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onClick={() => isMobile ? null : dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }))}
             className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
             style={{
                 opacity: isDragging ? 0.5 : 1,
@@ -351,5 +353,6 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         </div>
     );
 }
+
 
 export default TicketList;

@@ -191,8 +191,8 @@ const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTra
         const touchDuration = Date.now() - touchStartTime;
 
         if (!touchMoved && touchDuration < 200) {
-            e.preventDefault(); // ✅ Ensure no weird gesture interference
-            handleSelectedGoal(goal); // ✅ Fire manually if tap detected
+            e.preventDefault(); // Ensure no weird gesture interference
+            handleSelectedGoal(goal); // Fire manually if tap detected
         }
     };
 
