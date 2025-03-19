@@ -43,7 +43,8 @@ function Goals() {
 
     }, [dispatch]);
     
-    useEffect(() => {        
+    useEffect(() => {   
+        dispatch(setIsMobile(window.innerWidth <= 768))
         const handleResize = () => {
             dispatch(setIsMobile(window.innerWidth <= 768))
         };
@@ -149,9 +150,8 @@ function Goals() {
 
 const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTrashcan, setTrashcanPosition, setIsDragging }) => {
     const [touchStartTime, setTouchStartTime] = useState(0);
-    const [touchMoved, setTouchMoved] = useState(false); // Track movement to differentiate drag vs tap
+    const [touchMoved, setTouchMoved] = useState(false);
 
-    // Memoize drag item object
     const dragItem = useMemo(() => ({
         id: goal._id,
         type: "goal"
@@ -177,36 +177,37 @@ const GoalCard = ({ goal, selectedGoal, isMobile, handleSelectedGoal, setShowTra
         }
     });
 
-    // Handle quick taps separately from dragging
+    // Track touch for drag detection
     const handleTouchStart = (e) => {
         setTouchStartTime(Date.now());
-        setTouchMoved(false); // Reset movement detection
+        setTouchMoved(false);
     };
 
     const handleTouchMove = () => {
-        setTouchMoved(true); // If the user moves their finger, it's likely a drag
+        setTouchMoved(true); // If moved, it's a drag
     };
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (e) => {
         const touchDuration = Date.now() - touchStartTime;
 
-        if (!touchMoved && touchDuration < 200) { // Allow faster taps
-            handleSelectedGoal(goal);
+        if (!touchMoved && touchDuration < 200) {
+            e.preventDefault(); // ✅ Ensure no weird gesture interference
+            handleSelectedGoal(goal); // ✅ Fire manually if tap detected
         }
     };
 
     return (
         <button
-            ref={drag}
+            ref={drag} // Keep dragging enabled
             className={`goal-toggle ${selectedGoal?._id === goal._id ? "selected" : ""} ${goal.isBucket ? "is-bucket" : ""}`}
-            onClick={() => !isMobile && handleSelectedGoal(goal)}
+            onClick={isMobile ? null : () => handleSelectedGoal(goal)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             style={{
                 opacity: isDragging ? 0.5 : 1,
                 transform: isDragging ? "scale(1.1)" : "scale(1)",
-                touchAction: "manipulation" // Improves touch response on mobile
+                touchAction: "manipulation" // Prevents unwanted delays
             }}
         >
             {goal.title}
