@@ -86,6 +86,13 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
     const updateDuration = (e) => {
         touchDuration = Date.now() - touchStartTime;
 
+        if (touchDuration > 10) {
+            e.target.classList.add('selected-ticket-card')
+            setTimeout(() => document.querySelectorAll('.selected-ticket-card')
+                .forEach(ele => ele.classList.remove('selected-ticket-card'))
+            , 350)
+        }  
+
         if (touchDuration > 300) {
             setCanDrag(true);
 
