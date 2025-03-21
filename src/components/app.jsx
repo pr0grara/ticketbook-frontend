@@ -19,7 +19,7 @@ export default function App({ page }) {
     const [, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigate = useNavigate(); // ✅ Now it works since App is inside RouterProvider
+    const navigate = useNavigate(); // Now it works since App is inside RouterProvider
     const { userId } = useSelector(state=> state)
 
     console.count("🔄 App Component Rendered");
@@ -35,7 +35,7 @@ export default function App({ page }) {
                     if (!userId) dispatch(setUser(res.user.id))
                     return
                 } 
-                return dispatch(setLoggedOut())
+                dispatch(setLoggedOut())
             });
     }, []);
 

@@ -9,6 +9,7 @@ import reportWebVitals from "./reportWebVitals";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from 'react-dnd-touch-backend';
+import DragPreview from './components/DragPreview';
 
 const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 const getBackend = () => (isTouchDevice ? TouchBackend : HTML5Backend);
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <Provider store={store}>
         <DndProvider backend={getBackend()}>
           <RouterProvider router={router} /> {/* ✅ Wrap App inside RouterProvider here */}
+          {/* <DragPreview /> */}
         </DndProvider>
       </Provider>
     );
