@@ -6,16 +6,31 @@
     transition: background-color 0.3s;
 }
 
+.ticket-title-and-text {
+    width: 100%;
+}
+
 .editable {
     cursor: pointer;
-    padding: 5px;
+    margin: 5px 0px 25px 0px;
     border-radius: 4px;
     transition: background-color 0.2s;
+    color: #5a5a5a;
 }
 
 .editable:hover {
     // background-color: #f3f3f3;
     cursor: text;
+}
+
+.ticket-title {
+    display: flex;
+    margin: 15px 0px 10px 0px;
+    width: 90%;
+    font-weight: 800;
+    color: #212121;
+    font-size: 1.1rem;
+    // padding: 5px;
 }
 
 .edit-field {

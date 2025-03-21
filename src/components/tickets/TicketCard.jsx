@@ -125,8 +125,18 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             animationFrame = null
         }
 
-        if (!touchMoved && touchDuration < 500) {
+        if (!touchMoved && touchDuration < 250) {
             dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
+            document.querySelectorAll('.back-to-list').forEach(el => el.remove())
+            setTimeout(()=> {
+                const el = document.querySelector(`[data-ticket-id="${ticket._id}"]`);
+                if (el) {
+                    el.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    })
+                }
+            }, 500)
         } 
 
         setTimeout(() => {
@@ -135,6 +145,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
     };
 
     return (
+
         <div
             ref={(node) => drag(drop(node))}
             onTouchStart={handleTouchStart}
@@ -153,7 +164,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
                 touchAction: "auto",
             }}
         >
-            {ticket.title}
+            • {ticket.title}
         </div>
     );
 }

@@ -8,6 +8,8 @@ import { handleAIRequest } from "../hooks/useAI.js";
 import wind_rose from "../../icons/wind_rose.png"
 import joystick from "../../icons/joystick.png"
 import joystickDark from "../../icons/joystick-dark.png"
+import thickChevron from '../../icons/thick-chevron.png'
+import thickChevronWhite from '../../icons/thick-chevron-white.png'
 import { darkMode } from "../../util/theme_util.js";
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 
@@ -341,8 +343,16 @@ export default function Ticket({ ticket, isMobile }) {
         }, 200); // Matches CSS fade-out duration
     };
 
+    const scrollToList = () => {
+        const el = document.querySelector('.ticket-list-title');
+        if (el) el.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        })
+    }
+
     return (
-        <div className="ticket-container" onTouchEnd={(e)=> !!showActions ? handleTouchEnd(e) : null}>
+        <div className={`ticket-container`} data-ticket-id={ticket._id} onTouchEnd={(e)=> !!showActions ? handleTouchEnd(e) : null}>
             {!isMobile &&
                 <div className="ticket-button-container">
                     <div className={`ticket-button ${ticket.status === "done" ? "help" : "done"}`} onClick={() => { markDone(ticket.status === "done"); setShowActions(false); }}>{ticket.status === "done" ? "🔙 mark incomplete" : "✔️ mark done"}</div>
@@ -350,6 +360,7 @@ export default function Ticket({ ticket, isMobile }) {
                     <div className="ticket-button delete" onClick={() => { deleteItem({ type: "ticket", id: ticket._id }); setShowActions(false); }}>✖️ delete</div>
                 </div>
             }
+            {isMobile && <div className="back-to-list" onTouchStart={()=>scrollToList()}><img src={darkMode(theme) ? thickChevronWhite : thickChevron} alt="" /><span>back to list</span></div>}
             <div className="ticket-item">
                 {isMobile && 
                 <div className="ticket-utility-container">
@@ -362,29 +373,37 @@ export default function Ticket({ ticket, isMobile }) {
                             onTouchMove={handleTouchMove}
                         />
                         {showActions && (
-                                <div className={`compass-popup ${fadeOut ? "fade-out" : "show"}`} ref={actionRef}>
+                            <div className={`compass-popup ${fadeOut ? "fade-out" : "show"}`} ref={actionRef}>
                                 <button data-action="delete"
                                     className={`action-button north ${selectedAction === "delete" ? "selected" : ""}`} 
                                 >delete</button>
                                 <button data-action="mark-done"
                                     className={`action-button east ${selectedAction === "mark-done" ? "selected" : ""}`} 
-                                >mark done</button>
+                                >done</button>
                                 <button data-action="get-help"
                                     className={`action-button south ${selectedAction === "get-help" ? "selected" : ""}`} 
-                                >get help</button>
+                                >help</button>
                             </div>
                         )}
                     </div>
                 </div>
                 }
-                {/* <div className="ticket">{ticket.text}</div> */}
-                {editingField === "text" ? (
-                    <div className="edit-field">
-                        <textarea className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("text", tempValue)} />
-                    </div>
-                ) : (
-                    <p className="editable" onClick={() => handleEdit("text", ticket.text)}>{ticket.text}</p>
-                )}
+                <div className="ticket-title-and-text">
+                    {editingField === "title" ? (
+                        <div className="edit-field">
+                            <input className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("title", tempValue)} />
+                        </div>
+                    ) : (
+                        <div className="editable ticket-title" onClick={() => handleEdit("title", ticket.title)}>{ticket.title}</div>
+                    )}
+                    {ticket.title !== ticket.text && (editingField === "text" ? (
+                        <div className="edit-field">
+                            <textarea className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("text", tempValue)} />
+                        </div>
+                    ) : (
+                        <div className="editable" onClick={() => handleEdit("text", ticket.text)}>{ticket.text}</div>
+                    ))}
+                </div>
             </div>
             {/* <div className="ticket-item" style={{ fontSize: "small" }}>{ticket.status}</div>
             <div className="ticket-date-container">
