@@ -57,12 +57,13 @@ export default function App({ page }) {
     return (
         <>
             <Navbar />
+            {console.log("page =", page)} {/* 👈 RIGHT HERE */}
+
             {page === "" && <LoginPage />}
             {page === "login" && <LoginPage />}
-            {page === "tickets" && <Tickets />}
-            {page === "goals" && <Goals />}
-            {page === "plan" && <DailyPlan />}
-            {page === "calendar" && <CalendarView />}
+            {/* Protected Routes */}
+            {page === "goals" && <ProtectedRoute component={<Goals />} />}
+            {page === "calendar" && <ProtectedRoute component={<CalendarView />} />}
         </>
     );
 }
