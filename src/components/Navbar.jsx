@@ -14,8 +14,9 @@ const Navbar = () => {
     const dispatch = useDispatch();
 
     const handleLogout = () => {
-        authAPI.post('/auth/logout')
+        authAPI.post('/auth/logout?dev=true')
             .then(res => {
+                // debugger
                 dispatch(clearUser())
                 dispatch(setLoggedOut()) //change redux state
                 window.location.href = "/login"; // ✅ TEMP FIX: Avoid useNavigate
