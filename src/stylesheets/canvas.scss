@@ -17,12 +17,64 @@
     transition: all 0.3s ease-in-out;
 }
 
+.clear-chat-top {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.clear-chat-top svg {
+    stroke: #888;
+    width: 16px;
+    height: 16px;
+}
+
+.clear-chat-top:hover svg {
+    stroke: #000;
+}
+
 .ai-output {
     flex: 1;
     overflow-y: auto;
     padding: 28px;
     font-size: 16px;
     white-space: pre-wrap;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-message {
+    align-self: flex-start;
+    border-radius: 8px;
+    max-width: 90%;
+}
+
+.user-message {
+    align-self: flex-end;
+    background: #f1f1f1;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 75%;
+    text-align: right;
+}
+
+.blinking-cursor {
+    animation: blink 1s step-start infinite;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 2px;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
 }
 
 .placeholder {
@@ -54,7 +106,7 @@
 } 
 
 .ai-input button {
-    background: #007bff;
+    background: #191919;
     border: none;
     width: 50px;
     height: 50px;
@@ -128,19 +180,15 @@
 
     .toggle-ai-btn {
         display: block;
-        width: 12%;
-        padding: 6px;
-        font-size: 16px;
-        background-color: #007bff78;
         color: white;
         border: none;
         cursor: pointer;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-
-    .toggle-ai-btn:hover {
-        background-color: #0056b3;
+        border-radius: 0 0 5px 5px;
+        color: black;
+        width: 15%;
+        padding: unset;
+        padding-inline: unset;
+        padding-block: unset;
     }
 
     .ai-input {
@@ -148,9 +196,19 @@
         flex-direction: column;
         align-items: center;
         margin-bottom: 2rem;
+        position: relative;
         input {
             width: 90vw;
             font-size: 18px;
         }
+        button {
+            position: absolute;
+            right: 10px;
+            bottom: 8px;
+            background: black;
+            border-radius: 50%;
+            padding: 6px;
+        }
     }
+
 }

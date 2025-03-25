@@ -18,15 +18,15 @@
     color: white;
 }
 
-.dark-mode-canvas {
-    background: #212121f0;
-    color: white;
-} 
+// .dark-mode-canvas {
+//     background: #212121f0;
+//     color: white;
+// } 
 
-.dark-mode-canvas .ai-output, .dark-mode-canvas input {
-    background: #212121;
-    color: white;
-}
+// .dark-mode-canvas .ai-output, .dark-mode-canvas input {
+//     background: #212121;
+//     color: white;
+// }
 
 .dark-mode input {
     background: #212121;
@@ -109,5 +109,21 @@
         svg {
             color: black;
         }
+    }
+
+    .ai-input button {
+        background: whitesmoke;
+        svg {
+            color: black;
+        }
+    }
+
+    .user-message {
+        background: black;
+    }
+
+    .toggle-ai-btn {
+        background: #535353;
+        color: white;
     }
 }
