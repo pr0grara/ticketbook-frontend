@@ -82,7 +82,9 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
         { action: "delete", label: 'Delete', icon: Trash2 },
         { action: "get-help", label: 'Get Help', icon: LifeBuoy },
         { action: "do-today", label: `${ticket.doToday ? "Unmark" : "Mark"} for Today`, icon: Calendar },
-        { action: "set-focus", label: `${ticket.doSoon ? "Unmark" : "Mark"} as Focus`, icon: Target }
+        { action: "set-focus", label: `${ticket.doSoon ? "Unmark" : "Mark"} as Focus`, icon: Target },
+        { action: "quick-win", label: `${ticket.isQuickWin ? "Unmark" : "Mark"} as a quick win`, icon: Zap },
+        { action: "deep-focus", label: `${ticket.isDeepFocus ? "Unmark" : "Mark"} as time consuming`, icon: Brain }
     ];
 
     const handleAction = (id, ticket) => {
@@ -104,6 +106,14 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
                 break
             case "set-focus":
                 newTicket = { ...ticket, doSoon: !ticket.doSoon };
+                dispatch(updateTicket({ ticketId: ticket._id, ticket: newTicket }))
+                break
+            case "quick-win":
+                newTicket = { ...ticket, isQuickWin: !ticket.isQuickWin };
+                dispatch(updateTicket({ ticketId: ticket._id, ticket: newTicket }))
+                break
+            case "deep-focus":
+                newTicket = { ...ticket, isDeepFocus: !ticket.isDeepFocus };
                 dispatch(updateTicket({ ticketId: ticket._id, ticket: newTicket }))
                 break
             default:

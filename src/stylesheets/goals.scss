@@ -150,18 +150,24 @@
         // position: sticky;
         // right: 0;
         font-size: x-small;
-        border: 1px solid aqua;
+        border: 1px solid #00dede;
         color: black;
-        margin-left: 1rem;
+        margin-left: .5rem;
         border-radius: 5px;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 3px;
+        padding: 5px;
         background: whitesmoke;
+        svg {
+            color: #00dede;
+        }
     }
     .focus-enabled {
-        background-color: aqua;
+        background-color: #00dede;
+        svg {
+            color: black;
+        }
     }
 }
 
@@ -353,7 +359,7 @@
     }
 
     .ticket-context-container {
-        min-width: 40vw;
+        min-width: 250px;
     }
 
 }

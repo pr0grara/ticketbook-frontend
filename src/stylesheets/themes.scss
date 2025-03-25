@@ -85,4 +85,29 @@
     .ticket-title {
         color: white;
     }
+
+    .ticket-context-container {
+        background: #191919;
+
+        .ticket-context-action:hover {
+            background: #484848;
+            color: white;
+        }
+    }
+
+    .focus-selector {
+        background: #191919;
+        // border: unset;
+        svg {
+            color: aqua;
+        }
+    }
+
+    .focus-enabled {
+        background: aqua;
+        
+        svg {
+            color: black;
+        }
+    }
 }

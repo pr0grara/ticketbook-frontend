@@ -1,7 +1,15 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
-import { Trash2 } from "lucide-react";
+import {
+    CheckCircle,
+    Trash2,
+    LifeBuoy,
+    Target,
+    Calendar,
+    Zap,
+    Brain
+} from 'lucide-react'; 
 import useAPI from "../hooks/useAPI.js";
 import { setSelectedTickets,setUserActivatedTickets, updateTicketsOrder } from "../../redux/slices/ticketsSlice.js";
 import { setShowTickets } from "../../redux/slices/sessionSlice.js";
@@ -29,35 +37,57 @@ function TicketList() {
     const [closedTickets, setClosedTickets] = useState([]);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, ticket: null });
     const [focus, setFocus] = useState(false);
+    const [filters, setFilters] = useState({ today: false, soon: false, deepFocus: false, quickWin: false })
 
     const widthRef = useRef(null);
     const contextRef = useRef(null)
         
     const memoizedTickets = useMemo(() => tickets, [tickets]);
 
+    const filterTickets = (tickets, filters) => {
+        return tickets.filter((ticket) =>
+            filters.every((filter) => {
+                switch (filter) {
+                    case "today": return ticket.doToday;
+                    case "soon": return ticket.doSoon;
+                    case "deepFocus": return ticket.isDeepFocus;
+                    case "quickWin": return ticket.isQuickWin;
+                    default: return true;
+                }
+            })
+        )
+    }
+    
     useEffect(() => {
         console.log("reanalyzing")
         let sortedOpenTickets, filteredOpenTickets, sortedClosedTickets, filteredClosedTickets
+        const activeFilters = Object.keys(filters).filter((key) => filters[key]);
         if (!selectedGoal) {
             filteredOpenTickets = tickets.filter(ticket => ticket.status !== "done")
-            if (focus) filteredOpenTickets = filteredOpenTickets.filter(ticket => ticket.doToday || ticket.doSoon)
+            if (activeFilters.length > 0) filteredOpenTickets = filterTickets(filteredOpenTickets, activeFilters)
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
             
             filteredClosedTickets = tickets.filter(ticket => ticket.status === "done")
+            if (activeFilters.length > 0) filteredClosedTickets = filterTickets(filteredClosedTickets, activeFilters)
             sortedClosedTickets = filteredClosedTickets.sort((a, b) => a.order - b.order)
             
             setOpenTickets(sortedOpenTickets)
             setClosedTickets(sortedClosedTickets);
         } else if (selectedTickets.length > 0) {
-            setOpenTickets(selectedTickets.filter(ticket => ticket.status !== "done" && (focus ? ticket.doToday || ticket.doSoon : true)));
-            setClosedTickets(selectedTickets.filter(ticket => ticket.status === "done"));
+            let filteredSelectedOpenTickets = selectedTickets.filter(ticket => ticket.status !== "done")
+            if (activeFilters.length > 0) filteredSelectedOpenTickets = filterTickets(filteredSelectedOpenTickets, activeFilters);
+            let filteredSelectedClosedTickets = selectedTickets.filter(ticket => ticket.status === "done")
+            if (activeFilters.length > 0) filteredSelectedClosedTickets = filterTickets(filteredSelectedClosedTickets, activeFilters);
+            setOpenTickets(filteredSelectedOpenTickets);
+            setClosedTickets(filteredSelectedClosedTickets);
         } else if (selectedGoal) {
             const filteredTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
             filteredOpenTickets = filteredTickets.filter(ticket => ticket.status !== "done")
-            if (focus) filteredOpenTickets = filteredOpenTickets.filter(ticket => ticket.doToday || ticket.doSoon)
+            if (activeFilters.length > 0) filteredOpenTickets = filterTickets(filteredOpenTickets, activeFilters);
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
-
+            
             filteredClosedTickets = filteredTickets.filter(ticket => ticket.status === "done")
+            if (activeFilters.length > 0) filteredClosedTickets = filterTickets(filteredClosedTickets, activeFilters);
             sortedClosedTickets = filteredClosedTickets.sort((a, b) => a.order - b.order)            
             setOpenTickets(sortedOpenTickets);
             setClosedTickets(sortedClosedTickets);
@@ -65,7 +95,7 @@ function TicketList() {
             setOpenTickets(memoizedTickets.filter(ticket => ticket.status !== "done"));
             setClosedTickets(memoizedTickets.filter(ticket => ticket.status === "done"));
         }
-    }, [selectedTickets, memoizedTickets, selectedGoal, focus]);
+    }, [selectedTickets, memoizedTickets, selectedGoal, filters]);
 
     useEffect(() => {
         if (selectedGoal) {
@@ -199,16 +229,47 @@ function TicketList() {
             />
             <div className="ticket-list-title">Tickets</div>
             <div className="subtitle">All open and closed tickets</div>
-            <div className="ticket-tutorial">{(openTickets.length === 0 && !focus) && `Type something like "Follow up with Robert" to create your first ticket`}</div>
+            <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(filters).filter((key) => filters[key])).length === 0) && `Type something like "Follow up with Robert" to create your first ticket`}</div>
             <div className="open-tickets-container">
                 <DragPreview />
                 <div className="open-tickets-selector" onClick={(e) => {
-                    if (e.target.classList.contains('focus-selector')) return;
+                    if (!e.target.classList.contains('open-tickets-selector')) return;
                     dispatch(setShowTickets({ ...showTickets, openTickets: !showTickets.openTickets }))
                 }}>
                     <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})` }} />
                     Open Tickets
-                    <div className={`focus-selector ${focus ? "focus-enabled" : "focus-disabled"}`} onClick={()=>setFocus(!focus)}>focus</div>
+                    <div className={`focus-selector ${filters.today ? "focus-enabled" : "focus-disabled"}`} 
+                        title="Show tickets marked for 'today'"
+                        onClick={()=>{
+                            setFilters(prev => ({
+                                ...prev,
+                                today: !prev.today
+                            }))
+                    }}><Calendar size={16} /></div>
+                    <div className={`focus-selector ${filters.soon ? "focus-enabled" : "focus-disabled"}`} 
+                        title="Show tickets marked for 'soon'"
+                        onClick={()=>{
+                            setFilters(prev => ({
+                                ...prev,
+                                soon: !prev.soon
+                            }))
+                    }}><Target size={16} /></div>
+                    <div className={`focus-selector ${filters.quickWin ? "focus-enabled" : "focus-disabled"}`} 
+                        title="Show only quick wins"
+                        onClick={()=>{
+                        setFilters(prev => ({
+                            ...prev,
+                            quickWin: !prev.quickWin
+                        }))
+                    }}><Zap size={16} /></div>
+                    <div className={`focus-selector ${filters.deepFocus ? "focus-enabled" : "focus-disabled"}`}
+                        title="Show tickets marked for 'deep focus'"
+                        onClick={()=>{
+                        setFilters(prev => ({
+                            ...prev,
+                            deepFocus: !prev.deepFocus
+                        }))
+                    }}><Brain size={16} /></div>
                 </div>
                 {showTickets.openTickets && openTickets.map((ticket, index) => (
                     <TicketCard
