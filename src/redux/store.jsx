@@ -11,7 +11,7 @@ const store = configureStore({
         tickets: ticketsReducer,
         userId: userReducer,
         session: sessionReducer,
-        ai: aiReducer
+        ai: aiReducer,
     },
     // middleware: (getDefaultMiddleWare) =>
     //     getDefaultMiddleWare({

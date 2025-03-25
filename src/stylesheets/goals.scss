@@ -135,6 +135,9 @@
 }
 
 .open-tickets-selector, .closed-tickets-selector {
+    display: flex;
+    // justify-content: center;
+    align-items: center;
     margin-bottom: 10px;
     img {
         height: 15px;
@@ -142,6 +145,23 @@
     }
     &:hover {
         cursor: pointer;
+    }
+    .focus-selector {
+        // position: sticky;
+        // right: 0;
+        font-size: x-small;
+        border: 1px solid aqua;
+        color: black;
+        margin-left: 1rem;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3px;
+        background: whitesmoke;
+    }
+    .focus-enabled {
+        background-color: aqua;
     }
 }
 
@@ -154,6 +174,7 @@
     transition: 0.2s;
     font-size: .9rem;
     max-width: 75%;
+    overflow: visible;
 }
 
 .selected-ticket-card {
@@ -167,6 +188,45 @@
 
 .ticket-card:active {
     cursor: grabbing;
+}
+
+.ticket-context-container {
+    position: fixed;
+    border-radius: 6px;
+    padding: 10px;
+    top: 0;
+    right: 0;
+    background: #ececec;
+    // height: 10vh;
+    width: 20vw;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+
+    .ticket-context-action {
+        margin-bottom: 5px;
+        padding: 5px;
+        &:hover {
+            cursor: pointer;
+            background: white;
+        }
+    }
+
+    svg {
+        margin-right: 10px;
+    }
+}
+
+.ticket-context-container.fade-in {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.ticket-context-container.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 500ms ease, transform 120ms ease;
 }
 
 @media (hover: none) {
@@ -292,5 +352,8 @@
         flex-direction: column-reverse;
     }
 
+    .ticket-context-container {
+        min-width: 40vw;
+    }
 
 }

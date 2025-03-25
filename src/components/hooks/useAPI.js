@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGoals, removeGoal } from "../../redux/slices/goalsSlice";
+import { logFromExternal } from "../../redux/slices/aiMemorySlice";
+import { setIsLoading } from "../../redux/slices/sessionSlice";
+import { handleAIRequest } from "./useAI";
 import { updateTicketStatus, removeTicket, setUserActivatedTickets, clearUserActivatedTickets } from "../../redux/slices/ticketsSlice";
 import { API_BASE_URL } from "../../config";
 import authAPI from '../api/authAPI';
@@ -132,6 +135,22 @@ const useAPI = () => {
         }
     };
 
+    // Get AI help for ticket
+    const handleHelp = async (ticket) => {
+        let goalResponse;
+        if (!!ticket.goalId) goalResponse = await fetchGoalById(ticket.goalId);
+        const goal = goalResponse?.data || "";
+        const request = {
+            contextGoals: [goal],
+            contextTickets: [ticket],
+            userInput: "Please help me achieve this ticket. I need advice.",
+            requestType: "advise ticket",
+        };
+        const adviceResponse = await handleAIRequest(request);
+        dispatch(logFromExternal({ aiResponse: adviceResponse }));
+        dispatch(setIsLoading(false));
+    };
+
     // AI query submission
     const handleAiSubmit = async (query, setUserInput) => {
         if (!query.trim()) return;
@@ -177,6 +196,7 @@ const useAPI = () => {
         handleRemoveSuggestedTicket,
         handleTicketDrop,
         deleteItem,
+        handleHelp,
         handleAiSubmit,
         generateDailyPlan,
         confirmDailyPlan,

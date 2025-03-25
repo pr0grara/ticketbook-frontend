@@ -10,6 +10,7 @@ import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
 import TicketCard from "./TicketCard.jsx";
 import DragPreview from "../DragPreview.jsx";
+import TicketContextMenu from "./TicketContextMenu.jsx";
 
 function TicketList() {
     const dispatch = useDispatch();
@@ -26,8 +27,11 @@ function TicketList() {
     const [ticketWidth, setTicketWidth] = useState(0);
     const [openTickets, setOpenTickets] = useState([]);
     const [closedTickets, setClosedTickets] = useState([]);
-    
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, ticket: null });
+    const [focus, setFocus] = useState(false);
+
     const widthRef = useRef(null);
+    const contextRef = useRef(null)
         
     const memoizedTickets = useMemo(() => tickets, [tickets]);
 
@@ -36,6 +40,7 @@ function TicketList() {
         let sortedOpenTickets, filteredOpenTickets, sortedClosedTickets, filteredClosedTickets
         if (!selectedGoal) {
             filteredOpenTickets = tickets.filter(ticket => ticket.status !== "done")
+            if (focus) filteredOpenTickets = filteredOpenTickets.filter(ticket => ticket.doToday || ticket.doSoon)
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
             
             filteredClosedTickets = tickets.filter(ticket => ticket.status === "done")
@@ -44,11 +49,12 @@ function TicketList() {
             setOpenTickets(sortedOpenTickets)
             setClosedTickets(sortedClosedTickets);
         } else if (selectedTickets.length > 0) {
-            setOpenTickets(selectedTickets.filter(ticket => ticket.status !== "done"));
+            setOpenTickets(selectedTickets.filter(ticket => ticket.status !== "done" && (focus ? ticket.doToday || ticket.doSoon : true)));
             setClosedTickets(selectedTickets.filter(ticket => ticket.status === "done"));
         } else if (selectedGoal) {
             const filteredTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
             filteredOpenTickets = filteredTickets.filter(ticket => ticket.status !== "done")
+            if (focus) filteredOpenTickets = filteredOpenTickets.filter(ticket => ticket.doToday || ticket.doSoon)
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
 
             filteredClosedTickets = filteredTickets.filter(ticket => ticket.status === "done")
@@ -59,7 +65,7 @@ function TicketList() {
             setOpenTickets(memoizedTickets.filter(ticket => ticket.status !== "done"));
             setClosedTickets(memoizedTickets.filter(ticket => ticket.status === "done"));
         }
-    }, [selectedTickets, memoizedTickets, selectedGoal]);
+    }, [selectedTickets, memoizedTickets, selectedGoal, focus]);
 
     useEffect(() => {
         if (selectedGoal) {
@@ -77,6 +83,10 @@ function TicketList() {
         };
 
         const handleScroll = () => {
+            // if (contextRef.current) closeContextMenu()
+            if (document.querySelector('.ticket-context-container')) {
+                closeContextMenu();
+            }
             setScrollOffset({
                 x: window.scrollX || document.documentElement.scrollLeft,
                 y: window.scrollY || document.documentElement.scrollTop,
@@ -165,16 +175,40 @@ function TicketList() {
         return (ticket) => userActivatedTickets.includes(ticket);
     }, [userActivatedTickets]);
 
+    const handleContextMenu = (event, ticket) => {
+        event.preventDefault();
+        setContextMenu({
+            visible: true,
+            x: event.clientX || event.pageX,
+            y: event.clientY || event.pageY,
+            ticket,
+        });
+    };
+
+    const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, visible: false }));
+
     return (
         <div className="ticket-list-container" ref={widthRef}>
+            <TicketContextMenu
+                ref={contextRef}
+                visible={contextMenu.visible}
+                x={contextMenu.x}
+                y={contextMenu.y}
+                ticket={contextMenu.ticket}
+                onClose={closeContextMenu}
+            />
             <div className="ticket-list-title">Tickets</div>
             <div className="subtitle">All open and closed tickets</div>
-            <div className="ticket-tutorial">{openTickets.length === 0 && `Type something like "Follow up with Robert" to create your first ticket`}</div>
+            <div className="ticket-tutorial">{(openTickets.length === 0 && !focus) && `Type something like "Follow up with Robert" to create your first ticket`}</div>
             <div className="open-tickets-container">
                 <DragPreview />
-                <div className="open-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, openTickets: !showTickets.openTickets }))}>
+                <div className="open-tickets-selector" onClick={(e) => {
+                    if (e.target.classList.contains('focus-selector')) return;
+                    dispatch(setShowTickets({ ...showTickets, openTickets: !showTickets.openTickets }))
+                }}>
                     <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})` }} />
                     Open Tickets
+                    <div className={`focus-selector ${focus ? "focus-enabled" : "focus-disabled"}`} onClick={()=>setFocus(!focus)}>focus</div>
                 </div>
                 {showTickets.openTickets && openTickets.map((ticket, index) => (
                     <TicketCard
@@ -190,6 +224,7 @@ function TicketList() {
                         index={index}
                         ticketList="openTickets"
                         isMobile={isMobile}
+                        onContextMenu={handleContextMenu}
                     />
                 ))}
             </div>
@@ -212,6 +247,7 @@ function TicketList() {
                         index={index}
                         ticketList="closedTickets"
                         isMobile={isMobile}
+                        onContextMenu={handleContextMenu}
                     />
                 ))}
             </div>
@@ -230,6 +266,15 @@ function TicketList() {
                 <Trash2 size={"50px"} color={isOver ? "red" : "black"} />
                 <div>Drop to delete</div>
             </div>
+        </div>
+    )
+}
+
+function TicketCardContextMenu() {
+
+    return (
+        <div className="ticket-card-context-container">
+            context
         </div>
     )
 }

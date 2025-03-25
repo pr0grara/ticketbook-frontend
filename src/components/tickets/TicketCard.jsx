@@ -4,10 +4,11 @@ import { useDrag, useDrop } from "react-dnd";
 import { setUserActivatedTickets } from "../../redux/slices/ticketsSlice";
 import { getEmptyImage } from 'react-dnd-html5-backend';
 
-function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList, isMobile }) {
-    // const [touchStartTime, setTouchStartTime] = useState(0);
+function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList, isMobile, onContextMenu }) {
+    // const [touchStartTimeRef.current, setTouchStartTime] = useState(0);
     const [touchMoved, setTouchMoved] = useState(false);
     const [canDrag, setCanDrag] = useState(!isMobile);
+    const [contextCard, setContextCard] = useState(false);
     
     // useEffect(() => {
     //     const handleTouchStart = (e) => {
@@ -32,7 +33,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         ticket,
         isMobile,
         type: "ticket"
-    }), [ticket._id, index]);
+    }), [ticket._id, index, ticketList, ticket]); //added ticketList and ticket here while setting onContext() remove if buggy
 
     const [{ isDragging }, drag, preview] = useDrag({
         type: "ticket",
@@ -79,36 +80,59 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         e.preventDefault();
     };
 
-    let touchDuration = 0;
+    const touchActiveRef = useRef(false);
+    let touchDurationRef = useRef(0);
     let animationFrame;
-    let touchStartTime = 0;
+    let touchStartTimeRef = useRef(0);
+    let contextTriggeredRef = useRef(false);
 
     const updateDuration = (e) => {
-        touchDuration = Date.now() - touchStartTime;
+        touchDurationRef.current = Date.now() - touchStartTimeRef.current;
+        console.log(touchDurationRef.current)
 
-        if (touchDuration > 10) {
+        if (touchDurationRef.current > 10) {
             e.target.classList.add('selected-ticket-card')
             setTimeout(() => document.querySelectorAll('.selected-ticket-card')
                 .forEach(ele => ele.classList.remove('selected-ticket-card'))
             , 350)
         }  
 
-        if (touchDuration > 300) {
+        if (touchDurationRef.current > 300) {
             setCanDrag(true);
+        }
+        
+        if (touchDurationRef.current > 600 && !contextTriggeredRef.current) {
+            if (!touchActiveRef.current) return;
+            contextTriggeredRef.current = true;
+            const touch = e.touches[0]; // or e.changedTouches[0], depending on when called
+            onContextMenu(
+                {
+                    preventDefault: () => { },
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
+                },
+                ticket
+            );
 
+        }
+        
+        if (touchDurationRef.current > 1000) {
             if (animationFrame) {
                 cancelAnimationFrame(animationFrame); //Stop loop when drag is enabled
                 animationFrame = null;
             }
             return; // ✅ Prevent unnecessary frame requests
-        }
+        };
+
 
         animationFrame = requestAnimationFrame(()=>updateDuration(e)); //Keep updating if < 300ms
     };
 
     const handleTouchStart = (e) => {
-        touchStartTime = Date.now();
-        touchDuration = 0;
+        touchStartTimeRef.current = Date.now();
+        touchDurationRef.current = 0;
+        touchActiveRef.current = true;
+        contextTriggeredRef.current = false;
         setCanDrag(false);
         setTouchMoved(false);
 
@@ -120,12 +144,13 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
     }
 
     const handleTouchEnd = (e) => {
+        touchActiveRef.current = false;
         if (animationFrame) {
             cancelAnimationFrame(animationFrame);
             animationFrame = null
         }
 
-        if (!touchMoved && touchDuration < 250) {
+        if (!touchMoved && touchDurationRef.current < 250) {
             dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }));
             document.querySelectorAll('.back-to-list').forEach(el => el.remove())
             setTimeout(()=> {
@@ -137,11 +162,13 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
                     })
                 }
             }, 500)
-        } 
+
+        }
 
         setTimeout(() => {
             setCanDrag(!isMobile); // Reset drag after small delay to prevent flickering
         }, 100);
+        contextTriggeredRef.current = false;
     };
 
     return (
@@ -154,6 +181,8 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             onClick={() => isMobile ? null : dispatch(setUserActivatedTickets({ userActivatedTicket: ticket }))}
             onMouseLeave={() => console.log("left")}
             className={`${isUserActivatedTicket ? "user-activated-ticket " : ""}ticket-card`}
+            onContextMenu={(e) => onContextMenu(e, ticket)}
+            // onContextMenu={e => e.preventDefault()}
             style={{
                 opacity: isDragging ? 0.15 : 1,
                 transform: isDragging ? "scale(1.05)" : "scale(1)",

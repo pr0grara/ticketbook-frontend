@@ -14,7 +14,7 @@ import { darkMode } from "../../util/theme_util.js";
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 
 export default function Ticket({ ticket, isMobile }) {
-    const { deleteItem, fetchGoalById } = useAPI();
+    const { deleteItem, fetchGoalById, handleHelp } = useAPI();
     const dispatch = useDispatch();
     const { theme } = useSelector(state => state.session);
     
@@ -217,21 +217,6 @@ export default function Ticket({ ticket, isMobile }) {
             dispatch(updateTicket({ ticketId: ticket._id, ticket: { checklist: updatedChecklist } }));
             setFocus({index: index-1, query: ".checklist-input"})
         }
-    };
-
-    const handleHelp = async (ticket) => {
-        let goalResponse;
-        if (!!ticket.goalId) goalResponse = await fetchGoalById(ticket.goalId);
-        const goal = goalResponse?.data || "";
-        const request = {
-            contextGoals: [goal],
-            contextTickets: [ticket],
-            userInput: "Please help me achieve this ticket. I need advice.",
-            requestType: "advise ticket",
-        };
-        const adviceResponse = await handleAIRequest(request);
-        dispatch(logFromExternal({ aiResponse: adviceResponse }));
-        dispatch(setIsLoading(false));
     };
 
     const handlekeydown = (e) => {
