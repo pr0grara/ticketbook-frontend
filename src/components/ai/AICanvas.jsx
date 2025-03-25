@@ -80,7 +80,7 @@ function AICanvas({ from }) {
 
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode-canvas" : ""}`}>
-            {isMobile && (
+            {isMobile && isExpanded && (
             <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
                 {isExpanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
             </button>
@@ -92,7 +92,7 @@ function AICanvas({ from }) {
                     )) : <p className="placeholder">Create new goals, add tickets, ask me for advice...</p>}
                 </div>
             )}
-            <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from}>
+            <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from} onClick={()=>setIsExpanded(true)}>
                 <input
                     type="text"
                     value={userInput}
@@ -100,9 +100,9 @@ function AICanvas({ from }) {
                     onChange={(e) => setUserInput(e.target.value)}
                     placeholder="Type your request..."
                 />
-                <button type="submit" disabled={isLoading}>
+                {isExpanded && (<button type="submit" disabled={isLoading}>
                     {isLoading ? <Loader className="loading-icon" /> : <Send className="send-icon" />}
-                </button>
+                </button>)}
             </form>
         </div>
     );

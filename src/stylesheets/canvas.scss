@@ -114,10 +114,14 @@
         min-height: 30px;
         // overflow: hidden;
         width: 95%;
+        .ai-input {
+            margin-bottom: .5rem;
+        }
     }
 
     .ai-canvas.expanded {
-        // height: 300px;
+        max-height: 70vh;
+        // height: 70vh;
         padding: 0px;
         /* Expanded view for more content */
     }
