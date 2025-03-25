@@ -46,7 +46,7 @@ function TicketList() {
 
     const filterTickets = (tickets, filters) => {
         return tickets.filter((ticket) =>
-            filters.every((filter) => {
+            filters.some((filter) => {
                 switch (filter) {
                     case "today": return ticket.doToday;
                     case "soon": return ticket.doSoon;

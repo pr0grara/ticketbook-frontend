@@ -171,6 +171,24 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         contextTriggeredRef.current = false;
     };
 
+    const setBulletColor = (ticket) => {
+        const filterOptions = ["doToday", "doSoon", "isQuickWin", "isDeepFocus"]
+        const filters = Object.keys(ticket)
+            .filter(key => filterOptions.includes(key))
+            .filter(key => ticket[key]);
+
+        const firstMatch = filters.find(filter => {
+            return filterOptions.includes(filter);
+        })
+        switch (firstMatch) {
+            case "doToday": return "red";
+            case "doSoon": return "orange";
+            case "isQuickWin": return "green";
+            case "isDeepFocus": return "purple";
+            default: return "";
+        }
+    }
+
     return (
 
         <div
@@ -193,7 +211,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
                 touchAction: "auto",
             }}
         >
-            • {ticket.title}
+            <span style={{ color: setBulletColor(ticket) }}>⦿</span> {ticket.title}
         </div>
     );
 }
