@@ -126,4 +126,11 @@
         background: #535353;
         color: white;
     }
+
+    .shortcut-button {
+        background: #303030;
+        &.selected {
+            background: #00d3d3;
+        }
+    }
 }

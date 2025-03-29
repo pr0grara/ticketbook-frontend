@@ -29,6 +29,7 @@ function AICanvas({ from }) {
     const [typingIndex, setTypingIndex] = useState(0);
     const [displayedContent, setDisplayedContent] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [shortcuts, setShortcuts] = useState({"New Ticket": false, "New Goal": false, "New Bucket": false});
 
     useEffect(() => {
         const newAdvice = externalInteractions[0]?.aiResponse.advice;
@@ -60,9 +61,23 @@ function AICanvas({ from }) {
         const requestType = "user message";
         let contextTickets = tickets.length > 0 ? (selectedTickets.length > 0 ? selectedTickets : tickets) : [];
         let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
-
+        
+        
         try {
-            const aiResponse = await handleAIRequest({ requestType, contextGoals, contextTickets, userInput, conversation, from, aiHistory, userId });
+            // 🔐 This is the first payload sent towards backend AI — do not mutate structure lightly.
+            const request = { 
+                requestType, 
+                contextGoals, 
+                contextTickets, 
+                userInput, 
+                conversation, 
+                from, 
+                aiHistory, 
+                userId,
+                shortcuts,
+             }
+
+            const aiResponse = await handleAIRequest(request);
             const handledResponse = await handleAIResponse(aiResponse);
 
             dispatch(logInteraction({ userMessage: userInput, aiResponse: handledResponse }));
@@ -72,7 +87,7 @@ function AICanvas({ from }) {
                 localStorage.setItem("ai_conversation", JSON.stringify(updated));
                 return updated;
             });
-            
+
             setDisplayedContent("");
             setTypingIndex(0);
             setIsTyping(true);
@@ -94,8 +109,7 @@ function AICanvas({ from }) {
                         return updated;
                     });
                 }
-            }, 25);
-
+            }, 20);
 
             setUserInput("");
         } catch (err) {
@@ -108,6 +122,7 @@ function AICanvas({ from }) {
             });
         } finally {
             if (!isExpanded) setIsExpanded(true);
+            setShortcuts({ "New Ticket": false, "New Goal": false, "New Bucket": false })
             dispatch(setIsLoading(false));
         }
     };
@@ -119,6 +134,26 @@ function AICanvas({ from }) {
 
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode" : ""}`}>
+            {(!isMobile || isExpanded) && <div className="shortcut-buttons-container">
+                {Object.keys(shortcuts).map((shortcut, idx) => (
+                    <div 
+                    key={idx} 
+                    className={`shortcut-button${shortcuts[shortcut] ? " selected" : ""}`}
+                    onClick={() => {
+                        setShortcuts((prev) => {
+                            const isAlreadyActive = prev[shortcut];
+                            const updated = Object.fromEntries(
+                                Object.keys(prev).map((key) => [key, false])
+                            );
+                            if (!isAlreadyActive) updated[shortcut] = true;
+                            return updated;
+                        });
+                    }}
+                    >
+                        {shortcut}
+                    </div>
+                ))}
+            </div>}
             {(conversation.length > 0 && (!isMobile || isExpanded)) && (
                 <button
                     title="clear chat history"

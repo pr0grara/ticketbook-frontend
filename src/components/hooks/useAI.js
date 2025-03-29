@@ -69,7 +69,7 @@ async function handleAIResponse(res) {
         }
     }
 
-    const { action_type, advice, answer, dev_advice, status } = res;
+    const { action_type, advice, answer, dev_advice, status, isBucket } = res;
     if (dev_advice) alert(dev_advice);
     let writeBool = false;
     if (status !== "completed") writeBool = true;
@@ -109,7 +109,7 @@ async function handleAIResponse(res) {
             }
             store.dispatch(setSelectedGoal(newGoalObj.newGoal))
             store.dispatch(setSelectedTickets({newGoal: true, newTickets: newGoalObj.newTickets.map(newTick => newTick.newTicket)}))
-            return "New Goal created!"
+            return `New ${isBucket ? 'Bucket' : 'Goal'} created!`
         case "request_info":
             return res.question
         case "error":
@@ -123,11 +123,12 @@ async function handleAIResponse(res) {
     }
 }
 
-// 🏗️ FOUNDATION LAYER: Calls GPT-4o with basic reasoning power
+// Last stop on frontend before we begin backend AI processing
 async function callAI(request) {
     const { userId } = store.getState()
+
+    const {requestType, userInput, context} = request;
     try {
-        const {userInput, context, requestType, conversation, aiHistory} = request;
         var response;
         switch (requestType) {
             case "advise ticket":
@@ -145,7 +146,7 @@ async function callAI(request) {
             default:
                 response = await axios.post(
                     `${API_BASE_URL}/ai/request`,
-                    { userInput, context, requestType, conversation, aiHistory, userId },
+                    { ...request, userId },
                     { headers: { "Content-Type": "application/json" } }
                 );
                 break
@@ -158,7 +159,7 @@ async function callAI(request) {
 }
 
 // 🎯 CONTEXT LAYER: Injects Goal & Ticket Data Before AI Call
-function prepareContext(contextGoals, contextTickets) {
+function prepareContext(contextGoals, contextTickets, shortcuts) {
     // if (!selectedGoal) return "No goal selected.";
     return {
         goals: contextGoals.map(goal => ({
@@ -173,7 +174,8 @@ function prepareContext(contextGoals, contextTickets) {
             notes: ticket.notes,
             checklist: ticket.checklist,
             status: ticket.status
-        }))
+        })),
+        shortcut: Object.keys(shortcuts).filter(key => !!shortcuts[key]).join()
     };
 }
 
@@ -190,9 +192,30 @@ function refineAIOutput(rawOutput) {
 
 // 🚀 MAIN FUNCTION: Calls AI with Context & Instructions
 async function handleAIRequest(request) {
-    const { requestType, contextGoals, contextTickets, userInput, from, aiHistory, userId } = request;
-    const context = prepareContext(contextGoals, contextTickets);
-    const aiResponse = await callAI({userInput, context, requestType, from, aiHistory, userId});
+    const {
+        requestType,
+        contextGoals,
+        contextTickets,
+        userInput,
+        from,
+        aiHistory,
+        userId,
+        shortcuts,
+    } = request;
+
+    const context = prepareContext(contextGoals, contextTickets, shortcuts);
+
+    // Second stop on the train towards backend AI
+    const payload = {
+        userInput,
+        context,
+        requestType,
+        from,
+        aiHistory,
+        userId,
+    };
+
+    const aiResponse = await callAI(payload);
     return refineAIOutput(aiResponse);
 }
 
