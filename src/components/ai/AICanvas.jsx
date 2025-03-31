@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, handleAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
-import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X } from "lucide-react";
+import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X, CirclePlus, TicketPlus, PackagePlus } from "lucide-react";
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
 
@@ -76,7 +76,6 @@ function AICanvas({ from }) {
                 userId,
                 shortcuts,
              }
-
             const aiResponse = await handleAIRequest(request);
             const handledResponse = await handleAIResponse(aiResponse);
 
@@ -132,28 +131,26 @@ function AICanvas({ from }) {
         localStorage.removeItem("ai_conversation");
     };
 
+    const setShortcutIcon = (shortcut) => {
+        switch (shortcut) {
+            case "New Ticket":
+                return <TicketPlus />;
+            case "New Goal":
+                return <CirclePlus />;
+            case "New Bucket":
+                return <PackagePlus />;
+            default:
+                break
+        }
+    }
+
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode" : ""}`}>
-            {(!isMobile || isExpanded) && <div className="shortcut-buttons-container">
-                {Object.keys(shortcuts).map((shortcut, idx) => (
-                    <div 
-                    key={idx} 
-                    className={`shortcut-button${shortcuts[shortcut] ? " selected" : ""}`}
-                    onClick={() => {
-                        setShortcuts((prev) => {
-                            const isAlreadyActive = prev[shortcut];
-                            const updated = Object.fromEntries(
-                                Object.keys(prev).map((key) => [key, false])
-                            );
-                            if (!isAlreadyActive) updated[shortcut] = true;
-                            return updated;
-                        });
-                    }}
-                    >
-                        {shortcut}
-                    </div>
-                ))}
-            </div>}
+            {isMobile && isExpanded && (
+                <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
+                    {isExpanded ? <ChevronDown size={12} /> : <ChevronUp size={18} />}
+                </button>
+            )}
             {(conversation.length > 0 && (!isMobile || isExpanded)) && (
                 <button
                     title="clear chat history"
@@ -162,11 +159,6 @@ function AICanvas({ from }) {
                     aria-label="Clear conversation"
                 >
                     <X size={14} />
-                </button>
-            )}
-            {isMobile && isExpanded && (
-                <button className="toggle-ai-btn" onClick={() => setIsExpanded(!isExpanded)}>
-                    {isExpanded ? <ChevronDown size={12} /> : <ChevronUp size={18} />}
                 </button>
             )}
             {(!isMobile || isExpanded) && (
@@ -195,9 +187,33 @@ function AICanvas({ from }) {
                     placeholder="Type your request..."
                 />
                 {(!isMobile || isExpanded) && (
-                    <button type="submit" disabled={isLoading}>
-                        {isLoading ? <Loader className="loading-icon" /> : <ArrowUp size={18} className="send-icon" />}
-                    </button>
+                    <div className="submit-container">
+                        <div className="shortcut-buttons-container">
+                            {Object.keys(shortcuts).map((shortcut, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`shortcut-button${shortcuts[shortcut] ? " selected" : ""}`}
+                                    onClick={() => {
+                                        setShortcuts((prev) => {
+                                            const isAlreadyActive = prev[shortcut];
+                                            const updated = Object.fromEntries(
+                                                Object.keys(prev).map((key) => [key, false])
+                                            );
+                                            if (!isAlreadyActive) updated[shortcut] = true;
+                                            return updated;
+                                        });
+                                        document.querySelector('.canvas-input').focus()
+                                    }}
+                                >
+                                    {setShortcutIcon(shortcut)}
+                                    {(!isMobile || shortcuts[shortcut]) ? <span>{shortcut}</span> : ""}
+                                </div>
+                            ))}
+                        </div>
+                        <button type="submit" className="ai-submit-button" disabled={isLoading}>
+                            {isLoading ? <Loader className="loading-icon" /> : <ArrowUp size={18} className="send-icon" />}
+                        </button>
+                    </div>
                 )}
             </form>
         </div>

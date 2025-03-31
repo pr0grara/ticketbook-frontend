@@ -17,8 +17,10 @@ const Navbar = () => {
         authAPI.post('/auth/logout?dev=true')
             .then(res => {
                 // debugger
+                authAPI.post('/auth/logout');
                 dispatch(clearUser())
                 dispatch(setLoggedOut()) //change redux state
+                localStorage.clear();
                 window.location.href = "/login"; // ✅ TEMP FIX: Avoid useNavigate
                 // navigate("/login");
             })

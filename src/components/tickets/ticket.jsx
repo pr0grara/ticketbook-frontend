@@ -223,6 +223,7 @@ export default function Ticket({ ticket, isMobile }) {
         let { index, checklist, note } = e.target.dataset;
         index = parseInt(index);
         if (e.key === "Enter") {
+            debugger
             switch (e.target.dataset.type) {
                 case "existing-checklist":
                     handleAddTicketItem({ index, item: "checklist" })                    

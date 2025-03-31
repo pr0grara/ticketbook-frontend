@@ -6,8 +6,8 @@
     min-height: 20vh;
     max-height: 40vh;
     background: #fffffff1;
-    border-top: 1px solid #303030;
-    border-radius: 20px 20px 0px 0px;
+    border-top: 1px solid #d0d0d0;
+    // border-radius: 20px 20px 0px 0px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -84,10 +84,14 @@
 
 .ai-input {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     width: 90%;
     gap: 8px;
     margin-bottom: 4rem;
+    border: 1px solid gray;
+    border-radius: 10px;
+    margin: 10px;
 }
 
 .ai-input input {
@@ -102,26 +106,32 @@
     border: none;
     outline: none;
     font-size: 1.3rem;
-    border-bottom: 1px solid #333;
+    // border-bottom: 1px solid #333;
     border-radius: 0;
 } 
 
 .ai-input button {
-    background: #191919;
     border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
     padding: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: background 0.3s ease-in-out;
+    margin: 5px;
+}
+
+.ai-submit-button {
+    margin-left: auto;
+    background: #191919;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    // align-self: flex-end !important;
 }
 
 .ai-input button:hover {
-    background: #0056b3;
+    // background: #0056b3;
 }
 
 .ai-input button:disabled {
@@ -131,8 +141,6 @@
 
 .send-icon {
     color: white;
-    width: 24px;
-    height: 24px;
 }
 
 .loading-icon {
@@ -142,24 +150,60 @@
     animation: spin 1s linear infinite;
 }
 
+.submit-container {
+    width: 97%;
+    // border: 1px solid red;
+    display: flex;
+    margin-bottom: .5rem;
+    justify-content: space-between; // spreads buttons
+    align-self: center;
+}
+
+.shortcuts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: whitesmoke;
+    border-radius: 10px;
+    padding-top: 7px;
+    font-size: small;
+}
+
 .shortcut-buttons-container {
     display: flex;
 }
 
 .shortcut-button {
-    padding: 10px;
-    background: #e2e2e2;
-    margin: 10px;
+    background-color: unset;
+    padding: 0 5px;
+    // background: #f6f6f6;
+    margin: 5px;
     border-radius: 10px;
     transition: background .3s ease;
-
+    font-size: small;
+    // width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    align-items: center;
+    border: 1px solid grey;
     &:hover {
+        background: #dcdcdc;
         cursor: pointer;
+        color: black
     };
 
     &.selected {
-        background: #00d3d3;
+        background: #3695de;
         color: white;
+        border-radius: 8px !important;
+        width: unset;
+    }
+
+    span {
+        margin-left: 5px;
     }
 }
 
@@ -214,22 +258,34 @@
     }
 
     .ai-input {
-        width: 100vw;
+        width: 95vw;
         flex-direction: column;
         align-items: center;
         margin-bottom: 2rem;
         position: relative;
         input {
-            width: 90vw;
+            margin: 15px 0;
+            padding: unset;
+            width: 97%;
+            max-width: unset;
             font-size: 18px;
+            height: 2rem;
         }
-        button {
-            position: absolute;
-            right: 10px;
-            bottom: 8px;
-            background: black;
+        .shortcut-button {
+            border: 1px solid grey;
             border-radius: 50%;
-            padding: 6px;
+            padding: unset;
+            height: 2rem;
+            width: 2rem;
+            &:hover {
+                background: unset;
+            }
+            &.selected {
+                width: unset;
+                background: #3695de !important;
+                border: unset;
+                padding: 0 5px;
+            }
         }
     }
 

@@ -113,6 +113,9 @@
 
     .ai-input button {
         background: whitesmoke;
+    }
+
+    .ai-submit-button {
         svg {
             color: black;
         }
@@ -129,8 +132,22 @@
 
     .shortcut-button {
         background: #303030;
+        &:hover {
+            color: white;
+            background: #494949;
+        }
         &.selected {
-            background: #00d3d3;
+            background: #3695de;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .dark-mode {
+        .shortcut-button {
+            &:hover {
+                background: unset;
+            }
         }
     }
 }

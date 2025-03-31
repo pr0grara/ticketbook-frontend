@@ -70,6 +70,7 @@ async function handleAIResponse(res) {
     }
 
     const { action_type, advice, answer, dev_advice, status, isBucket } = res;
+    const { userId } = store.getState();
     if (dev_advice) alert(dev_advice);
     let writeBool = false;
     if (status !== "completed") writeBool = true;
@@ -113,6 +114,7 @@ async function handleAIResponse(res) {
         case "request_info":
             return res.question
         case "error":
+            // authAPI.post('/error/log-client-error', {error: res.message, userId, errorId: res.errorId})
             return res.message
         case "fatal_error":
             return "Fatal AI Error"
@@ -214,7 +216,6 @@ async function handleAIRequest(request) {
         aiHistory,
         userId,
     };
-
     const aiResponse = await callAI(payload);
     return refineAIOutput(aiResponse);
 }
