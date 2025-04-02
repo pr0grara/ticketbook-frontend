@@ -202,7 +202,7 @@ function TicketList() {
     };
 
     const isUserActivated = useMemo(() => {
-        return (ticket) => userActivatedTickets.includes(ticket);
+        return (ticket) => userActivatedTickets.map((tick => tick._id)).includes(ticket._id);
     }, [userActivatedTickets]);
 
     const handleContextMenu = (event, ticket) => {
@@ -271,8 +271,12 @@ function TicketList() {
                         }))
                     }}><Brain size={16} /></div>
                 </div>
-                {showTickets.openTickets && openTickets.map((ticket, index) => (
-                    <TicketCard
+                {showTickets.openTickets && openTickets.map((ticket, index) => {
+                    let userActivated = isUserActivated(ticket);
+                    if (userActivated && ticket._id === '67c66903e4006aade5389dea') {
+                        // debugger
+                    }
+                    return <TicketCard
                         ticket={ticket}
                         dispatch={dispatch}
                         setIsDragging={setIsDragging}
@@ -287,7 +291,7 @@ function TicketList() {
                         isMobile={isMobile}
                         onContextMenu={handleContextMenu}
                     />
-                ))}
+                })}
             </div>
             <div className="closed-tickets-container">
                 <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, closedTickets: !showTickets.closedTickets }))}>

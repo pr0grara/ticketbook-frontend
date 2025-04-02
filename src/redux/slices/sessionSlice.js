@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ActivitySquareIcon } from "lucide-react";
+import authAPI from "../../components/api/authAPI";
 
 const sessionSlice = createSlice({
     name: "session",
@@ -12,7 +13,8 @@ const sessionSlice = createSlice({
             closedTickets: false
         },
         isMobile: false,
-        allowFastLogin: true
+        allowFastLogin: true,
+        watchedTutorial: false
     },
     reducers: {
         setLoggedIn: (state, action) => { 
@@ -35,9 +37,12 @@ const sessionSlice = createSlice({
         },
         disableFastLogin: (state) => {
             return { ...state, allowFastLogin: false }
+        },
+        setWatchedTutorial: (state, action) => {
+            return { ...state, watchedTutorial: action.payload }
         }
     },
 });
 
-export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin } = sessionSlice.actions;
+export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial } = sessionSlice.actions;
 export default sessionSlice.reducer;

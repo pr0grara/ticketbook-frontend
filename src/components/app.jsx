@@ -11,8 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/slices/userSlice.js";
 import axios from "axios";
 import { API_BASE_URL } from "../config.js";
-import { checkStatus } from "./api/authAPI.js";
-import { setLoggedIn, setLoggedOut } from "../redux/slices/sessionSlice.js";
+import authAPI, { checkStatus } from "./api/authAPI.js";
+import { setLoggedIn, setLoggedOut, setWatchedTutorial } from "../redux/slices/sessionSlice.js";
+import { ArcadeEmbed } from "./ArcadeEmbed.jsx";
 
 export default function App({ page }) {
     const dispatch = useDispatch();
@@ -33,6 +34,10 @@ export default function App({ page }) {
                 if (loggedIn) {
                     dispatch(setLoggedIn())
                     if (!userId) dispatch(setUser(res.user.id))
+                    authAPI.get(`/users/watched-tutorial/status/${res.user.id}`)
+                        .then(res => {
+                            dispatch(setWatchedTutorial(res.data.watchedTutorial))
+                        })
                     return
                 } 
                 dispatch(setLoggedOut())
@@ -61,6 +66,8 @@ export default function App({ page }) {
 
             {page === "" && <LoginPage />}
             {page === "login" && <LoginPage />}
+            {page === "tutorial" && ArcadeEmbed()}
+
             {/* Protected Routes */}
             {page === "goals" && <ProtectedRoute component={<Goals />} />}
             {page === "calendar" && <ProtectedRoute component={<CalendarView />} />}

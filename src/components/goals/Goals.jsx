@@ -6,8 +6,8 @@ import useAPI from "../hooks/useAPI.js";
 import AICanvas from "../ai/AICanvas.jsx";
 import { setSelectedGoal } from "../../redux/slices/goalsSlice";
 import { clearUserActivatedTickets, fetchTickets, setSelectedTickets, setUserActivatedTickets } from "../../redux/slices/ticketsSlice.js";
-import { checkStatus } from "../api/authAPI.js";
-import { setIsMobile, setLoggedIn, setLoggedOut, setShowTickets } from "../../redux/slices/sessionSlice.js";
+import authAPI, { checkStatus } from "../api/authAPI.js";
+import { setIsMobile, setLoggedIn, setLoggedOut, setShowTickets, setWatchedTutorial } from "../../redux/slices/sessionSlice.js";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { fetchGoals } from "../../redux/slices/goalsSlice.js";
 import TicketSpace from '../tickets/TicketSpace.jsx';
@@ -15,13 +15,14 @@ import TicketList from "../tickets/TicketList.jsx";
 import { darkMode } from "../../util/theme_util.js";
 import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
+import { ArcadeEmbed } from "../ArcadeEmbed.jsx";
 
 function Goals() {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
     const userId = useSelector(state => state.userId);
-    const { theme, showTickets, isMobile } = useSelector(state => state.session);
+    const { theme, showTickets, isMobile, watchedTutorial } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 
     const [, setIsDragging] = useState(false);
@@ -98,6 +99,19 @@ function Goals() {
 
     return (
         <>
+        {(!watchedTutorial) && (
+            <>
+            {/* {ArcadeEmbed({dispatch, setWatchedTutorial, watchedTutorial, authAPI, userId})} */}
+            {/* <div className="watched-tutorial-button">
+                <span onClick={() => {
+                    dispatch(setWatchedTutorial(!watchedTutorial))
+                    authAPI.post('/users/mark-tutorial-watched', {userId, watched: !watchedTutorial})
+                }}>
+                ✅ Mark Tutorial as Watched
+                </span>
+            </div> */}
+            </>
+        )}
         <div className={`goals-container${darkMode(theme) ? " dark-mode" : ""}`}>
             {isMobile && (
                 <>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import authAPI from "../api/authAPI";
-import { disableFastLogin, setLoggedIn } from "../../redux/slices/sessionSlice";
+import { disableFastLogin, setLoggedIn, setWatchedTutorial } from "../../redux/slices/sessionSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/slices/userSlice";
 import { fetchGoals } from "../../redux/slices/goalsSlice";
@@ -73,11 +73,12 @@ const LoginPage = () => {
         setError(null);
         try {
             const response = await authAPI.post("/auth/login", { email: emailVal, password: passwordVal }, { withCredentials: true });
-            const { success, userId } = response.data;
+            const { success, userId, watchedTutorial } = response.data;
             if (!success) throw new Error("Login failed");
 
             dispatch(setUser(userId));
             dispatch(setLoggedIn());
+            dispatch(setWatchedTutorial(watchedTutorial))
 
             await Promise.all([
                 dispatch(fetchGoals(userId)),
