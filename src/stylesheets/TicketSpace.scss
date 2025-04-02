@@ -230,17 +230,19 @@
 
 .checklist-input-container {
     display: flex;
+    align-items: center;
     width: 100%;
     position: relative;
 }
 
-.checklist-item input {
+.checklist-item textarea {
     // font-size: 1.2rem;
     border: none;
     outline: none;
     padding: 10px;
     overflow: visible;
     font-size: 16px;
+    font-family: unset;
 }
 
 .checked-list-item {
@@ -309,7 +311,8 @@
     border-bottom: 1px solid black;
     position: relative;
 
-    input {
+    textarea {
+        font-family: unset;
         width: 95%;
         border: none;
         background-color: transparent;

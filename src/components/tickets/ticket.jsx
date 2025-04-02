@@ -47,14 +47,14 @@ export default function Ticket({ ticket, isMobile }) {
     }, [ticket]);
 
     useEffect(() => {
-        if (ticket.checklist?.length > 0 && ticket.checklist[0]?.item !== "") setShowChecklist(true);
+        // if (ticket.checklist?.length > 0 && ticket.checklist[0]?.item !== "") setShowChecklist(true);
         if (JSON.stringify(ticket.checklist) !== JSON.stringify(checklist)) {
             setChecklist(ticket.checklist || []);
         }
     }, [ticket.checklist]);
 
     useEffect(() => {
-        if (ticket.notes?.length > 0 && ticket.notes[0] !== " ") setShowNotes(true);
+        // if (ticket.notes?.length > 0 && ticket.notes[0] !== " ") setShowNotes(true);
         if (ticket.notes?.length === 0) {
             // dispatch(updateTicket({ticketId: ticket._id, ticket: {...ticket, notes: [""]}}))
         }
@@ -377,14 +377,14 @@ export default function Ticket({ ticket, isMobile }) {
                 <div className="ticket-title-and-text">
                     {editingField === "title" ? (
                         <div className="edit-field">
-                            <input className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("title", tempValue)} />
+                            <textarea className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("title", tempValue)} />
                         </div>
                     ) : (
                         <div className="editable ticket-title" onClick={() => handleEdit("title", ticket.title)}>{ticket.title}</div>
                     )}
                     {ticket.title !== ticket.text && (editingField === "text" ? (
                         <div className="edit-field">
-                            <textarea className="editable-textarea" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("text", tempValue)} />
+                            <textarea className="editable-textarea" style={isMobile ? {minHeight: "7rem"} : {}}value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus onBlur={() => handleBlur("text", tempValue)} />
                         </div>
                     ) : (
                         <div className="editable" onClick={() => handleEdit("text", ticket.text)}>{ticket.text}</div>
@@ -423,7 +423,7 @@ export default function Ticket({ ticket, isMobile }) {
                                         checked={item?.status === "checked"}
                                         onChange={() => handleToggleChecklistItem(index)}
                                     />
-                                    <input 
+                                    <textarea 
                                         type="text"
                                         value={item.item}
                                         data-type="existing-checklist"
@@ -475,7 +475,7 @@ export default function Ticket({ ticket, isMobile }) {
                     }}>
                         {notes.map((note, index) => (
                             <div key={index} className="note-item">
-                                <input
+                                <textarea
                                     type="text"
                                     value={note}
                                     onChange={(e) => handleEditNote(index, e.target.value)}

@@ -6,7 +6,7 @@ import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X, CirclePlus, TicketPlu
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
 
-function AICanvas({ from }) {
+function AICanvas({ from, placeholderIdx }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isExpanded, setIsExpanded] = useState(false);
     const { isLoading } = useSelector(state => state.session);
@@ -31,9 +31,13 @@ function AICanvas({ from }) {
     const [isTyping, setIsTyping] = useState(false);
     const [shortcuts, setShortcuts] = useState({"New Ticket": false, "New Goal": false, "New Bucket": false});
     const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+    const [rows, setRows] = useState(1);
+    const [inputLength, setInputLength] = useState(0);
+    const [charsPerRow, setCharsPerRow] = useState(0);
 
     const scrollRef = useRef(null);
     const outputRef = useRef(null);
+    const inputRef = useRef(null);
 
     useEffect(() => {
         if (autoScrollEnabled && scrollRef.current) {
@@ -123,7 +127,6 @@ function AICanvas({ from }) {
         let contextTickets = tickets.length > 0 ? (selectedTickets.length > 0 ? selectedTickets : tickets) : [];
         let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
         
-        
         try {
             // 🔐 This is the first payload sent towards backend AI — do not mutate structure lightly.
             const request = { 
@@ -149,6 +152,7 @@ function AICanvas({ from }) {
             });
 
             setDisplayedContent("");
+            setRows(1);
             setTypingIndex(0);
             setIsTyping(true);
             setAutoScrollEnabled(true);
@@ -207,8 +211,20 @@ function AICanvas({ from }) {
     }
 
     const handleChange = (e) => {
-        const input = e.target.value;
+        const el = inputRef.current;
+        let rows = Math.floor(el.scrollHeight / (isMobile ? 20 : 35));
+        if (el.value.length === 0) rows = 1;
+        if (!charsPerRow && rows === 2) {
+            setCharsPerRow(Math.floor(el.value.length * 1.1))
+        };
+        if (!!charsPerRow && (el.value.length < inputLength)) {
+            let newRowCount = Math.ceil(inputLength / charsPerRow) + 1
+            rows = newRowCount > rows ? rows : newRowCount;
+        }
+        setInputLength(el.value.length)
+        setRows(rows);
 
+        const input = e.target.value;
         const activeShortcut = Object.keys(shortcuts).find(key => shortcuts[key]);
         const expectedPrefix = activeShortcut ? `/${activeShortcut.toLowerCase().replace(" ", "")} ` : "";
         console.log(expectedPrefix)
@@ -230,6 +246,29 @@ function AICanvas({ from }) {
         }    
     };
 
+    const placeholders = [
+        "/newgoal I want to get better at cooking",
+        "/newticket follow up with Tara about art show",
+        "Make me a new bucket to keep track of my widget business",
+        "Make me a shopping list for chicken katsu",
+        "What do I need to make an old fashioned?",
+        "I need to make 50 widgets by Friday",
+        "/newgoal Learn basic Spanish for travel",
+        "/newticket Schedule a call with Jake about the deck",
+        "/newbucket crypto",
+        "Plan menu for bbq dinner party",
+        "What's the process for renewing my passport?",
+        "Remind me to send invoices before the 10th",
+        "/newgoal Start running 3 times a week",
+        "/newticket Ask Ngoc about the updated branding",
+        "Make me a new bucket for podcast episode ideas",
+        "Plan a meal prep list for the week",
+        "Send thank you emails to all new customers today",
+        "Add a reminder to cancel my trial subscription",
+        "Make packing list for 3 day camping trip in Sierra's",
+        "/newticket Bring amazon package in for Troy",
+        "What are the steps to register an LLC in California?"
+    ];
 
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode" : ""}`}>
@@ -249,7 +288,7 @@ function AICanvas({ from }) {
                 </button>
             )}
             {(!isMobile || isExpanded) && (
-                <div className="ai-output" ref={outputRef}>
+                <div className="ai-output" ref={outputRef} onTouchStart={()=>!!isTyping && setAutoScrollEnabled(false)}>
                     {conversation.map((msg, index) => (
                         <div key={index} className={msg.role === "user" ? "user-message" : "ai-message"}>
                             {msg.content.split("\n").map((line, i) => (
@@ -274,13 +313,23 @@ function AICanvas({ from }) {
                     <div ref={scrollRef} />
                 </div>
             )}
-            <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from} onClick={() => setIsExpanded(true)}>
-                <input
+            <form className="ai-input" onSubmit={handleAiSubmit} data-from={from} onClick={() => setIsExpanded(true)}>
+                <textarea
+                    ref={inputRef}
                     type="text"
                     value={userInput}
                     className="canvas-input"
                     onChange={handleChange}
-                    placeholder="Type your request..."
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            if (!e.shiftKey) {
+                                e.preventDefault();
+                                handleAiSubmit(e);
+                            } else setRows(rows + 1)
+                        }
+                    }}
+                    placeholder={placeholders[placeholderIdx]}
+                    rows={rows}
                 />
                 {(!isMobile || isExpanded) && (
                     <div className="submit-container">
@@ -300,6 +349,9 @@ function AICanvas({ from }) {
                                             if (!!prevActive.length && !isAlreadyActive && !!userInput) {
                                                 let humanInput = userInput.split(`/${prevActive[0].toLowerCase().replace(" ", "")} `)[1];
                                                 setUserInput(`/${shortcut.toLowerCase().replace(" ", "")} ${humanInput}`)
+                                            } else if (!!prevActive.length && !!isAlreadyActive && !!userInput) {
+                                                let humanInput = userInput.split(`/${prevActive[0].toLowerCase().replace(" ", "")} `)[1];
+                                                setUserInput(humanInput)
                                             } else if (!!prevActive.length && !isAlreadyActive && !userInput) {
                                                 setUserInput(`/${shortcut.toLowerCase().replace(" ", "")} ${userInput.replace(prevActive, '').join('')}`)
                                             } else {
@@ -317,9 +369,9 @@ function AICanvas({ from }) {
                                 </div>
                             ))}
                         </div>
-                        <button type="submit" className="ai-submit-button" disabled={isLoading}>
+                        {(!isMobile || isExpanded) && <button type="submit" className="ai-submit-button" disabled={isLoading}>
                             {isLoading ? <Loader className="loading-icon" /> : <ArrowUp size={18} className="send-icon" />}
-                        </button>
+                        </button>}
                     </div>
                 )}
             </form>

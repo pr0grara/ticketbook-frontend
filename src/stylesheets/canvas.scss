@@ -10,7 +10,7 @@
     // border-radius: 20px 20px 0px 0px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     z-index: 100;
     transition: all 0.3s ease-in-out;
@@ -19,7 +19,7 @@
 .clear-chat-top {
     position: absolute;
     top: 8px;
-    right: 10px;
+    right: 0;
     background: transparent;
     border: none;
     padding: 4px;
@@ -29,8 +29,8 @@
 
 .clear-chat-top svg {
     stroke: #888;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
 }
 
 .clear-chat-top:hover svg {
@@ -97,29 +97,37 @@
 .ai-input {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    width: 90%;
+    // justify-content: center;
+    align-items: stretch;
+    // width: 90%;
     gap: 8px;
     margin-bottom: 4rem;
     border: 1px solid gray;
     border-radius: 10px;
     margin: 10px;
+    overflow: visible;
 }
 
-.ai-input input {
+.ai-input textarea {
     flex: 1;
     padding: 10px;
-    max-width: 80%;
+    // max-width: 80%;
     margin: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    height: 10%;
+    // height: 10%;
     // background: #191919;
     border: none;
     outline: none;
     font-size: 1.3rem;
+    resize: none;
+    overflow: hidden;
     // border-bottom: 1px solid #333;
     border-radius: 0;
+    transition: height 0.15s ease-in-out;
+    &::placeholder {
+        font-size: .9rem;
+    }
 } 
 
 .ai-input button {
@@ -243,9 +251,9 @@
         /* Minimized mode */
         min-height: 30px;
         // overflow: hidden;
-        width: 95%;
+        width: calc(100% - 20px);
         .ai-input {
-            margin-bottom: .5rem;
+            // margin-bottom: .5rem;
         }
     }
 
@@ -276,18 +284,22 @@
     }
 
     .ai-input {
-        width: 95vw;
+        // width: 95vw;
+        // width: 100%;
+        flex-shrink: 0;
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
         margin-bottom: 2rem;
         position: relative;
-        input {
+        textarea {
             margin: 15px 0;
             padding: unset;
-            width: 97%;
+            padding-left: 10px;
+            // width: 97%;
             max-width: unset;
             font-size: 18px;
-            height: 2rem;
+            min-height: 2rem;
+            // height: 2rem;
         }
         .shortcut-button {
             border: 1px solid grey;

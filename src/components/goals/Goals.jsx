@@ -157,7 +157,7 @@ function Goals() {
                 <div>Drop to delete</div>
             </div>
         </div>
-        <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} />
+            <AICanvas userId={userId} tickets={tickets} selectedGoal={selectedGoal} aiSuggestions={aiSuggestions} handleRemoveSuggestedTicket={handleRemoveSuggestedTicket} placeholderIdx={Math.floor(Math.random() * 21)}/>
         </>
     );
 }

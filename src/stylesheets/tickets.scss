@@ -47,7 +47,7 @@
     outline: none;
     background: transparent;
     width: 100%;
-    height: auto;
+    // height: auto;
     /* Adjusts to content */
     display: block;
     line-height: 1.5;
@@ -59,8 +59,8 @@
     /* Removes default textarea styling */
     font-size: inherit;
     font-family: inherit;
-    width: 60vw;
-    height: auto;
+    width: 100%;
+    // min-height: 7rem;
     line-height: inherit;
     display: block;
     padding: 5px;
