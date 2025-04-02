@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, handleAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
@@ -30,6 +30,67 @@ function AICanvas({ from }) {
     const [displayedContent, setDisplayedContent] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const [shortcuts, setShortcuts] = useState({"New Ticket": false, "New Goal": false, "New Bucket": false});
+    const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+
+    const scrollRef = useRef(null);
+    const outputRef = useRef(null);
+
+    useEffect(() => {
+        if (autoScrollEnabled && scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [conversation, displayedContent, autoScrollEnabled]);
+
+    useEffect(() => {
+        const el = outputRef.current;
+        if (!el) return;
+        const SCROLL_THRESHOLD = 1; // pixels from bottom to count as "near bottom"
+
+
+        const handleScroll = () => {
+            // setTimeout(() => {
+                let scrollOffset = 0;
+                scrollOffset = el.scrollHeight - el.scrollTop - el.clientHeight;
+                const awayFromBottom = scrollOffset > SCROLL_THRESHOLD;
+                console.log(scrollOffset)
+                console.log(isTyping)
+                if (awayFromBottom) {
+                    setAutoScrollEnabled(false);
+                } else {
+                    // debugger
+                    setAutoScrollEnabled(true);
+                }
+            // }, 50); // Delay gives browser time to update scrollTop
+        };
+
+        el.addEventListener("scroll", handleScroll);
+        return () => el.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // useEffect(() => {
+    //     if (autoScrollEnabled && scrollRef.current) {
+    //         requestAnimationFrame(() => {
+    //             scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    //         });
+    //     }
+    // }, [conversation, displayedContent, autoScrollEnabled]);
+
+
+    // useEffect(() => {
+    //     const el = outputRef.current;
+    //     if (!el) return;
+
+    //     const handleScroll = () => {
+    //         const scrollOffset = el.scrollHeight - el.scrollTop - el.clientHeight;
+    //         const isNearBottom = scrollOffset < 10;
+    //         setAutoScrollEnabled(isNearBottom);
+    //     };
+
+    //     el.addEventListener("scroll", handleScroll);
+    //     return () => el.removeEventListener("scroll", handleScroll);
+    // }, []);
+
+
 
     useEffect(() => {
         const newAdvice = externalInteractions[0]?.aiResponse.advice;
@@ -90,6 +151,7 @@ function AICanvas({ from }) {
             setDisplayedContent("");
             setTypingIndex(0);
             setIsTyping(true);
+            setAutoScrollEnabled(true);
 
             let i = 0;
             let output = "";
@@ -144,6 +206,31 @@ function AICanvas({ from }) {
         }
     }
 
+    const handleChange = (e) => {
+        const input = e.target.value;
+
+        const activeShortcut = Object.keys(shortcuts).find(key => shortcuts[key]);
+        const expectedPrefix = activeShortcut ? `/${activeShortcut.toLowerCase().replace(" ", "")} ` : "";
+        console.log(expectedPrefix)
+        // If user is deleting the prefix OR manually modifying it
+        // console.log(activeShortcut, (!input.startsWith(expectedPrefix) || input.length < expectedPrefix.length))
+
+        if (
+            !!activeShortcut && !!userInput &&
+            (!input.startsWith(expectedPrefix) || input.length < expectedPrefix.length)
+        ) {
+            setShortcuts({ "New Ticket": false, "New Goal": false, "New Bucket": false });
+            return setUserInput('')
+        }
+
+        if (expectedPrefix && !input.startsWith(expectedPrefix)) {
+            setUserInput(expectedPrefix + input);
+        } else {
+            setUserInput(input);
+        }    
+    };
+
+
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode" : ""}`}>
             {isMobile && isExpanded && (
@@ -162,7 +249,7 @@ function AICanvas({ from }) {
                 </button>
             )}
             {(!isMobile || isExpanded) && (
-                <div className="ai-output">
+                <div className="ai-output" ref={outputRef}>
                     {conversation.map((msg, index) => (
                         <div key={index} className={msg.role === "user" ? "user-message" : "ai-message"}>
                             {msg.content.split("\n").map((line, i) => (
@@ -176,6 +263,15 @@ function AICanvas({ from }) {
                             <span className="blinking-cursor">|</span>
                         </div>
                     )}
+                    {/* {!autoScrollEnabled && (
+                        <button className="scroll-to-bottom" onClick={() => {
+                            scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+                            setAutoScrollEnabled(true);
+                        }}>
+                            <ChevronDown />
+                        </button>
+                    )} */}
+                    <div ref={scrollRef} />
                 </div>
             )}
             <form className="ai-input" onSubmit={handleAiSubmit} tickets={tickets} data-from={from} onClick={() => setIsExpanded(true)}>
@@ -183,7 +279,7 @@ function AICanvas({ from }) {
                     type="text"
                     value={userInput}
                     className="canvas-input"
-                    onChange={(e) => setUserInput(e.target.value)}
+                    onChange={handleChange}
                     placeholder="Type your request..."
                 />
                 {(!isMobile || isExpanded) && (
@@ -199,6 +295,17 @@ function AICanvas({ from }) {
                                             const updated = Object.fromEntries(
                                                 Object.keys(prev).map((key) => [key, false])
                                             );
+                                            //START UPDATE USER INPUT FIELD ON SHORTCUT ACTIVATION
+                                            const prevActive = Object.keys(prev).filter(cut => !!prev[cut])
+                                            if (!!prevActive.length && !isAlreadyActive && !!userInput) {
+                                                let humanInput = userInput.split(`/${prevActive[0].toLowerCase().replace(" ", "")} `)[1];
+                                                setUserInput(`/${shortcut.toLowerCase().replace(" ", "")} ${humanInput}`)
+                                            } else if (!!prevActive.length && !isAlreadyActive && !userInput) {
+                                                setUserInput(`/${shortcut.toLowerCase().replace(" ", "")} ${userInput.replace(prevActive, '').join('')}`)
+                                            } else {
+                                                setUserInput(`/${shortcut.toLowerCase().replace(" ", "")} ${userInput}`)
+                                            }
+                                            //END UPDATE USER INPUT FIELD ON SHORTCUT ACTIVATION
                                             if (!isAlreadyActive) updated[shortcut] = true;
                                             return updated;
                                         });

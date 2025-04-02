@@ -4,7 +4,7 @@ import { useDrag, useDrop } from "react-dnd";
 import { setUserActivatedTickets } from "../../redux/slices/ticketsSlice";
 import { getEmptyImage } from 'react-dnd-html5-backend';
 
-function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList, isMobile, onContextMenu }) {
+function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcanPosition, dispatch, userActivated, scrollOffset, moveTicket, ticketList, isMobile, onContextMenu, closeContextMenu }) {
     // const [touchStartTimeRef.current, setTouchStartTime] = useState(0);
     const [touchMoved, setTouchMoved] = useState(false);
     const [canDrag, setCanDrag] = useState(!isMobile);
@@ -46,6 +46,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             setTrashcanPosition({ x, y });
             setIsDragging(true);
             setShowTrashcan(true);
+            closeContextMenu();
             console.log(isDragging)
             return dragItem;
         },
@@ -56,6 +57,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             setTimeout(() => {
                 setIsDragging(false);
                 setShowTrashcan(false);
+                closeContextMenu();
             }, 50);
         }
     });
@@ -73,6 +75,8 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
                 moveTicket(draggedItem.index, index, draggedItem.ticketList, draggedItem.ticket);
                 draggedItem.index = index;
             }
+            closeContextMenu()
+
         }
     });
 
@@ -118,6 +122,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
         
         if (touchDurationRef.current > 1000) {
             if (animationFrame) {
+                if (touchMoved) closeContextMenu()
                 cancelAnimationFrame(animationFrame); //Stop loop when drag is enabled
                 animationFrame = null;
             }

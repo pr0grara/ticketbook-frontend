@@ -290,6 +290,7 @@ function TicketList() {
                         ticketList="openTickets"
                         isMobile={isMobile}
                         onContextMenu={handleContextMenu}
+                        closeContextMenu={closeContextMenu}
                     />
                 })}
             </div>
@@ -313,6 +314,7 @@ function TicketList() {
                         ticketList="closedTickets"
                         isMobile={isMobile}
                         onContextMenu={handleContextMenu}
+                        closeContextMenu={closeContextMenu}
                     />
                 ))}
             </div>
