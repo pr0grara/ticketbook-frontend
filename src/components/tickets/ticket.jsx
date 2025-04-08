@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useAPI from "../hooks/useAPI.js";
-import { Trash2 } from "lucide-react";
-import { clearUserActivatedTickets, updateTicket, updateTicketStatus } from "../../redux/slices/ticketsSlice.js";
+import { Trash2, X } from "lucide-react";
+import { clearUserActivatedTickets, setUserActivatedTickets, updateTicket, updateTicketStatus } from "../../redux/slices/ticketsSlice.js";
 import { logFromExternal } from "../../redux/slices/aiMemorySlice.js";
 import { handleAIRequest } from "../hooks/useAI.js";
 import wind_rose from "../../icons/wind_rose.png"
@@ -17,6 +17,7 @@ export default function Ticket({ ticket, isMobile }) {
     const { deleteItem, fetchGoalById, handleHelp } = useAPI();
     const dispatch = useDispatch();
     const { theme } = useSelector(state => state.session);
+    const { userActivatedTickets } = useSelector(state => state.tickets);
     
     // UI State
     const [showNotes, setShowNotes] = useState(false);
@@ -339,6 +340,16 @@ export default function Ticket({ ticket, isMobile }) {
 
     return (
         <div className={`ticket-container`} data-ticket-id={ticket._id} onTouchEnd={(e)=> !!showActions ? handleTouchEnd(e) : null}>
+            {ticket && (<button
+                title="Remove ticket"
+                className="clear-chat-top remove-ticket"
+                onClick={() => {
+                    dispatch(setUserActivatedTickets({userActivatedTicket: ticket}));
+                }}
+                aria-label="Remove ticket"
+            >
+                <X size={14} />
+            </button>)}
             {!isMobile &&
                 <div className="ticket-button-container">
                     <div className={`ticket-button ${ticket.status === "done" ? "help" : "done"}`} onClick={() => { markDone(ticket.status === "done"); setShowActions(false); }}>{ticket.status === "done" ? "🔙 mark incomplete" : "✔️ mark done"}</div>

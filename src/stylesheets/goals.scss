@@ -178,9 +178,78 @@
     margin-bottom: 8px;
     cursor: grab;
     transition: 0.2s;
-    font-size: .9rem;
+    font-size: 1.1rem;
     max-width: 75%;
     overflow: visible;
+    position: relative;
+    min-height: 25px;
+    display: flex;
+    // border: 1px solid red;
+}
+
+.bullet-container {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    /* Two columns */
+    grid-auto-rows: min-content;
+    /* Each bullet takes just as much space as needed */
+    // gap: 4px;
+    /* spacing between bullets */
+    position: absolute;
+    left: 0;
+    // border: 1px solid green;
+    // height: 100%;
+    width: 24px; 
+    height: 24px;
+}
+
+.bullet {
+    max-height: 10px;
+}
+
+.bullet-wrapper {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;/* Prevent bullet container from shrinking */
+    // margin-top: 4px;/* Optional tweak to better align with text baseline */
+}
+
+.bullet-count-3 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+.bullet-dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    background-color: black;
+
+    justify-self: center;
+    align-self: center;
+}
+
+.bullet-count-3 .dot-0 {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.bullet-count-3 .dot-1 {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.bullet-count-3 .dot-2 {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    justify-self: center;
 }
 
 .selected-ticket-card {
@@ -296,7 +365,7 @@
     align-items: center;
     // font-family: Nunito;
     padding: 7px 10px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     border: 1px solid #3695de77;
     border-radius: 5px;
     // background-color: whitesmoke;

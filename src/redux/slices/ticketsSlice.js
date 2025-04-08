@@ -84,7 +84,6 @@ const ticketsSlice = createSlice({
         },
         setUserActivatedTickets: (state, action) => {
             const { userActivatedTicket } = action.payload;
-
             let newUserActivatedTickets;
             if (state.userActivatedTickets.length === 0) {
                 newUserActivatedTickets = [userActivatedTicket];

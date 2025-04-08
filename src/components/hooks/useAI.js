@@ -127,7 +127,7 @@ async function handleAIResponse(res) {
 
 // Last stop on frontend before we begin backend AI processing
 async function callAI(request) {
-    const { userId } = store.getState()
+    const { userId } = store.getState().user
 
     const {requestType, userInput, context} = request;
     try {
@@ -161,7 +161,7 @@ async function callAI(request) {
 }
 
 // 🎯 CONTEXT LAYER: Injects Goal & Ticket Data Before AI Call
-function prepareContext(contextGoals, contextTickets, shortcuts) {
+function prepareContext(contextGoals, contextTickets, shortcuts={}) {
     // if (!selectedGoal) return "No goal selected.";
     return {
         goals: contextGoals.map(goal => ({
@@ -175,9 +175,13 @@ function prepareContext(contextGoals, contextTickets, shortcuts) {
             ticketId: ticket._id,
             notes: ticket.notes,
             checklist: ticket.checklist,
-            status: ticket.status
+            status: ticket.status,
+            doToday: ticket.doToday,
+            doSoon: ticket.doSoon,
+            isQuickWin: ticket.isQuickWin,
+            isDeepFocus: ticket.isDeepFocus,
         })),
-        shortcut: Object.keys(shortcuts).filter(key => !!shortcuts[key]).join()
+        shortcut: Object.keys(shortcuts)?.filter(key => !!shortcuts[key]).join() || "",
     };
 }
 
@@ -192,15 +196,15 @@ function refineAIOutput(rawOutput) {
     }
 }
 
-// 🚀 MAIN FUNCTION: Calls AI with Context & Instructions
+//MAIN FUNCTION: Calls AI with Context & Instructions
 async function handleAIRequest(request) {
     const {
         requestType,
         contextGoals,
         contextTickets,
         userInput,
+        conversation,
         from,
-        aiHistory,
         userId,
         shortcuts,
     } = request;
@@ -209,12 +213,13 @@ async function handleAIRequest(request) {
 
     // Second stop on the train towards backend AI
     const payload = {
+        userId,
         userInput,
         context,
+        conversation,
         requestType,
         from,
-        aiHistory,
-        userId,
+        // aiHistory, //Make sure you can swap this out w "conversation" across all processors on backend
     };
     const aiResponse = await callAI(payload);
     return refineAIOutput(aiResponse);

@@ -73,10 +73,10 @@ const LoginPage = () => {
         setError(null);
         try {
             const response = await authAPI.post("/auth/login", { email: emailVal, password: passwordVal }, { withCredentials: true });
-            const { success, userId, watchedTutorial } = response.data;
+            const { success, userId, watchedTutorial, firstname } = response.data;
             if (!success) throw new Error("Login failed");
 
-            dispatch(setUser(userId));
+            dispatch(setUser({userId, firstname}));
             dispatch(setLoggedIn());
             dispatch(setWatchedTutorial(watchedTutorial))
 

@@ -11,7 +11,7 @@ function DailyPlan() {
     const goals = useSelector(state => state.goals.goals);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 
-    const userId = useSelector(state => state.userId);
+    const { userId } = useSelector(state => state.user);
     const aiHistory = useSelector(state => state.ai);
 
     const { generateDailyPlan, confirmDailyPlan } = useAPI(userId, selectedGoal);

@@ -383,6 +383,10 @@
     align-items: center;
 }
 
+.remove-ticket {
+    margin-right: 1rem;
+}
+
 @media (max-width: 768px) {
     .checklist-item {
         flex-basis: 100%;

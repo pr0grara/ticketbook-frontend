@@ -12,7 +12,7 @@ import axios from "axios";
 const useAPI = () => {
     const dispatch = useDispatch();
     
-    const userId = useSelector(state => state.userId);
+    const { userId } = useSelector(state => state.user);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const [goals, setGoals] = useState([]);
     const [activeTickets, setActiveTickets] = useState([]);
@@ -145,6 +145,8 @@ const useAPI = () => {
             contextTickets: [ticket],
             userInput: "Please help me achieve this ticket. I need advice.",
             requestType: "advise ticket",
+            conversation: JSON.parse(localStorage.ai_conversation),
+            userId
         };
         const adviceResponse = await handleAIRequest(request);
         dispatch(logFromExternal({ aiResponse: adviceResponse }));

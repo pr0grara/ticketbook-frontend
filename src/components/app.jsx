@@ -3,9 +3,10 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import LoginPage from "./LoginPage/LoginPage.jsx";
 import Navbar from "./Navbar.jsx";
 import Tickets from "./tickets/Ticket.jsx";
-import Goals from "./goals/Goals";
+import Goals from "./goals/Goals.jsx";
+import Baseline from "./Baseline.jsx";
 import DailyPlan from "./ai/DailyPlan";
-import CalendarView from "./Calendar";
+import CalendarView from "./Calendar.jsx";
 import { useState, useEffect, startTransition } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/slices/userSlice.js";
@@ -33,7 +34,7 @@ export default function App({ page }) {
                 const loggedIn = res.loggedIn;
                 if (loggedIn) {
                     dispatch(setLoggedIn())
-                    if (!userId) dispatch(setUser(res.user.id))
+                    if (!userId) dispatch(setUser({userId: res.user.id, firstname: res.user.firstname}))
                     authAPI.get(`/users/watched-tutorial/status/${res.user.id}`)
                         .then(res => {
                             dispatch(setWatchedTutorial(res.data.watchedTutorial))
@@ -71,6 +72,7 @@ export default function App({ page }) {
             {/* Protected Routes */}
             {page === "goals" && <ProtectedRoute component={<Goals />} />}
             {page === "calendar" && <ProtectedRoute component={<CalendarView />} />}
+            {/* {page === "baseline" && <ProtectedRoute component={<Baseline />} />} */}
         </>
     );
 }

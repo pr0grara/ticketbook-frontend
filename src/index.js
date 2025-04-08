@@ -27,7 +27,8 @@ const router = createBrowserRouter([
   { path: "/tickets", element: <App page="tickets" /> },
   { path: "/goals", element: <App page="goals" /> },
   { path: "/plan", element: <App page="plan" /> },
-  { path: "/calendar", element: <App page="calendar" /> }
+  { path: "/calendar", element: <App page="calendar" /> },
+  { path: "/baseline", element: <App page="baseline" /> }
 ], {
   future: {
     v7_startTransition: true,

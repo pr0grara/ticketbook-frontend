@@ -20,11 +20,11 @@ import TicketCard from "./TicketCard.jsx";
 import DragPreview from "../DragPreview.jsx";
 import TicketContextMenu from "./TicketContextMenu.jsx";
 
-function TicketList() {
+function TicketList({TICKETS}) {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
-    const userId = useSelector(state => state.userId);
+    const { userId } = useSelector(state => state.user);
     const { theme, showTickets, isMobile } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 
@@ -62,7 +62,18 @@ function TicketList() {
         console.log("reanalyzing")
         let sortedOpenTickets, filteredOpenTickets, sortedClosedTickets, filteredClosedTickets
         const activeFilters = Object.keys(filters).filter((key) => filters[key]);
-        if (!selectedGoal) {
+        
+        //TICKETS represents specifically fed array of tickets from another component / overides all other states for ticket selection
+        if (!!TICKETS) {
+            filteredOpenTickets = TICKETS.filter(t => t.status !== "done")
+            sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
+
+            filteredClosedTickets = TICKETS.filter(t => t.status === "done")
+            sortedClosedTickets = filteredClosedTickets.sort((a, b) => a.order - b.order)
+            // debugger
+            setOpenTickets(sortedOpenTickets)
+            setClosedTickets(sortedClosedTickets);
+        } else if (!selectedGoal) {
             filteredOpenTickets = tickets.filter(ticket => ticket.status !== "done")
             if (activeFilters.length > 0) filteredOpenTickets = filterTickets(filteredOpenTickets, activeFilters)
             sortedOpenTickets = filteredOpenTickets.sort((a, b) => a.order - b.order)
@@ -333,15 +344,6 @@ function TicketList() {
                 <Trash2 size={"50px"} color={isOver ? "red" : "black"} />
                 <div>Drop to delete</div>
             </div>
-        </div>
-    )
-}
-
-function TicketCardContextMenu() {
-
-    return (
-        <div className="ticket-card-context-container">
-            context
         </div>
     )
 }

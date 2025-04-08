@@ -9,7 +9,7 @@ const store = configureStore({
     reducer: {
         goals: goalsReducer,
         tickets: ticketsReducer,
-        userId: userReducer,
+        user: userReducer,
         session: sessionReducer,
         ai: aiReducer,
     },

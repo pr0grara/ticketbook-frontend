@@ -21,7 +21,7 @@ function Goals() {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
-    const userId = useSelector(state => state.userId);
+    const { userId } = useSelector(state => state.user);
     const { theme, showTickets, isMobile, watchedTutorial } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 

@@ -16,7 +16,7 @@ function AICanvas({ from, placeholderIdx }) {
     const selectedTickets = useSelector(state => state.tickets.selectedTickets);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
     const goals = useSelector(state => state.goals);
-    const userId = useSelector(state => state.userId);
+    const { userId } = useSelector(state => state.user);
     const aiHistory = useSelector(state => state.ai);
     const { externalInteractions } = useSelector(state => state.ai);
     const { theme } = useSelector(state => state.session);
@@ -34,6 +34,7 @@ function AICanvas({ from, placeholderIdx }) {
     const [rows, setRows] = useState(1);
     const [inputLength, setInputLength] = useState(0);
     const [charsPerRow, setCharsPerRow] = useState(0);
+    const [quickcut, setQuickcut] = useState('')
 
     const scrollRef = useRef(null);
     const outputRef = useRef(null);
@@ -71,31 +72,6 @@ function AICanvas({ from, placeholderIdx }) {
         return () => el.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // useEffect(() => {
-    //     if (autoScrollEnabled && scrollRef.current) {
-    //         requestAnimationFrame(() => {
-    //             scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    //         });
-    //     }
-    // }, [conversation, displayedContent, autoScrollEnabled]);
-
-
-    // useEffect(() => {
-    //     const el = outputRef.current;
-    //     if (!el) return;
-
-    //     const handleScroll = () => {
-    //         const scrollOffset = el.scrollHeight - el.scrollTop - el.clientHeight;
-    //         const isNearBottom = scrollOffset < 10;
-    //         setAutoScrollEnabled(isNearBottom);
-    //     };
-
-    //     el.addEventListener("scroll", handleScroll);
-    //     return () => el.removeEventListener("scroll", handleScroll);
-    // }, []);
-
-
-
     useEffect(() => {
         const newAdvice = externalInteractions[0]?.aiResponse.advice;
         if (!!newAdvice) {
@@ -125,6 +101,8 @@ function AICanvas({ from, placeholderIdx }) {
 
         const requestType = "user message";
         let contextTickets = tickets.length > 0 ? (selectedTickets.length > 0 ? selectedTickets : tickets) : [];
+        // //Only send open tickets to backend
+        // contextTickets = contextTickets.filter(tick => tick.status !== "done");
         let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
         
         try {

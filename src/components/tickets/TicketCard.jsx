@@ -9,6 +9,12 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
     const [touchMoved, setTouchMoved] = useState(false);
     const [canDrag, setCanDrag] = useState(!isMobile);
     const [contextCard, setContextCard] = useState(false);
+    const [bullets, setBullets] = useState({
+        "doToday": ticket.doToday,
+        "doSoon": ticket.doSoon,
+        "isQuickWin": ticket.isQuickWin,
+        "isDeepFocus": ticket.isDeepFocus
+    })
     
     // useEffect(() => {
     //     const handleTouchStart = (e) => {
@@ -23,6 +29,14 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
     //         document.removeEventListener("touchstart", handleTouchStart);
     //     };
     // }, []);
+
+    useEffect(() => {
+        // setBullets([{ doToday: ticket.doToday },
+        // { doSoon: ticket.doSoon },
+        // { isQuickWin: ticket.isQuickWin },
+        // { isDeepFocus: ticket.isDeepFocus }
+        // ])
+    }, [])
 
     const isUserActivatedTicket = useMemo(() => userActivated(ticket), [ticket, userActivated]);
 
@@ -182,6 +196,8 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             .filter(key => filterOptions.includes(key))
             .filter(key => ticket[key]);
 
+            // debugger
+
         const firstMatch = filters.find(filter => {
             return filterOptions.includes(filter);
         })
@@ -193,6 +209,47 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             default: return "";
         }
     }
+
+    const setBulletColors = (ticket) => {
+        const filterOptions = {
+            doToday: "red",
+            doSoon: "orange",
+            isQuickWin: "green",
+            isDeepFocus: "purple"
+        };
+
+        const colors = Object.entries(filterOptions)
+            .filter(([key]) => ticket[key])
+            .map(([_, color]) => color);
+
+        // debugger
+        return colors.length ? colors : ["black"];
+    };
+
+    const BulletIndicators = (ticket) => {
+        const filterToColor = {
+            doToday: "red",
+            doSoon: "orange",
+            isQuickWin: "green",
+            isDeepFocus: "purple"
+        };
+
+        let activeColors = Object.entries(filterToColor)
+            .filter(([key]) => ticket[key])
+            .map(([_, color]) => color);
+
+        if (activeColors.length === 0) activeColors = ["black"];
+
+        const className = `bullet-wrapper bullet-count-${activeColors.length}`;
+
+        return (
+            <div className={className}>
+                {activeColors.map((color, idx) => (
+                    <div key={idx} className={`bullet-dot dot-${idx}`} style={{ backgroundColor: color }} />
+                ))}
+            </div>
+        );
+    };
 
     return (
 
@@ -216,7 +273,12 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
                 touchAction: "auto",
             }}
         >
-            <span style={{ color: setBulletColor(ticket) }}>⦿</span> {ticket.title}
+            {/* <div className="bullet-container">
+                {setBulletColors(ticket).map((color, idx) => <span key={idx} className="bullet" style={{ color: color }}>⦿</span>)}
+            </div> */}
+            {/* <span style={{ color: setBulletColor(ticket) }}>⦿</span> */}
+            {BulletIndicators(ticket)}
+            {ticket.title}
         </div>
     );
 }
