@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { handleAIRequest, handleAIResponse } from "../hooks/useAI.js";
 import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
-import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X, CirclePlus, TicketPlus, PackagePlus } from "lucide-react";
+import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X, CirclePlus, TicketPlus, PackagePlus, MessageCirclePlus } from "lucide-react";
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
+import authAPI from "../api/authAPI.js";
 
 function AICanvas({ from, placeholderIdx }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -35,6 +36,7 @@ function AICanvas({ from, placeholderIdx }) {
     const [inputLength, setInputLength] = useState(0);
     const [charsPerRow, setCharsPerRow] = useState(0);
     const [quickcut, setQuickcut] = useState('')
+    const [feedback, setFeedback] = useState(false)
 
     const scrollRef = useRef(null);
     const outputRef = useRef(null);
@@ -96,6 +98,19 @@ function AICanvas({ from, placeholderIdx }) {
         e.preventDefault();
         if (!userInput.trim() || isLoading) return;
 
+        if (feedback) {
+            authAPI.post('/users/feedback', {
+                // userId,
+                userFeedback: userInput
+            })
+            setIsTyping(true)
+            setDisplayedContent('Thanks for the feedbizzie 🫡');
+            setUserInput('');
+            setTimeout(() => setIsTyping(false), 3000)
+            setFeedback(false)
+            return;
+        }
+
         dispatch(setIsLoading(true));
         document.querySelector('.canvas-input').blur();
 
@@ -106,11 +121,14 @@ function AICanvas({ from, placeholderIdx }) {
         let contextGoals = !!selectedGoal ? [selectedGoal] : goals.goals;
         
         try {
+            // let input = userInput;
+            // input = input.replace('/newticket ', '').replace('/newgoal ', '').replace('/newbucket ', '')
             // 🔐 This is the first payload sent towards backend AI — do not mutate structure lightly.
             const request = { 
                 requestType, 
                 contextGoals, 
                 contextTickets, 
+                // userInput: input, 
                 userInput, 
                 conversation, 
                 from, 
@@ -183,6 +201,8 @@ function AICanvas({ from, placeholderIdx }) {
                 return <CirclePlus />;
             case "New Bucket":
                 return <PackagePlus />;
+            case "feedback":
+                return <MessageCirclePlus />;
             default:
                 break
         }
@@ -248,6 +268,18 @@ function AICanvas({ from, placeholderIdx }) {
         "What are the steps to register an LLC in California?"
     ];
 
+    const feedbackPlaceholders = [
+        'Anything frustrating?',
+        'Something annoying?',
+        'Do you like something?',
+        "or don't idc",
+        '',
+        'Steps slowing you down?',
+        'Suggestion?',
+        'Suggestion?',
+        'Comment?',
+    ]
+
     return (
         <div className={`ai-canvas${isMobile ? (isExpanded ? " expanded" : " collapsed") : ""}${darkMode(theme) ? " dark-mode" : ""}`}>
             {isMobile && isExpanded && (
@@ -306,7 +338,9 @@ function AICanvas({ from, placeholderIdx }) {
                             } else setRows(rows + 1)
                         }
                     }}
-                    placeholder={placeholders[placeholderIdx]}
+                    // placeholder={feedback ? "Test " + feedbackPlaceholders[Math.floor(feedbackPlaceholders.length * Math.random())] : placeholders[placeholderIdx]}
+                    placeholder={feedback ? `Annonymous feedback... 
+    ${feedbackPlaceholders[Math.floor(feedbackPlaceholders.length * Math.random())]}` : placeholders[placeholderIdx]}
                     rows={rows}
                 />
                 {(!isMobile || isExpanded) && (
@@ -315,9 +349,10 @@ function AICanvas({ from, placeholderIdx }) {
                             {Object.keys(shortcuts).map((shortcut, idx) => (
                                 <div
                                     key={idx}
-                                    className={`shortcut-button${shortcuts[shortcut] ? " selected" : ""}`}
+                                    className={`shortcut-button${(shortcuts[shortcut] && !feedback) ? " selected" : ""}`}
                                     onClick={() => {
                                         setShortcuts((prev) => {
+                                            if (feedback) setFeedback(false);
                                             const isAlreadyActive = prev[shortcut];
                                             const updated = Object.fromEntries(
                                                 Object.keys(prev).map((key) => [key, false])
@@ -347,9 +382,25 @@ function AICanvas({ from, placeholderIdx }) {
                                 </div>
                             ))}
                         </div>
-                        {(!isMobile || isExpanded) && <button type="submit" className="ai-submit-button" disabled={isLoading}>
-                            {isLoading ? <Loader className="loading-icon" /> : <ArrowUp size={18} className="send-icon" />}
-                        </button>}
+                        <div className="ai-submit-container">
+                            <div 
+                                className={`shortcut-button${!!feedback ? " selected" : ""}`}
+                                onClick={() => {
+                                    // debugger
+                                    const shortkeys = ['New Ticket', 'New Goal', 'New Bucket'];
+                                    if (shortkeys.some(key => shortcuts[key])) setUserInput('');
+                                    setShortcuts({ "New Ticket": false, "New Goal": false, "New Bucket": false })
+                                    setFeedback(!feedback)
+                                    document.querySelector('.canvas-input').focus();
+                                }}
+                                >
+                                {(feedback) ? <span>feedback&nbsp;</span> : ""}
+                                {setShortcutIcon("feedback")}
+                            </div>
+                            {(!isMobile || isExpanded) && <button type="submit" className="ai-submit-button" disabled={isLoading}>
+                                {isLoading ? <Loader className="loading-icon" /> : <ArrowUp size={18} className="send-icon" />}
+                            </button>}
+                        </div>
                     </div>
                 )}
             </form>

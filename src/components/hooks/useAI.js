@@ -221,6 +221,8 @@ async function handleAIRequest(request) {
         from,
         // aiHistory, //Make sure you can swap this out w "conversation" across all processors on backend
     };
+
+    console.log('payload: ', payload)
     const aiResponse = await callAI(payload);
     return refineAIOutput(aiResponse);
 }

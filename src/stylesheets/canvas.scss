@@ -227,6 +227,20 @@
     }
 }
 
+.ai-submit-container {
+    display: flex;
+    align-items: center;
+    .shortcut-button {
+        // margin-right: 1rem;
+        // height: 20px;
+    }
+}
+
+.feedback-active {
+    border: 2px solid #3695de;
+    color: #3695de;
+}
+
 /* 🔄 Spinning animation */
 @keyframes spin {
     0% {
