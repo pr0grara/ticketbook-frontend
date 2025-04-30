@@ -23,7 +23,10 @@ const useAPI = () => {
     useEffect(() => {
         authAPI.post("/goals/foruser", {userId})
         // axios.post(`${API_BASE_URL}/goals/foruser`, { userId })
-            .then((res) => setGoals(res.data))
+            .then((res) => {
+                if (res.forceReload) return window.location.reload()
+                setGoals(res.data)
+            })
             // .then((res) => setGoals(res.data))
             .catch((err) => console.error(err));
     }, [userId]);

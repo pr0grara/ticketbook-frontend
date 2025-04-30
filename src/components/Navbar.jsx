@@ -38,6 +38,7 @@ const Navbar = () => {
                 <Link to="/goals" className="nav-link">Goals</Link>
                 {/* <Link to="/plan" className="nav-link">Daily Plan</Link> */}
                 <Link to="/calendar" className="nav-link">Calendar</Link>
+                <Link to="/health" className="nav-link">Health</Link>
                 {/* <Link to="/baseline" className="nav-link">{`Baseline ${firstname}`}</Link> */}
             </div>
             <div className="nav-right">

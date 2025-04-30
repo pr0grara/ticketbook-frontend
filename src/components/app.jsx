@@ -5,6 +5,7 @@ import Navbar from "./Navbar.jsx";
 import Tickets from "./tickets/Ticket.jsx";
 import Goals from "./goals/Goals.jsx";
 import Baseline from "./Baseline.jsx";
+import Health from "./Health.jsx";
 import DailyPlan from "./ai/DailyPlan";
 import CalendarView from "./Calendar.jsx";
 import { useState, useEffect, startTransition } from "react";
@@ -72,6 +73,7 @@ export default function App({ page }) {
             {/* Protected Routes */}
             {page === "goals" && <ProtectedRoute component={<Goals />} />}
             {page === "calendar" && <ProtectedRoute component={<CalendarView />} />}
+            {page === "health" && <ProtectedRoute component={<Health />} />}
             {/* {page === "baseline" && <ProtectedRoute component={<Baseline />} />} */}
         </>
     );

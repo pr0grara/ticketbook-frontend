@@ -45,6 +45,7 @@
 
 .dark-mode .goal-and-ticket-container {
     color: white;
+    background: #212121;
 }
 
 .dark-mode .ticket-checklist {
@@ -143,6 +144,38 @@
         }
         &.selected {
             background: #3695de;
+        }
+    }
+
+    .canvas-popup {
+        background: #212121;
+        box-shadow: 0 0 10px rgba(230, 230, 230, 0.902);
+    }
+
+    .canvas-goal-selector {
+        background: #505050;
+        &:hover {
+            background: #3f3f3f;
+        }
+    }
+
+    .canvas-connector-path {
+        stroke: rgba(150, 150, 150, 0.902)
+    }
+
+    .ticket-list-spaceholder {
+        background: #212121;
+    }
+
+    .ticket-space-container {
+        background: #212121;
+    }
+
+    .modal-content {
+        background: #232323;    
+        input {
+            background: rgba(255, 255, 255, 1);
+            color: black;
         }
     }
 }

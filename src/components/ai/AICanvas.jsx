@@ -5,7 +5,9 @@ import { logInteraction } from "../../redux/slices/aiMemorySlice.js";
 import { Send, Loader, ChevronDown, ChevronUp, ArrowUp, X, CirclePlus, TicketPlus, PackagePlus, MessageCirclePlus } from "lucide-react";
 import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
+import CanvasPopup from "./CanvasPopup.jsx";
 import authAPI from "../api/authAPI.js";
+import { setPopup } from "../../redux/slices/canvasSlice.js";
 
 function AICanvas({ from, placeholderIdx }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -21,6 +23,7 @@ function AICanvas({ from, placeholderIdx }) {
     const aiHistory = useSelector(state => state.ai);
     const { externalInteractions } = useSelector(state => state.ai);
     const { theme } = useSelector(state => state.session);
+    const { popup } = useSelector(state => state.canvas);
 
     const [userInput, setUserInput] = useState("");
     const [conversation, setConversation] = useState(() => {
@@ -35,8 +38,8 @@ function AICanvas({ from, placeholderIdx }) {
     const [rows, setRows] = useState(1);
     const [inputLength, setInputLength] = useState(0);
     const [charsPerRow, setCharsPerRow] = useState(0);
-    const [quickcut, setQuickcut] = useState('')
-    const [feedback, setFeedback] = useState(false)
+    const [quickcut, setQuickcut] = useState('');
+    const [feedback, setFeedback] = useState(false);
 
     const scrollRef = useRef(null);
     const outputRef = useRef(null);
@@ -173,6 +176,8 @@ function AICanvas({ from, placeholderIdx }) {
             }, 20);
 
             setUserInput("");
+            if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'none';
+            dispatch(setPopup(false));
         } catch (err) {
             console.error("AI error:", err);
             const errorMsg = "\u26A0\uFE0F AI service is currently unavailable.";
@@ -323,6 +328,10 @@ function AICanvas({ from, placeholderIdx }) {
                     <div ref={scrollRef} />
                 </div>
             )}
+            {popup && <CanvasPopup type={popup} goalObjs={goals} />}
+            {!isMobile && <svg className="canvas-connector-svg" >
+                <path className="canvas-connector-path" fill='none'/>
+            </svg>}
             <form className="ai-input" onSubmit={handleAiSubmit} data-from={from} onClick={() => setIsExpanded(true)}>
                 <textarea
                     ref={inputRef}
@@ -372,6 +381,13 @@ function AICanvas({ from, placeholderIdx }) {
                                             }
                                             //END UPDATE USER INPUT FIELD ON SHORTCUT ACTIVATION
                                             if (!isAlreadyActive) updated[shortcut] = true;
+                                            if (updated['New Ticket'] && !selectedGoal) {
+                                                dispatch(setPopup("SPECIFY_GOAL_FOR_TICKET"))
+                                                if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'unset'
+                                            } else if (!updated['New Ticket'] && popup) {
+                                                dispatch(setPopup(false))
+                                                if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'none'
+                                            }
                                             return updated;
                                         });
                                         document.querySelector('.canvas-input').focus()

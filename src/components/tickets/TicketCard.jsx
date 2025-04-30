@@ -231,7 +231,7 @@ function TicketCard({ ticket, index, setIsDragging, setShowTrashcan, setTrashcan
             doToday: "red",
             doSoon: "orange",
             isQuickWin: "green",
-            isDeepFocus: "purple"
+            isDeepFocus: "magenta"
         };
 
         let activeColors = Object.entries(filterToColor)

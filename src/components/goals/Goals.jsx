@@ -122,6 +122,7 @@ function Goals() {
             <TicketList />
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
+                {/* <div className="goal-info-container">test</div> */}
                 <div className="goal-list-header-container">
                         <div className="goal-list-title">Goals and Buckets</div>
                         <div className="goal-subtitle">Group your tickets into <span style={{ color: "#3695de" }}>goals</span> and <span style={{ color: "#dea336" }}>buckets</span></div>

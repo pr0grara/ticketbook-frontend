@@ -12,20 +12,21 @@ import {
 } from 'lucide-react'; 
 import useAPI from "../hooks/useAPI.js";
 import { setSelectedTickets,setUserActivatedTickets, updateTicketsOrder } from "../../redux/slices/ticketsSlice.js";
-import { setShowTickets } from "../../redux/slices/sessionSlice.js";
+import { setShowTickets, setShowRecurrenceModal } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
 import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
 import TicketCard from "./TicketCard.jsx";
 import DragPreview from "../DragPreview.jsx";
 import TicketContextMenu from "./TicketContextMenu.jsx";
+import RecurrenceModal from "../Modal/RecurrenceModal";
 
 function TicketList({TICKETS}) {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
     const { userId } = useSelector(state => state.user);
-    const { theme, showTickets, isMobile } = useSelector(state => state.session);
+    const { theme, showTickets, isMobile, showRecurrenceModal } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 
     const [, setIsDragging] = useState(false);
@@ -344,6 +345,10 @@ function TicketList({TICKETS}) {
                 <Trash2 size={"50px"} color={isOver ? "red" : "black"} />
                 <div>Drop to delete</div>
             </div>
+            <RecurrenceModal
+                isOpen={showRecurrenceModal}
+                onClose={() => dispatch(setShowRecurrenceModal(false))}
+            />
         </div>
     )
 }

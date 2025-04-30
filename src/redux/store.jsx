@@ -4,6 +4,7 @@ import ticketsReducer from "./slices/ticketsSlice";
 import userReducer from "./slices/userSlice";
 import aiReducer from "./slices/aiMemorySlice";
 import sessionReducer from "./slices/sessionSlice";
+import canvasReducer from "./slices/canvasSlice";
 
 const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
         user: userReducer,
         session: sessionReducer,
         ai: aiReducer,
+        canvas: canvasReducer,
     },
     // middleware: (getDefaultMiddleWare) =>
     //     getDefaultMiddleWare({

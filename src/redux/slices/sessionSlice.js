@@ -14,7 +14,9 @@ const sessionSlice = createSlice({
         },
         isMobile: false,
         allowFastLogin: true,
-        watchedTutorial: false
+        watchedTutorial: false,
+        showRecurrenceModal: false,
+        modalTickets: []
     },
     reducers: {
         setLoggedIn: (state, action) => { 
@@ -40,9 +42,15 @@ const sessionSlice = createSlice({
         },
         setWatchedTutorial: (state, action) => {
             return { ...state, watchedTutorial: action.payload }
+        },
+        setShowRecurrenceModal: (state, action) => {
+            return { ...state, showRecurrenceModal: action.payload }
+        },
+        setModalTickets: (state, action) => {
+            return { ...state, modalTickets: action.payload }
         }
     },
 });
 
-export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial } = sessionSlice.actions;
+export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial, setShowRecurrenceModal, setModalTickets } = sessionSlice.actions;
 export default sessionSlice.reducer;

@@ -1,0 +1,50 @@
+.modal-overlay {
+    position: absolute;
+    background: rgba(0, 0, 0, .2);
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+};
+
+.no-scroll {
+    overflow: hidden;
+    height: 100vh;
+}
+
+.modal-content {
+    // height: 100%;
+    // width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 1);
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.recurrence-form {
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+}
+
+.recurrence-form-label {
+    font-size: 1.2rem;
+    margin-bottom: .7rem;
+    input, select {
+        margin-left: .5rem;
+    }
+}
+
+.recurrence-form-submit-button, .modal-close {
+    margin-bottom: .5rem;
+    font-size: 1.2rem;
+}

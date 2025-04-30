@@ -6,12 +6,14 @@ import {
     Target,
     Calendar,
     Zap,
-    Brain
+    Brain,
+    RefreshCw
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTicket } from '../../redux/slices/ticketsSlice';
 import useAPI from '../hooks/useAPI';
-import { setIsLoading } from '../../redux/slices/sessionSlice';
+import { setIsLoading, setShowRecurrenceModal, setModalTickets } from '../../redux/slices/sessionSlice';
+import authAPI from '../api/authAPI';
 
 const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, externalRef) => {
     const dispatch = useDispatch();
@@ -21,6 +23,8 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
     const { isMobile } = useSelector(state => state.session);
     const [shouldRender, setShouldRender] = useState(false);
     const [animatingOut, setAnimatingOut] = useState(false);
+
+    const { modalTickets, showReccurenceModal } = useSelector(state => state.session);
 
     useEffect(() => {
         if (visible) {
@@ -84,7 +88,8 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
         { action: "do-today", label: `${ticket.doToday ? "Unmark" : "Mark"} for Today`, icon: Calendar },
         { action: "set-focus", label: `${ticket.doSoon ? "Unmark" : "Mark"} as Focus`, icon: Target },
         { action: "quick-win", label: `${ticket.isQuickWin ? "Unmark" : "Mark"} as a quick win`, icon: Zap },
-        { action: "deep-focus", label: `${ticket.isDeepFocus ? "Unmark" : "Mark"} as time consuming`, icon: Brain }
+        { action: "deep-focus", label: `${ticket.isDeepFocus ? "Unmark" : "Mark"} as time consuming`, icon: Brain },
+        { action: "recurrance", label: `${ticket.isRecurring ? 'Remove Recurrence' : 'Reccurence Settings'}`, icon: RefreshCw }
     ];
 
     const handleAction = (id, ticket) => {
@@ -115,6 +120,19 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
             case "deep-focus":
                 newTicket = { ...ticket, isDeepFocus: !ticket.isDeepFocus };
                 dispatch(updateTicket({ ticketId: ticket._id, ticket: newTicket }))
+                break
+            case "recurrance":
+                // let newModalTickets = JSON.parse(JSON.stringify(modalTickets));
+                // newModalTickets.push(ticket)
+                // dispatch(setModalTickets(newModalTickets));
+                if (ticket.isRecurring) {
+                    authAPI.delete('/recurrence/delete-recurrence', {data: { ticketId: ticket._id }})
+                        .then(res => window.alert(res.data))
+                        .catch(err => console.log(err))
+                } else {
+                    dispatch(setShowRecurrenceModal(!showReccurenceModal));
+                    dispatch(setModalTickets([{...ticket, y: window.scrollY}]));
+                }
                 break
             default:
                 break

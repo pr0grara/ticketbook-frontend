@@ -209,6 +209,7 @@
     text-align: center;
     align-items: center;
     border: 1px solid grey;
+    z-index: 1200;
     &:hover {
         background: #dcdcdc;
         cursor: pointer;
@@ -239,6 +240,118 @@
 .feedback-active {
     border: 2px solid #3695de;
     color: #3695de;
+}
+
+.ai-input {
+    position: relative;
+    overflow: visible;
+}
+
+.canvas-popup {
+    position: absolute;
+    // top: -200%;
+    bottom: 100%;
+    left: 50%;
+    // transform: translateX(-50%);
+    width: 90%;
+    height: fit-content;
+    max-width: 400px;
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 24px #696969;
+    z-index: 1100;
+    animation: popupFadeIn 0.2s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-popup-header {
+    font-size: 1.5rem;
+    margin-bottom: .75rem;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.canvas-goal-selectors-container {
+    display: flex;
+    flex-flow: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.canvas-goal-selector {
+    background-color: #f7f7f7;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    user-select: none;
+    width: fit-content;
+}
+
+.canvas-goal-selector:hover {
+    background-color: #e9ecef;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+}
+
+.canvas-goal-selector:active {
+    background-color: #dee2e6;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.12) inset;
+}
+
+// .canvas-connector-svg {
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     pointer-events: none;
+//     /* don't block clicks */
+//     overflow: visible;
+//     /* allow full path rendering */
+//     z-index: 1000;
+// }
+
+.canvas-input {
+    // width: 100%;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+.canvas-connector-svg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1000;
+    // border: 1px dashed red;/* temporary */
+}
+
+.canvas-connector-path {
+    fill: none;
+    stroke: #a9a9a9;
+    // fill: rgba(255, 0, 0, 0.2); /* see if this is taking effect */
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* 🔄 Spinning animation */
@@ -333,4 +446,18 @@
         }
     }
 
+    .canvas-popup {
+        width: 90%;
+        // max-height: 20vh;
+        padding: unset;
+        left: 5%;
+        bottom: 175px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .canvas-goal-selector {
+        font-size: 1rem;
+        padding: 5px;
+    }
 }
