@@ -82,7 +82,7 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
     if (!shouldRender || !ticket) return null;
 
     const actions = [
-        { action: "mark-done", label: 'Mark As Done', icon: CheckCircle },
+        { action: "mark-done", label: ticket.status === "pending" ? 'Mark As Done' : 'Mark Incomplete', icon: CheckCircle },
         { action: "delete", label: 'Delete', icon: Trash2 },
         { action: "get-help", label: 'Get Help', icon: LifeBuoy },
         { action: "do-today", label: `${ticket.doToday ? "Unmark" : "Mark"} for Today`, icon: Calendar },
@@ -96,7 +96,7 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
         let newTicket;
         switch (id) {
             case "mark-done":
-                dispatch(updateTicket({ ticketId: ticket._id, ticket: { ...ticket, status: "done" } }))
+                dispatch(updateTicket({ ticketId: ticket._id, ticket: { ...ticket, status: ticket.status === "pending" ? "done" : "pending"} }))
                 break
             case "delete":
                 deleteItem({ type: "ticket", id: ticket._id })

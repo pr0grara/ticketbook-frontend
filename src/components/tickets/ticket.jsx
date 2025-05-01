@@ -316,7 +316,7 @@ export default function Ticket({ ticket, isMobile }) {
             if (selectedAction === "delete") {
                 deleteItem({ type: "ticket", id: ticket._id });
             } else if (selectedAction === "mark-done") {
-                markDone();
+                markDone(ticket.status === "done");
             } else if (selectedAction === "get-help") {
                 handleHelp(ticket);
                 dispatch(setIsLoading(true))
