@@ -4,7 +4,7 @@ import LoginPage from "./LoginPage/LoginPage.jsx";
 import Navbar from "./Navbar.jsx";
 import Tickets from "./tickets/Ticket.jsx";
 import Goals from "./goals/Goals.jsx";
-import Baseline from "./Baseline.jsx";
+import Routine from "./Routine.jsx";
 import Health from "./Health.jsx";
 import DailyPlan from "./ai/DailyPlan";
 import CalendarView from "./Calendar.jsx";
@@ -73,8 +73,8 @@ export default function App({ page }) {
             {/* Protected Routes */}
             {page === "goals" && <ProtectedRoute component={<Goals />} />}
             {page === "calendar" && <ProtectedRoute component={<CalendarView />} />}
-            {page === "health" && <ProtectedRoute component={<Health />} />}
-            {/* {page === "baseline" && <ProtectedRoute component={<Baseline />} />} */}
+            {/* {page === "health" && <ProtectedRoute component={<Health />} />} */}
+            {page === "routine" && <ProtectedRoute component={<Routine />} />}
         </>
     );
 }

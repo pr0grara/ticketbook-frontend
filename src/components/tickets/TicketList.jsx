@@ -21,7 +21,7 @@ import DragPreview from "../DragPreview.jsx";
 import TicketContextMenu from "./TicketContextMenu.jsx";
 import RecurrenceModal from "../Modal/RecurrenceModal";
 
-function TicketList({TICKETS}) {
+function TicketList({TICKETS, data}) {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
@@ -239,8 +239,8 @@ function TicketList({TICKETS}) {
                 ticket={contextMenu.ticket}
                 onClose={closeContextMenu}
             />
-            <div className="ticket-list-title">Tickets</div>
-            <div className="subtitle">All open and closed tickets</div>
+            <div className="ticket-list-title">{data ? data.title : "Tickets"}</div>
+            <div className="subtitle">{data ? data.subtitle : "All open and closed tickets"}</div>
             <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(filters).filter((key) => filters[key])).length === 0) && `Type something like "Follow up with Robert" to create your first ticket`}</div>
             <div className="open-tickets-container">
                 <DragPreview />

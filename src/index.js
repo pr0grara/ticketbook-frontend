@@ -28,7 +28,7 @@ const router = createBrowserRouter([
   { path: "/goals", element: <App page="goals" /> },
   { path: "/plan", element: <App page="plan" /> },
   { path: "/calendar", element: <App page="calendar" /> },
-  { path: "/baseline", element: <App page="baseline" /> },
+  { path: "/routine", element: <App page="routine" /> },
   { path: "/health", element: <App page="health" /> }
 ], {
   future: {

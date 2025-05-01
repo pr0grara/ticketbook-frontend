@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import authAPI, { checkStatus } from "./api/authAPI";
+import authAPI from "./api/authAPI";
 import { setLoggedOut, setTheme, setWatchedTutorial } from "../redux/slices/sessionSlice";
-import { clearUser } from "../redux/slices/userSlice";
+import { clearUser, setUser } from "../redux/slices/userSlice";
 import { darkMode } from "../util/theme_util";
 import nightmode from '../icons/night-mode.png'
 import daymode from '../icons/day-mode.png'
@@ -35,11 +35,15 @@ const Navbar = () => {
     return (
         <nav className={`navbar${darkMode(theme) ? " dark-mode" : ""}`}>
             <div className="nav-left">
-                <Link to="/goals" className="nav-link">Goals</Link>
-                {/* <Link to="/plan" className="nav-link">Daily Plan</Link> */}
-                <Link to="/calendar" className="nav-link">Calendar</Link>
-                <Link to="/health" className="nav-link">Health</Link>
-                {/* <Link to="/baseline" className="nav-link">{`Baseline ${firstname}`}</Link> */}
+                {loggedIn && 
+                    <>
+                    <Link to="/goals" className="nav-link">Goals</Link>
+                    {/* <Link to="/plan" className="nav-link">Daily Plan</Link> */}
+                    {/* <Link to="/calendar" className="nav-link">Calendar</Link> */}
+                    {/* <Link to="/health" className="nav-link">Health</Link> */}
+                    <Link to="/routine" className="nav-link">{`${firstname ? firstname + "'s " : ""}Routine`}</Link>
+                    </>
+                }
             </div>
             <div className="nav-right">
                 {/* {(!isMobile && watchedTutorial) && 

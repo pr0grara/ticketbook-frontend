@@ -1,0 +1,54 @@
+.routine-container {
+    display: flex;
+    .ticket-space-container {
+        width: 70vw;
+    }
+}
+
+.routine-ticketspace-container {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.routine-banner-container {
+    width: 90%;
+}
+
+.routine-header {
+    font-size: 1.3rem;
+}
+
+.routine-sub-header{
+    font-size: 1.2rem;
+    margin-top: .5rem;
+    font-style: italic;
+}
+
+.routine-body{
+    font-size: 1rem;
+    margin-top: 1rem;
+    font-weight: 600;
+    span {
+        color: lightskyblue;
+        text-decoration: underline;
+        &:hover{
+            cursor: pointer;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .routine-container{
+        flex-direction: column-reverse;
+        .ticket-space-container {
+            width: 100vw;
+        }
+    }
+
+    .routine-banner-container {
+        margin: 3rem 0rem;
+    }
+}

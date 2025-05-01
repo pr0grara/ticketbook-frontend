@@ -57,7 +57,7 @@ function Goals() {
         if (selectedGoal) {
             const goalTickets = tickets.filter(ticket => ticket.goalId === selectedGoal._id);
             if (goalTickets.length === 0) {
-                console.log("No tickets found for selected Goal, fetching from server...")
+                // console.log("No tickets found for selected Goal, fetching from server...")
                 // dispatch(fetchTickets({ type: "BY GOAL", id: selectedGoal._id }))
             };
             dispatch(setSelectedTickets({ goal: selectedGoal, tickets: goalTickets }));
