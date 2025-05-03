@@ -3,7 +3,7 @@
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
-    width: 80vw;
+    width: 80%;
     align-self: center;
     justify-content: center;
     align-items: center;
@@ -15,9 +15,9 @@
 
 .daily-progress-bar {
     width: 30%;
-    background: #f702023e;
+    background: #bd5353;
     // border: solid 1px blue;
-    height: 1rem;
+    height: .5rem;
     position: relative;
     border-radius: 10px;
     margin-top: 10px;
@@ -26,7 +26,7 @@
 .daily-progress-amount {
     width: 0%;
     background:#2c803f;
-    height: 1rem;
+    height: .5rem;
     border-radius: 8px 0px 0px 8px;
 }
 

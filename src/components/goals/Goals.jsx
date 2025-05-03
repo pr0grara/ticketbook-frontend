@@ -32,20 +32,20 @@ function Goals() {
 
     const recurringTickets = tickets.filter(t => t.isRecurring);
 
-    useEffect(() => {        
-        checkStatus()
-            .then(res => {
-                const status = res.loggedIn;
-                const userId = res.user?.id;
-                if (status) {
-                    if (goals.length === 0) dispatch(fetchGoals(userId));
-                    if (tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: userId }));
-                }
-                if (!status) dispatch(setLoggedOut())
-            })
-        console.log("HIT")
+    // useEffect(() => {        
+    //     checkStatus()
+    //         .then(res => {
+    //             const status = res.loggedIn;
+    //             const userId = res.user?.id;
+    //             if (status) {
+    //                 if (goals.length === 0) dispatch(fetchGoals(userId));
+    //                 if (tickets.length === 0) dispatch(fetchTickets({ type: "BY USER", id: userId }));
+    //             }
+    //             if (!status) dispatch(setLoggedOut())
+    //         })
+    //     console.log("HIT")
 
-    }, [dispatch]);
+    // }, [dispatch]);
     
     useEffect(() => {   
         dispatch(setIsMobile(window.innerWidth <= 768))
