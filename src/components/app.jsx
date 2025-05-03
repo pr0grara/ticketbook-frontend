@@ -88,6 +88,21 @@ export default function App({ page }) {
         init();
     }, [dispatch]);
 
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible" && userId) {
+                console.log("🔁 App became visible. Refetching goals/tickets...");
+                dispatch(fetchGoals(userId));
+                dispatch(fetchTickets({ type: "BY USER", id: userId }));
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, [dispatch, userId]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {console.log(error)}</p>;
