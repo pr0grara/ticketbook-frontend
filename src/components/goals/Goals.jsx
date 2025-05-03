@@ -16,6 +16,7 @@ import { darkMode } from "../../util/theme_util.js";
 import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
 import { ArcadeEmbed } from "../ArcadeEmbed.jsx";
+import DailyProgress from "../DailyProgress.jsx";
 
 function Goals() {
     const dispatch = useDispatch();
@@ -28,6 +29,8 @@ function Goals() {
     const [, setIsDragging] = useState(false);
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
+
+    const recurringTickets = tickets.filter(t => t.isRecurring);
 
     useEffect(() => {        
         checkStatus()
@@ -142,6 +145,7 @@ function Goals() {
                             />
                         ))}
                 </div>
+                {recurringTickets.length > 0 && <DailyProgress />}
             {!isMobile && <TicketSpace />}
             </div>
             <div

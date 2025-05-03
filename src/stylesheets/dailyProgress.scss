@@ -1,0 +1,37 @@
+.daily-progress-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    // border: solid red 1px;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.daily-progress-bar {
+    width: 30%;
+    background: #f702023e;
+    // border: solid 1px blue;
+    height: 1rem;
+    position: relative;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.daily-progress-amount {
+    width: 0%;
+    background:#2c803f;
+    height: 1rem;
+    border-radius: 8px 0px 0px 8px;
+}
+
+@media (max-width: 768px) {
+    .daily-progress-bar {
+        width: 65%;
+    }
+}
