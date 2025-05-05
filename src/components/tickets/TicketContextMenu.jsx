@@ -10,7 +10,7 @@ import {
     RefreshCw
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateTicket } from '../../redux/slices/ticketsSlice';
+import { fetchTickets, updateTicket } from '../../redux/slices/ticketsSlice';
 import useAPI from '../hooks/useAPI';
 import { setIsLoading, setShowRecurrenceModal, setModalTickets } from '../../redux/slices/sessionSlice';
 import authAPI from '../api/authAPI';
@@ -25,6 +25,7 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
     const [animatingOut, setAnimatingOut] = useState(false);
 
     const { modalTickets, showReccurenceModal } = useSelector(state => state.session);
+    const { userId } = useSelector(state => state.user);
 
     useEffect(() => {
         if (visible) {
@@ -127,7 +128,10 @@ const TicketContextMenu = forwardRef(({ visible, x, y, ticket, onClose }, extern
                 // dispatch(setModalTickets(newModalTickets));
                 if (ticket.isRecurring) {
                     authAPI.delete('/recurrence/delete-recurrence', {data: { ticketId: ticket._id }})
-                        .then(res => window.alert(res.data))
+                        .then(res => {
+                            window.alert(res.data)
+                            dispatch(fetchTickets({ type: "BY USER", id: userId }));
+                        })
                         .catch(err => console.log(err))
                 } else {
                     dispatch(setShowRecurrenceModal(!showReccurenceModal));

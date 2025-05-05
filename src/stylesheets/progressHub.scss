@@ -1,0 +1,31 @@
+.progress-hub-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-hub-header {
+    font-size: large;
+    font-weight: 500;
+    margin-top: 1rem;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.progress-hub-rings {
+    display: flex;
+    align-items: center;
+    margin-top: 1.5rem;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.progress-ring-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 2rem;
+}

@@ -5,8 +5,11 @@ import { useNavigate } from "react-router-dom";
 export default function DailyProgress() {
     const { tickets } = useSelector(state => state.tickets);
     const recurringTickets = tickets.filter(t => t.isRecurring)
-    const recurringCount = recurringTickets.length;
-    const completedCount = recurringTickets.filter(t => t.status === "done").length;
+    const daily = recurringTickets.filter(t => t.isRecurring === "daily");
+    const weekly = recurringTickets.filter(t => t.isRecurring === "weekly");
+    const monthly = recurringTickets.filter(t => t.isRecurring === "monthly");
+    const recurringCount = daily.length;
+    const completedCount = daily.filter(t => t.status === "done").length;
 
     const navigate = useNavigate();
 

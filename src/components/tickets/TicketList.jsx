@@ -21,7 +21,7 @@ import DragPreview from "../DragPreview.jsx";
 import TicketContextMenu from "./TicketContextMenu.jsx";
 import RecurrenceModal from "../Modal/RecurrenceModal";
 
-function TicketList({TICKETS, data}) {
+function TicketList({TICKETS, data, forPage}) {
     const dispatch = useDispatch();
     const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
@@ -227,6 +227,73 @@ function TicketList({TICKETS, data}) {
         });
     };
 
+    const filterSelector = (classname) => {
+        return (
+            <div className={`${classname}-tickets-selector`} onClick={(e) => {
+                if (!e.target.classList.contains('open-tickets-selector')) return;
+                dispatch(setShowTickets({ ...showTickets, openTickets: !showTickets.openTickets }))
+            }}>
+                <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})` }} />
+                Open Tickets
+                <div className={`focus-selector ${filters.today ? "focus-enabled" : "focus-disabled"}`}
+                    title="Show tickets marked for 'today'"
+                    onClick={() => {
+                        setFilters(prev => ({
+                            ...prev,
+                            today: !prev.today
+                        }))
+                    }}><Calendar size={16} /></div>
+                <div className={`focus-selector ${filters.soon ? "focus-enabled" : "focus-disabled"}`}
+                    title="Show tickets marked for 'soon'"
+                    onClick={() => {
+                        setFilters(prev => ({
+                            ...prev,
+                            soon: !prev.soon
+                        }))
+                    }}><Target size={16} /></div>
+                <div className={`focus-selector ${filters.quickWin ? "focus-enabled" : "focus-disabled"}`}
+                    title="Show only quick wins"
+                    onClick={() => {
+                        setFilters(prev => ({
+                            ...prev,
+                            quickWin: !prev.quickWin
+                        }))
+                    }}><Zap size={16} /></div>
+                <div className={`focus-selector ${filters.deepFocus ? "focus-enabled" : "focus-disabled"}`}
+                    title="Show tickets marked for 'deep focus'"
+                    onClick={() => {
+                        setFilters(prev => ({
+                            ...prev,
+                            deepFocus: !prev.deepFocus
+                        }))
+                    }}><Brain size={16} /></div>
+            </div>
+        )
+    }
+
+    const returnTicketCard = (ticket, index, classname) => (
+         <TicketCard
+            ticket={ticket}
+            dispatch={dispatch}
+            setIsDragging={setIsDragging}
+            setShowTrashcan={setShowTrashcan}
+            setTrashcanPosition={setTrashcanPosition}
+            userActivated={() => isUserActivated(ticket)}
+            key={ticket._id}
+            scrollOffset={scrollOffset}
+            moveTicket={moveTicket}
+            index={index}
+            ticketList={`${classname}Tickets`}
+            isMobile={isMobile}
+            onContextMenu={handleContextMenu}
+            closeContextMenu={closeContextMenu}
+        />
+    );
+
+    const dailyTickets = TICKETS?.filter(t => t.isRecurring === "daily");
+    const weeklyTickets = TICKETS?.filter(t => t.isRecurring === "weekly");
+    const monthlyTickets = TICKETS?.filter(t => t.isRecurring === "monthly");
+
     const closeContextMenu = () => setContextMenu((prev) => ({ ...prev, visible: false }));
 
     return (
@@ -241,95 +308,85 @@ function TicketList({TICKETS, data}) {
             />
             <div className="ticket-list-title">{data ? data.title : "Tickets"}</div>
             <div className="subtitle">{data ? data.subtitle : "All open and closed tickets"}</div>
-            <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(filters).filter((key) => filters[key])).length === 0) && `Type something like "Follow up with Robert" to create your first ticket`}</div>
-            <div className="open-tickets-container">
+            <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(filters).filter((key) => filters[key])).length === 0) && forPage === "GOAL" && `Type something like "Follow up with Robert" to create your first ticket`}</div>
+            
+            {/* OPEN TICKETS */}
+            {forPage === "GOALS" && <div className="open-tickets-container">
                 <DragPreview />
-                <div className="open-tickets-selector" onClick={(e) => {
-                    if (!e.target.classList.contains('open-tickets-selector')) return;
-                    dispatch(setShowTickets({ ...showTickets, openTickets: !showTickets.openTickets }))
-                }}>
-                    <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})` }} />
-                    Open Tickets
-                    <div className={`focus-selector ${filters.today ? "focus-enabled" : "focus-disabled"}`} 
-                        title="Show tickets marked for 'today'"
-                        onClick={()=>{
-                            setFilters(prev => ({
-                                ...prev,
-                                today: !prev.today
-                            }))
-                    }}><Calendar size={16} /></div>
-                    <div className={`focus-selector ${filters.soon ? "focus-enabled" : "focus-disabled"}`} 
-                        title="Show tickets marked for 'soon'"
-                        onClick={()=>{
-                            setFilters(prev => ({
-                                ...prev,
-                                soon: !prev.soon
-                            }))
-                    }}><Target size={16} /></div>
-                    <div className={`focus-selector ${filters.quickWin ? "focus-enabled" : "focus-disabled"}`} 
-                        title="Show only quick wins"
-                        onClick={()=>{
-                        setFilters(prev => ({
-                            ...prev,
-                            quickWin: !prev.quickWin
-                        }))
-                    }}><Zap size={16} /></div>
-                    <div className={`focus-selector ${filters.deepFocus ? "focus-enabled" : "focus-disabled"}`}
-                        title="Show tickets marked for 'deep focus'"
-                        onClick={()=>{
-                        setFilters(prev => ({
-                            ...prev,
-                            deepFocus: !prev.deepFocus
-                        }))
-                    }}><Brain size={16} /></div>
-                </div>
+                {filterSelector("open")}
                 {showTickets.openTickets && openTickets.map((ticket, index) => {
-                    let userActivated = isUserActivated(ticket);
-                    if (userActivated && ticket._id === '67c66903e4006aade5389dea') {
-                        // debugger
-                    }
-                    return <TicketCard
-                        ticket={ticket}
-                        dispatch={dispatch}
-                        setIsDragging={setIsDragging}
-                        setShowTrashcan={setShowTrashcan}
-                        setTrashcanPosition={setTrashcanPosition}
-                        userActivated={() => isUserActivated(ticket)}
-                        key={ticket._id}
-                        scrollOffset={scrollOffset}
-                        moveTicket={moveTicket}
-                        index={index}
-                        ticketList="openTickets"
-                        isMobile={isMobile}
-                        onContextMenu={handleContextMenu}
-                        closeContextMenu={closeContextMenu}
-                    />
+                    return returnTicketCard(ticket, index, "open")
+                    // let userActivated = isUserActivated(ticket);
+                    // if (userActivated && ticket._id === '67c66903e4006aade5389dea') {
+                    //     // debugger
+                    // }
+                    // return <TicketCard
+                    //     ticket={ticket}
+                    //     dispatch={dispatch}
+                    //     setIsDragging={setIsDragging}
+                    //     setShowTrashcan={setShowTrashcan}
+                    //     setTrashcanPosition={setTrashcanPosition}
+                    //     userActivated={() => isUserActivated(ticket)}
+                    //     key={ticket._id}
+                    //     scrollOffset={scrollOffset}
+                    //     moveTicket={moveTicket}
+                    //     index={index}
+                    //     ticketList="openTickets"
+                    //     isMobile={isMobile}
+                    //     onContextMenu={handleContextMenu}
+                    //     closeContextMenu={closeContextMenu}
+                    // />
                 })}
-            </div>
-            <div className="closed-tickets-container">
+            </div>}
+
+            {/* DAILY TICKETS */}
+            {forPage === "ROUTINE" && <div className="tickets-container">
+                <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, dailyTickets: !showTickets.dailyTickets }))}>
+                    <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.dailyTickets ? "90deg" : "0deg"})` }} />
+                    Today
+                </div>
+
+                {showTickets.dailyTickets && dailyTickets.map((ticket, index) => (
+                    ticket.status !== "done" && returnTicketCard(ticket, index, "daily")
+                ))}
+            </div>}
+
+            {/* WEEKLY TICKETS */}
+            {forPage === "ROUTINE" && weeklyTickets.length > 0 && <div className="tickets-container">
+                <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, weeklyTickets: !showTickets.weeklyTickets }))}>
+                    <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.weeklyTickets ? "90deg" : "0deg"})` }} />
+                    This Week
+                </div>
+
+                {showTickets.weeklyTickets && weeklyTickets.map((ticket, index) => (
+                    ticket.status !== "done" && returnTicketCard(ticket, index, "weekly")
+                ))}
+            </div>}
+
+            {/* MONTHLY TICKETS */}
+            {forPage === "ROUTINE" && monthlyTickets.length > 0 && <div className="tickets-container">
+                <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, monthlyTickets: !showTickets.monthlyTickets }))}>
+                    <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.monthlyTickets ? "90deg" : "0deg"})` }} />
+                    <span>{new Date().toLocaleString('default', { month: 'long' })}</span>
+                </div>
+
+                {showTickets.monthlyTickets && monthlyTickets.map((ticket, index) => (
+                    ticket.status !== "done" && returnTicketCard(ticket, index, "monthly")
+                ))}
+            </div>}
+
+            {/* CLOSED TICKETS */}
+            {<div className="closed-tickets-container">
                 <div className="closed-tickets-selector" onClick={() => dispatch(setShowTickets({ ...showTickets, closedTickets: !showTickets.closedTickets }))}>
                     <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.closedTickets ? "90deg" : "0deg"})` }} />
                     Closed Tickets
                 </div>
+
                 {showTickets.closedTickets && closedTickets.map((ticket, index) => (
-                    <TicketCard
-                        ticket={ticket}
-                        dispatch={dispatch}
-                        setIsDragging={setIsDragging}
-                        setShowTrashcan={setShowTrashcan}
-                        setTrashcanPosition={setTrashcanPosition}
-                        userActivated={() => isUserActivated(ticket)}
-                        key={ticket._id}
-                        scrollOffset={scrollOffset}
-                        moveTicket={moveTicket}
-                        index={index}
-                        ticketList="closedTickets"
-                        isMobile={isMobile}
-                        onContextMenu={handleContextMenu}
-                        closeContextMenu={closeContextMenu}
-                    />
+                   returnTicketCard(ticket, index, "closed")
                 ))}
-            </div>
+            </div>}
+
             {!isMobile && <div className="ticket-list-spaceholder"></div>}
             <div
                 ref={drop}

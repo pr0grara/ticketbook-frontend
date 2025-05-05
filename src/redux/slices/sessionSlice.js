@@ -10,7 +10,10 @@ const sessionSlice = createSlice({
         isLoading: false,
         showTickets: {
             openTickets: true,
-            closedTickets: false
+            closedTickets: false,
+            dailyTickets: true,
+            weeklyTickets: true,
+            monthlyTickets: true
         },
         isMobile: false,
         allowFastLogin: true,

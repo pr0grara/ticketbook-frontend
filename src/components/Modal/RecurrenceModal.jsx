@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import Modal from './Modal'; // Import your modular modal
 import authAPI from '../api/authAPI';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchTickets } from '../../redux/slices/ticketsSlice';
 
 export default function RecurrenceModal({ isOpen, onClose, ticketId }) {
+    const dispatch = useDispatch();
+
     const [repeatInterval, setRepeatInterval] = useState('daily');
     const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0]); // Default today
     const [endDate, setEndDate] = useState('');
 
     const { modalTickets } = useSelector(state => state.session);
+    const { userId } = useSelector(state => state.user);
 
     // useEffect(() => {
     //     let modalOverlay = document.querySelector('.modal-overlay');
@@ -23,7 +27,10 @@ export default function RecurrenceModal({ isOpen, onClose, ticketId }) {
             startDate,
             endDate: endDate || null
         })
-            .then(res => window.alert((res.data)))
+            .then(res => {
+                window.alert((res.data))
+                dispatch(fetchTickets({ type: "BY USER", id: userId }));
+            })
             .catch(err => console.log(err))
         onClose();
     };

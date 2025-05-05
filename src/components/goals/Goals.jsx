@@ -16,7 +16,8 @@ import { darkMode } from "../../util/theme_util.js";
 import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
 import { ArcadeEmbed } from "../ArcadeEmbed.jsx";
-import DailyProgress from "../DailyProgress.jsx";
+// import DailyProgress from "../DailyProgress.jsx";
+import ProgressHub from "../Progress/ProgressHub.jsx";
 
 function Goals() {
     const dispatch = useDispatch();
@@ -122,7 +123,7 @@ function Goals() {
                     <TicketSpace />
                 </>
             )}
-            <TicketList />
+            <TicketList forPage="GOALS"/>
             <div className="goal-and-ticket-container">
             {/* 🔹 Goal Selection Bubbles */}
                 {/* <div className="goal-info-container">test</div> */}
@@ -145,7 +146,8 @@ function Goals() {
                             />
                         ))}
                 </div>
-                {recurringTickets.length > 0 && <DailyProgress />}
+                {/* {recurringTickets.length > 0 && <DailyProgress />} */}
+                <ProgressHub />
             {!isMobile && <TicketSpace />}
             </div>
             <div
