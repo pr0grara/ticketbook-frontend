@@ -19,7 +19,13 @@ const sessionSlice = createSlice({
         allowFastLogin: true,
         watchedTutorial: false,
         showRecurrenceModal: false,
-        modalTickets: []
+        modalTickets: [],
+        ticketFilters: {
+            today: false,
+            soon: false,
+            deepFocus: false,
+            quickWin: false
+        }
     },
     reducers: {
         setLoggedIn: (state, action) => { 
@@ -51,9 +57,12 @@ const sessionSlice = createSlice({
         },
         setModalTickets: (state, action) => {
             return { ...state, modalTickets: action.payload }
+        },
+        setTicketFilters: (state, action) => {
+            return { ...state, ticketFilters: action.payload }
         }
     },
 });
 
-export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial, setShowRecurrenceModal, setModalTickets } = sessionSlice.actions;
+export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial, setShowRecurrenceModal, setModalTickets, setTicketFilters } = sessionSlice.actions;
 export default sessionSlice.reducer;

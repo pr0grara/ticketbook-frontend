@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function ProgressRing({ type, tickets = [], onClick }) {
+export default function ProgressRing({ type, tickets = [], onClick, forRoutine }) {
     const navigate = useNavigate();
     const label = type.charAt(0).toUpperCase() + type.slice(1); // e.g., "Daily"
 
-    const filtered = tickets.filter(t => t.isRecurring === type);
+    const filtered = forRoutine ? tickets.filter(t => t.isRecurring === type) : tickets;
     const total = filtered.length;
     const completed = filtered.filter(t => t.status === "done").length;
     const percentage = total > 0 ? (completed / total) * 100 : 0;
@@ -50,7 +50,7 @@ export default function ProgressRing({ type, tickets = [], onClick }) {
             <div className="progress-ring-text">
                 {completed}/{total}
             </div>
-            <div className="progress-ring-label">{label}</div>
+            <div className="progress-ring-label">{label} Routine</div>
         </div>
     );
 }

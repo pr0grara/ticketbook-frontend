@@ -31,8 +31,6 @@ function Goals() {
     const [trashcanPosition, setTrashcanPosition] = useState({ x: 0, y: 0 });
     const [showTrashcan, setShowTrashcan] = useState(false);
 
-    const recurringTickets = tickets.filter(t => t.isRecurring);
-
     // useEffect(() => {        
     //     checkStatus()
     //         .then(res => {
@@ -147,7 +145,7 @@ function Goals() {
                         ))}
                 </div>
                 {/* {recurringTickets.length > 0 && <DailyProgress />} */}
-                <ProgressHub />
+                <ProgressHub TICKETS={selectedTickets.length > 0 ? selectedTickets : null}/>
             {!isMobile && <TicketSpace />}
             </div>
             <div

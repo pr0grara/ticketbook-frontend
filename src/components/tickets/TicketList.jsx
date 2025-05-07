@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'; 
 import useAPI from "../hooks/useAPI.js";
 import { setSelectedTickets,setUserActivatedTickets, updateTicketsOrder } from "../../redux/slices/ticketsSlice.js";
-import { setShowTickets, setShowRecurrenceModal } from "../../redux/slices/sessionSlice.js";
+import { setShowTickets, setShowRecurrenceModal, setTicketFilters } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
 import chevron from '../../icons/chevron.png';
 import chevronWhite from '../../icons/chevron-white.png';
@@ -23,10 +23,9 @@ import RecurrenceModal from "../Modal/RecurrenceModal";
 
 function TicketList({TICKETS, data, forPage}) {
     const dispatch = useDispatch();
-    const { goals } = useSelector((state) => state.goals);
     const { tickets, selectedTickets, userActivatedTickets } = useSelector((state) => state.tickets);
     const { userId } = useSelector(state => state.user);
-    const { theme, showTickets, isMobile, showRecurrenceModal } = useSelector(state => state.session);
+    const { theme, showTickets, isMobile, showRecurrenceModal, ticketFilters } = useSelector(state => state.session);
     const selectedGoal = useSelector(state => state.goals.selectedGoal);
 
     const [, setIsDragging] = useState(false);
@@ -37,8 +36,6 @@ function TicketList({TICKETS, data, forPage}) {
     const [openTickets, setOpenTickets] = useState([]);
     const [closedTickets, setClosedTickets] = useState([]);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, ticket: null });
-    const [focus, setFocus] = useState(false);
-    const [filters, setFilters] = useState({ today: false, soon: false, deepFocus: false, quickWin: false })
 
     const widthRef = useRef(null);
     const contextRef = useRef(null)
@@ -62,7 +59,7 @@ function TicketList({TICKETS, data, forPage}) {
     useEffect(() => {
         console.log("reanalyzing")
         let sortedOpenTickets, filteredOpenTickets, sortedClosedTickets, filteredClosedTickets
-        const activeFilters = Object.keys(filters).filter((key) => filters[key]);
+        const activeFilters = Object.keys(ticketFilters).filter((key) => ticketFilters[key]);
         
         //TICKETS represents specifically fed array of tickets from another component / overides all other states for ticket selection
         if (!!TICKETS) {
@@ -107,7 +104,7 @@ function TicketList({TICKETS, data, forPage}) {
             setOpenTickets(memoizedTickets.filter(ticket => ticket.status !== "done"));
             setClosedTickets(memoizedTickets.filter(ticket => ticket.status === "done"));
         }
-    }, [selectedTickets, memoizedTickets, selectedGoal, filters]);
+    }, [selectedTickets, memoizedTickets, selectedGoal, ticketFilters]);
 
     useEffect(() => {
         if (selectedGoal) {
@@ -235,38 +232,22 @@ function TicketList({TICKETS, data, forPage}) {
             }}>
                 <img src={darkMode(theme) ? chevronWhite : chevron} alt="" className="ticket-toggle" style={{ transform: `rotate(${showTickets.openTickets ? "90deg" : "0deg"})` }} />
                 Open Tickets
-                <div className={`focus-selector ${filters.today ? "focus-enabled" : "focus-disabled"}`}
+                <div className={`focus-selector today ${ticketFilters.today ? "focus-enabled" : "focus-disabled"}`}
                     title="Show tickets marked for 'today'"
-                    onClick={() => {
-                        setFilters(prev => ({
-                            ...prev,
-                            today: !prev.today
-                        }))
-                    }}><Calendar size={16} /></div>
-                <div className={`focus-selector ${filters.soon ? "focus-enabled" : "focus-disabled"}`}
+                    onClick={() => dispatch(setTicketFilters({...ticketFilters, today: !ticketFilters["today"]}))}
+                ><Calendar size={16} /></div>
+                <div className={`focus-selector soon ${ticketFilters.soon ? "focus-enabled" : "focus-disabled"}`}
                     title="Show tickets marked for 'soon'"
-                    onClick={() => {
-                        setFilters(prev => ({
-                            ...prev,
-                            soon: !prev.soon
-                        }))
-                    }}><Target size={16} /></div>
-                <div className={`focus-selector ${filters.quickWin ? "focus-enabled" : "focus-disabled"}`}
+                    onClick={() => dispatch(setTicketFilters({ ...ticketFilters, soon: !ticketFilters["soon"] }))}
+                ><Target size={16} /></div>
+                <div className={`focus-selector ${ticketFilters.quickWin ? "focus-enabled" : "focus-disabled"}`}
                     title="Show only quick wins"
-                    onClick={() => {
-                        setFilters(prev => ({
-                            ...prev,
-                            quickWin: !prev.quickWin
-                        }))
-                    }}><Zap size={16} /></div>
-                <div className={`focus-selector ${filters.deepFocus ? "focus-enabled" : "focus-disabled"}`}
+                    onClick={() => dispatch(setTicketFilters({ ...ticketFilters, quickWin: !ticketFilters["quickWin"] }))}
+                ><Zap size={16} /></div>
+                <div className={`focus-selector ${ticketFilters.deepFocus ? "focus-enabled" : "focus-disabled"}`}
                     title="Show tickets marked for 'deep focus'"
-                    onClick={() => {
-                        setFilters(prev => ({
-                            ...prev,
-                            deepFocus: !prev.deepFocus
-                        }))
-                    }}><Brain size={16} /></div>
+                    onClick={() => dispatch(setTicketFilters({ ...ticketFilters, deepFocus: !ticketFilters["deepFocus"] }))}
+                ><Brain size={16} /></div>
             </div>
         )
     }
@@ -308,7 +289,7 @@ function TicketList({TICKETS, data, forPage}) {
             />
             <div className="ticket-list-title">{data ? data.title : "Tickets"}</div>
             <div className="subtitle">{data ? data.subtitle : "All open and closed tickets"}</div>
-            <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(filters).filter((key) => filters[key])).length === 0) && forPage === "GOAL" && `Type something like "Follow up with Robert" to create your first ticket`}</div>
+            <div className="ticket-tutorial">{(openTickets.length === 0 && (Object.keys(ticketFilters).filter((key) => ticketFilters[key])).length === 0) && forPage === "GOAL" && `Type something like "Follow up with Robert" to create your first ticket`}</div>
             
             {/* OPEN TICKETS */}
             {forPage === "GOALS" && <div className="open-tickets-container">

@@ -16,7 +16,9 @@
 
 .progress-hub-rings {
     display: flex;
+    flex-flow: wrap;
     align-items: center;
+    justify-content: center;
     margin-top: 1.5rem;
     &:hover {
         cursor: pointer;
@@ -28,4 +30,31 @@
     flex-direction: column;
     align-items: center;
     margin-right: 2rem;
+    margin-top: 1rem;
+}
+
+.progress-ring-text {
+    margin-top: 5px;
+    font-size: 1.5rem;
+    // color: white;
+}
+
+.tickets-remaining-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    // width: 80px;
+    margin-right: 2rem;
+}
+
+.tickets-remaining-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    height: 60px;
+    width: 80px;
+    // border: solid 1px red;
 }

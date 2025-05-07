@@ -62,7 +62,7 @@ function Routine() {
                     <div className="routine-body">To add recurrence... go to the <span onClick={() => navigate('/goals')}>goals</span> page → {isMobile ? "long-press" : "right-click"} any ticket → select 'Recurrence Settings'.</div>
                         {firstname === "Ngoc" && <h5>Hi choop 😘 lub u</h5>}
                     </div>}   
-                    {recurringTickets.length > 0 && <ProgressHub />}
+                    {recurringTickets.length > 0 && <ProgressHub forPage="ROUTINE" />}
                     {!isMobile && <TicketSpace />}
                 </div>   
                 <AICanvas from={"ROUTINE"}/>
