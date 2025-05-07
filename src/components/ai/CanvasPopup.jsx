@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPopup } from '../../redux/slices/canvasSlice';
 import { X } from 'lucide-react';
 import { updateTicket } from '../../redux/slices/ticketsSlice';
+import { fromZonedTime } from 'date-fns-tz';
+
+const TIMEZONE = 'America/Los_Angeles';
 
 const CanvasPopup = ({type, goalObjs}) => {
     const dispatch = useDispatch();
@@ -60,6 +63,20 @@ const CanvasPopup = ({type, goalObjs}) => {
             path.setAttribute('d', d);
     }
 
+    const closeModalButton = () => (
+        <button
+            title="clear chat history"
+            className="clear-chat-top"
+            onClick={() => {
+                dispatch(setPopup(false))
+                if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'none'
+            }}
+            aria-label="Clear conversation"
+        >
+            <X size={14} />
+        </button>
+    )
+
     switch (type) {
         case "SPECIFY_GOAL_FOR_TICKET":
             let goals = goalObjs.goals.map(g => ({
@@ -71,17 +88,7 @@ const CanvasPopup = ({type, goalObjs}) => {
                     <div className="canvas-popup-header">Add to a specific goal?</div>
                     {/* <div className="canvas-connector-line" /> */}
                     <div className="canvas-goal-selectors-container">
-                        <button
-                            title="clear chat history"
-                            className="clear-chat-top"
-                            onClick={() => {
-                                dispatch(setPopup(false))
-                                if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'none'
-                            }}
-                            aria-label="Clear conversation"
-                        >
-                            <X size={14} />
-                        </button>
+                        {closeModalButton()}
                         {goals.map((goal, idx) => {
                             return (
                                 <div className="canvas-goal-selector" 
@@ -105,6 +112,7 @@ const CanvasPopup = ({type, goalObjs}) => {
         case "SET_SCHEDULING_FOR_TICKET":
             return (
                 <div className="canvas-popup">
+                    {closeModalButton()}
                     <div className="canvas-popup-header">Add scheduling to this ticket?</div>
                     <div className="canvas-scheduling-options">
                         <label>
@@ -116,7 +124,12 @@ const CanvasPopup = ({type, goalObjs}) => {
                             <input type="date" onChange={(e) => setDoTodayDate(e.target.value)} />
                         </label>
                         <button onClick={() => {
-                            dispatch(updateTicket({ ticketId: popupTicketId, ticket: { setSoon: doSoonDate, setToday: doTodayDate }}))
+                            let localSetSoon = new Date(`${doSoonDate}T12:00:00`);
+                            let localSetToday = new Date(`${doTodayDate}T12:00:00`);
+                            const utcSetSoon = fromZonedTime(localSetSoon, TIMEZONE);
+                            const utcSetToday = fromZonedTime(localSetToday, TIMEZONE);
+
+                            dispatch(updateTicket({ ticketId: popupTicketId, ticket: { setSoon: utcSetSoon, setToday: utcSetToday }}))
                             dispatch(setPopup(false));
                         }}>
                             Save
