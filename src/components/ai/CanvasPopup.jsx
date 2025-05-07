@@ -1,13 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { setSelectedGoal } from '../../redux/slices/goalsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPopup } from '../../redux/slices/canvasSlice';
 import { X } from 'lucide-react';
+import { updateTicket } from '../../redux/slices/ticketsSlice';
 
 const CanvasPopup = ({type, goalObjs}) => {
     const dispatch = useDispatch();
 
     const { isMobile } = useSelector(state => state.session);
+    const { popupTicketId } = useSelector(state => state.canvas);
+
+    const [doTodayDate, setDoTodayDate] = useState('');
+    const [doSoonDate, setDoSoonDate] = useState('');
+
 
     useEffect(() => {
         const handler = () => !isMobile && positionPopupAndConnector();
@@ -93,6 +99,28 @@ const CanvasPopup = ({type, goalObjs}) => {
                                 </div>
                             )
                         })}
+                    </div>
+                </div>
+            );
+        case "SET_SCHEDULING_FOR_TICKET":
+            return (
+                <div className="canvas-popup">
+                    <div className="canvas-popup-header">Add scheduling to this ticket?</div>
+                    <div className="canvas-scheduling-options">
+                        <label>
+                            Put on my radar:
+                            <input type="date" onChange={(e) => setDoSoonDate(e.target.value)} />
+                        </label>
+                        <label>
+                            Set to urgent on:
+                            <input type="date" onChange={(e) => setDoTodayDate(e.target.value)} />
+                        </label>
+                        <button onClick={() => {
+                            dispatch(updateTicket({ ticketId: popupTicketId, ticket: { setSoon: doSoonDate, setToday: doTodayDate }}))
+                            dispatch(setPopup(false));
+                        }}>
+                            Save
+                        </button>
                     </div>
                 </div>
             );

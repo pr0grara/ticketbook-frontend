@@ -7,7 +7,7 @@ import { setIsLoading } from "../../redux/slices/sessionSlice.js";
 import { darkMode } from "../../util/theme_util.js";
 import CanvasPopup from "./CanvasPopup.jsx";
 import authAPI from "../api/authAPI.js";
-import { setPopup } from "../../redux/slices/canvasSlice.js";
+import { setPopup, setPopupTicketId } from "../../redux/slices/canvasSlice.js";
 
 function AICanvas({ from, placeholderIdx }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -138,8 +138,12 @@ function AICanvas({ from, placeholderIdx }) {
                 aiHistory, 
                 userId,
                 shortcuts,
-             }
+            }
             const aiResponse = await handleAIRequest(request);
+            if (aiResponse?.status === "completed" && aiResponse.action_type === "create_ticket") {
+                dispatch(setPopupTicketId(aiResponse.newTicket?._id))
+                dispatch(setPopup("SET_SCHEDULING_FOR_TICKET"))
+            }
             const handledResponse = await handleAIResponse(aiResponse);
 
             dispatch(logInteraction({ userMessage: userInput, aiResponse: handledResponse }));
@@ -177,7 +181,7 @@ function AICanvas({ from, placeholderIdx }) {
 
             setUserInput("");
             if (!isMobile) document.querySelector('.canvas-connector-svg').style.display = 'none';
-            dispatch(setPopup(false));
+            // dispatch(setPopup(false));
         } catch (err) {
             console.error("AI error:", err);
             const errorMsg = "\u26A0\uFE0F AI service is currently unavailable.";
