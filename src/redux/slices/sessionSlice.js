@@ -25,7 +25,8 @@ const sessionSlice = createSlice({
             soon: false,
             deepFocus: false,
             quickWin: false
-        }
+        },
+        showSummary: false
     },
     reducers: {
         setLoggedIn: (state, action) => { 
@@ -60,9 +61,12 @@ const sessionSlice = createSlice({
         },
         setTicketFilters: (state, action) => {
             return { ...state, ticketFilters: action.payload }
+        },
+        setShowSummary: (state, action) => {
+            return { ...state, showSummary: action.payload }
         }
     },
 });
 
-export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial, setShowRecurrenceModal, setModalTickets, setTicketFilters } = sessionSlice.actions;
+export const { setLoggedIn, setLoggedOut, setTheme, setIsLoading, setShowTickets, setIsMobile, disableFastLogin, setWatchedTutorial, setShowRecurrenceModal, setModalTickets, setTicketFilters, setShowSummary } = sessionSlice.actions;
 export default sessionSlice.reducer;

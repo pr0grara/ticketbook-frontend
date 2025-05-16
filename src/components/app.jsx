@@ -18,6 +18,7 @@ import { setLoggedIn, setLoggedOut, setWatchedTutorial } from "../redux/slices/s
 import { ArcadeEmbed } from "./ArcadeEmbed.jsx";
 import { fetchTickets } from "../redux/slices/ticketsSlice.js";
 import { fetchGoals } from "../redux/slices/goalsSlice.js";
+import { fetchSummaries } from "../redux/slices/dailySummarySlice.js";
 
 export default function App({ page }) {
     const dispatch = useDispatch();
@@ -77,12 +78,13 @@ export default function App({ page }) {
             dispatch(setUser({ userId: id, firstname }));
             dispatch(setLoggedIn());
 
-            const tutorialRes = await authAPI.get(`/users/watched-tutorial/status/${id}`);
-            dispatch(setWatchedTutorial(tutorialRes.data.watchedTutorial));
+            // const tutorialRes = await authAPI.get(`/users/watched-tutorial/status/${id}`);
+            // dispatch(setWatchedTutorial(tutorialRes.data.watchedTutorial));
 
             // ✅ Now that we have userId, fetch goals and tickets
             dispatch(fetchGoals(id));
             dispatch(fetchTickets({ type: "BY USER", id }));
+            dispatch(fetchSummaries(id))
         };
 
         init();
