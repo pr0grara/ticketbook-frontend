@@ -1,14 +1,34 @@
 .toggle-show-summary {
-    font-size: 1.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: .9rem;
     font-weight: 500;
     margin-top: 10px;
-    color: #6161c8;
+    color: #3695de;
+    &:hover {
+        cursor: pointer;
+    }
+    svg {
+        height: .9rem
+    }
 }
 
 .summary-item {
-    margin-right: 2rem;
+    margin-top: .75rem;
+    width: 80%;
+}
+
+.daily-summary-ul {
+    padding-inline-start: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 @media (max-width: 768px) {
-
+    .summary-item {
+        width: 95%;
+        margin-top: .75rem;
+    }
 }

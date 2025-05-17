@@ -48,3 +48,14 @@
     margin-bottom: .5rem;
     font-size: 1.2rem;
 }
+
+.modal-title {
+    margin: unset;
+}
+
+.modal-sub-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {}

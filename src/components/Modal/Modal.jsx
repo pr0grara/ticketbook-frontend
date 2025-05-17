@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export default function Modal({ isOpen, onClose, title, children, position }) {
+export default function Modal({ isOpen, onClose, title, subTitle, children, position, closeButton }) {
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape') onClose();
@@ -31,10 +31,11 @@ export default function Modal({ isOpen, onClose, title, children, position }) {
         <div className="modal-overlay" onClick={onClose} style={modalStyle}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 {title && <h2 className="modal-title">{title}</h2>}
+                {subTitle && <h3 className="modal-sub-title">{subTitle}</h3>}
                 <div className="modal-body">
                     {children}
                 </div>
-                <button className="modal-close" onClick={onClose}>Cancel</button>
+                <button className="modal-close" onClick={onClose}>{closeButton || "Cancel"}</button>
             </div>
         </div>
     );
