@@ -21,17 +21,18 @@ import { fetchGoals } from "../redux/slices/goalsSlice.js";
 import { fetchSummaries } from "../redux/slices/dailySummarySlice.js";
 
 export default function App({ page }) {
+    // useAutoRefetchOnInactivity();
     const dispatch = useDispatch();
     const [, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate(); // Now it works since App is inside RouterProvider
-    const { userId } = useSelector(state => state)
+    const { userId } = useSelector(state => state.user)
     const { tickets } = useSelector(state => state.tickets)
     const { goals } = useSelector(state => state.goals)
  
-    console.count("🔄 App Component Rendered");
-    console.log(`⏳ Render Time: ${performance.now()}ms`);
+    // console.count("🔄 App Component Rendered");
+    // console.log(`⏳ Render Time: ${performance.now()}ms`);
 
     // useEffect(() => {
     //     console.time("checkStatus Execution Time");
@@ -80,8 +81,6 @@ export default function App({ page }) {
 
             // const tutorialRes = await authAPI.get(`/users/watched-tutorial/status/${id}`);
             // dispatch(setWatchedTutorial(tutorialRes.data.watchedTutorial));
-
-            // ✅ Now that we have userId, fetch goals and tickets
             dispatch(fetchGoals(id));
             dispatch(fetchTickets({ type: "BY USER", id }));
             dispatch(fetchSummaries(id))
@@ -90,21 +89,49 @@ export default function App({ page }) {
         init();
     }, [dispatch]);
 
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible" && userId) {
-                console.log("🔁 App became visible. Refetching goals/tickets...");
-                dispatch(fetchGoals(userId));
-                dispatch(fetchTickets({ type: "BY USER", id: userId }));
-            }
-        };
+    // useEffect(() => {
+    //     const lastActive = parseInt(localStorage.getItem("lastActiveTime"), 10);
+    //     const now = Date.now();
 
-        document.addEventListener("visibilitychange", handleVisibilityChange);
+    //     if (userId && now - lastActive > 15 * 1000) {
+    //         console.log("⏱ Triggering refetch from screen load");
+    //         dispatch(fetchGoals(userId));
+    //         dispatch(fetchTickets({ type: "BY USER", id: userId }));
+    //         dispatch(fetchSummaries(userId));
+    //     }
 
-        return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-        };
-    }, [dispatch, userId]);
+    //     // Always update last activity timestamp
+    //     localStorage.setItem("lastActiveTime", now);
+    // }, []); // Run on page/component mount
+
+    // useEffect(() => {
+    //     const refetch = () => {
+    //         if (userId) {
+    //             console.log("🔁 Refetch triggered by visibility/focus/resume");
+    //             dispatch(fetchGoals(userId));
+    //             dispatch(fetchTickets({ type: "BY USER", id: userId }));
+    //             dispatch(fetchSummaries(userId));
+    //         }
+    //     };
+
+    //     refetch()
+
+    //     // const handleVisibility = () => {
+    //     //     if (document.visibilityState === "visible") refetch();
+    //     // };
+
+    //     // document.addEventListener("visibilitychange", handleVisibility);
+    //     window.addEventListener("focus", refetch);
+    //     // document.addEventListener("resume", refetch);
+
+    //     return () => {
+    //         // document.removeEventListener("visibilitychange", handleVisibility);
+    //         window.removeEventListener("focus", refetch);
+    //         // document.removeEventListener("resume", refetch);
+    //     };
+    // }, []);
+
+
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {console.log(error)}</p>;
@@ -112,11 +139,11 @@ export default function App({ page }) {
     return (
         <>
             <Navbar />
-            {console.log("page =", page)} {/* 👈 RIGHT HERE */}
+            {/* {console.log("page =", page)}  */}
 
             {page === "" && <LoginPage />}
             {page === "login" && <LoginPage />}
-            {page === "tutorial" && ArcadeEmbed()}
+            {/* {page === "tutorial" && ArcadeEmbed()} */}
 
             {/* Protected Routes */}
             {page === "goals" && <ProtectedRoute component={<Goals />} />}

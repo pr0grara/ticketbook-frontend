@@ -18,6 +18,7 @@ import chevronWhite from '../../icons/chevron-white.png';
 import { ArcadeEmbed } from "../ArcadeEmbed.jsx";
 // import DailyProgress from "../DailyProgress.jsx";
 import ProgressHub from "../Progress/ProgressHub.jsx";
+import { fetchSummaries } from "../../redux/slices/dailySummarySlice.js";
 
 function Goals() {
     const dispatch = useDispatch();
@@ -45,6 +46,34 @@ function Goals() {
     //     console.log("HIT")
 
     // }, [dispatch]);
+
+    useEffect(() => {
+        const INTERVAL = 30 * 60 * 1000;
+
+        const handler = () => {
+            const last = parseInt(localStorage.getItem("lastActiveTime"), 10) || 0;
+            const now = Date.now();
+
+            if (userId && now - last > INTERVAL) {
+                // window.alert("🔁 User interaction triggered refetch (stale)");
+                dispatch(fetchGoals(userId));
+                dispatch(fetchTickets({ type: "BY USER", id: userId }));
+                dispatch(fetchSummaries(userId));
+            }
+
+            localStorage.setItem("lastActiveTime", now); // always update
+        };
+
+        window.addEventListener("touchstart", handler);
+        window.addEventListener("mousedown", handler);
+
+        return () => {
+            window.removeEventListener("touchstart", handler);
+            window.removeEventListener("mousedown", handler);
+        };
+    }, [userId]);
+
+
     
     useEffect(() => {   
         dispatch(setIsMobile(window.innerWidth <= 768))

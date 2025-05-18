@@ -24,10 +24,10 @@ const TicketSpace = () => {
     })); 
 
 
-    useEffect(() => {
-        console.log("🔄 TicketSpace Rerendered. Tickets:", userActivatedTickets);
-        // setTickets(userActivatedTickets.map(ticket => ({ ...ticket })))
-    }, [userActivatedTickets]);
+    // useEffect(() => {
+    //     console.log("🔄 TicketSpace Rerendered. Tickets:", userActivatedTickets);
+    //     // setTickets(userActivatedTickets.map(ticket => ({ ...ticket })))
+    // }, [userActivatedTickets]);
 
     return (
         <nav className="ticket-space-container">
